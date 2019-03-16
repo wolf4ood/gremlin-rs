@@ -12,10 +12,6 @@ jobs:
         rustup_toolchain: beta
       nightly:
         rustup_toolchain: nightly
-      minimum_supported_version_plus_one:
-        rustup_toolchain: 1.31.0
-      minimum_supported_version:
-        rustup_toolchain: 1.30.0
   steps:
   - ${{ if ne(parameters.name, 'Windows') }}:
     # Linux and macOS.
@@ -35,10 +31,14 @@ jobs:
   - script: |
         rustc -Vv
         cargo -V
-  - script: rustup component add clippy rustfmt
-    displayName: Install Rustfmt & Clippy
+  - script: rustup component add rustfmt
+    displayName: Install Rustfmt 
   - script: cargo fmt --all -- --check
-    displayName: Run Rustfmt      
+    displayName: Run Rustfmt 
+  - script: rustup component add clippy
+    displayName: Install Clippy
+    condition: ne( parameters['rustup_toolchain'], 'nightly' )
   - script: cargo clippy --all
-    displayName: Run clippy      
+    displayName: Run clippy
+    condition: ne( parameters['rustup_toolchain'], 'nightly' )      
   
