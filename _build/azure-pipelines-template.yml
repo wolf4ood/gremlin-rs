@@ -41,4 +41,5 @@ jobs:
   - script: cargo clippy --all
     displayName: Run clippy
     condition: ne( variables['RUSTUP_TOOLCHAIN'] , 'nightly' )      
+  - script: docker-compose -f docker-compose/docker-compose.yaml up -d  
   
