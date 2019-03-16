@@ -4,6 +4,12 @@
 
 
 
+
+[![Build Status](https://dev.azure.com/enricorisa/gremlin-rs/_apis/build/status/wolf4ood.gremlin-rs?branchName=master)](https://dev.azure.com/enricorisa/gremlin-rs/_build/latest?definitionId=1&branchName=master)
+
+
+
+
 ## gremlin-client
 
 A Rust client for Apache TinkerPop™.
