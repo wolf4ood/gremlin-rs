@@ -37,8 +37,8 @@ jobs:
     displayName: Run Rustfmt 
   - script: rustup component add clippy
     displayName: Install Clippy
-    condition: ne( $RUSTUP_TOOLCHAIN , 'nightly' )
+    condition: ne( variable['RUSTUP_TOOLCHAIN'], 'nightly' )
   - script: cargo clippy --all
     displayName: Run clippy
-    condition: ne( $RUSTUP_TOOLCHAIN , 'nightly' )      
+    condition: ne( variable['RUSTUP_TOOLCHAIN'] , 'nightly' )      
   
