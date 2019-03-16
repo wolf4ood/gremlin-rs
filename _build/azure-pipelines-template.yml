@@ -8,10 +8,13 @@ jobs:
     matrix:
       stable:
         rustup_toolchain: stable
+        gremlin_server: 3.4.0
       beta:
         rustup_toolchain: beta
+        gremlin_server: 3.4.0
       nightly:
         rustup_toolchain: nightly
+        gremlin_server: 3.4.0 
   steps:
   - ${{ if ne(parameters.name, 'Windows') }}:
     # Linux and macOS.
