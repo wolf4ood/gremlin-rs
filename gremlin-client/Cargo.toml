@@ -1,0 +1,24 @@
+[package]
+authors = ["Enrico Risa <enrico.risa@gmail.com>"]
+name = "gremlin-client"
+version = "0.1.0"
+edition = "2018"
+license = "Apache-2.0"
+
+[dependencies]
+serde = "1.0"
+serde_json = "1.0"
+serde_derive="1.0"
+r2d2 = "0.8.3"
+chrono = "0.4"
+
+
+
+[dependencies.websocket]
+version="0.22"
+default-features = false 
+features = ["sync","sync-ssl"]
+
+[dependencies.uuid]
+features = ["serde", "v4"]
+version = "0.5.1"

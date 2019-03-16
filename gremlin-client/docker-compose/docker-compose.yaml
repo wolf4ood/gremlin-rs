@@ -1,0 +1,12 @@
+version: "3"
+services:
+  gremlin-server:
+    image: tinkerpop/gremlin-server:${GREMLIN_SERVER}
+    # build:
+    #   context: "."
+    #   dockerfile: Dockerfile
+    #   args:
+    #     - GREMLIN_SERVER:${GREMLIN_SERVER}
+    command : ["conf/gremlin-server-modern.yaml"]  
+    ports:
+      - "8182:8182"
