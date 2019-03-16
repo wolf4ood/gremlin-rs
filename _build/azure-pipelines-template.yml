@@ -40,5 +40,5 @@ jobs:
     condition: ne( parameters['rustup_toolchain'], 'nightly' )
   - script: cargo clippy --all
     displayName: Run clippy
-    condition: ne( parameters['rustup_toolchain'], 'nightly' )      
+    condition: ne( ${{ parameters['rustup_toolchain'] }}, 'nightly' )      
   
