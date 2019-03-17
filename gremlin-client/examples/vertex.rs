@@ -9,7 +9,7 @@ fn main() -> Result<(), Box<std::error::Error>> {
         .map(|f| f.take::<Vertex>())
         .collect::<Result<Vec<Vertex>, _>>()?;
 
-    println!("{:?}", results);
+    println!("{:#?}", results);
 
     Ok(())
 }
