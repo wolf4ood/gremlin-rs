@@ -4,6 +4,7 @@ name = "gremlin-client"
 version = "0.1.0"
 edition = "2018"
 license = "Apache-2.0"
+description= "A Rust client for Apache TinkerPop™"
 repository = "https://github.com/wolf4ood/gremlin-rs"
 keywords = ["database", "graphs","tinkerpop"]
 categories = ["database"]
