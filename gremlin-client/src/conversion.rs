@@ -1,4 +1,6 @@
-use crate::{Edge, GValue, GremlinError, GremlinResult, List, Map, Vertex, VertexProperty, GID};
+use crate::{
+    Edge, GValue, GremlinError, GremlinResult, List, Map, Path, Vertex, VertexProperty, GID,
+};
 
 use std::collections::HashMap;
 
@@ -73,6 +75,7 @@ impl_from_galue!(Map, GValue::Map);
 impl_from_galue!(List, GValue::List);
 impl_from_galue!(Vertex, GValue::Vertex);
 impl_from_galue!(Edge, GValue::Edge);
+impl_from_galue!(Path, GValue::Path);
 impl_from_galue!(String, GValue::String);
 impl_from_galue!(f32, GValue::Float);
 impl_from_galue!(f64, GValue::Double);
