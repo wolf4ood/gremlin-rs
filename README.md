@@ -3,10 +3,8 @@
 
 
 
-
-
-[![Build Status](https://dev.azure.com/enricorisa/gremlin-rs/_apis/build/status/wolf4ood.gremlin-rs?branchName=master)](https://dev.azure.com/enricorisa/gremlin-rs/_build/latest?definitionId=1&branchName=master)
-
+[![Build Status](https://travis-ci.org/wolfwood/gremlin-rs.svg?branch=master)](https://travis-ci.org/wolf4ood/gremlin-rs)
+[![Codecov Status](https://codecov.io/gh/wolf4ood/gremlin-rs/branch/master/graph/badge.svg)](https://codecov.io/gh/wolf4ood/gremlin-rs)
 
 
 
