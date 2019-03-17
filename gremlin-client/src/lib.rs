@@ -36,7 +36,7 @@ pub use client::GremlinClient;
 pub use connection::ConnectionOptions;
 pub use error::GremlinError;
 
-pub use conversion::{FromGValue, ToGValue};
+pub use conversion::ToGValue;
 
 pub type GremlinResult<T> = Result<T, error::GremlinError>;
 

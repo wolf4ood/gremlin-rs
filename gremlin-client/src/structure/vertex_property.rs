@@ -1,7 +1,7 @@
 use crate::structure::{GValue, GID};
 use crate::GremlinResult;
 
-use crate::conversion::FromGValue;
+use crate::conversion::{BorrowFromGValue, FromGValue};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct VertexProperty {
@@ -39,6 +39,12 @@ impl VertexProperty {
         T::from_gvalue(*self.value)
     }
 
+    pub fn borrow<'a, T>(&'a self) -> GremlinResult<&'a T>
+    where
+        T: BorrowFromGValue,
+    {
+        T::from_gvalue(&self.value)
+    }
     pub fn label(&self) -> &String {
         &self.label
     }

@@ -1,4 +1,6 @@
+use crate::conversion::{BorrowFromGValue, FromGValue};
 use crate::GValue;
+use crate::GremlinResult;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Property {
@@ -16,5 +18,26 @@ impl Property {
             label: label.into(),
             value: Box::new(value.into()),
         }
+    }
+
+    pub fn value(&self) -> &GValue {
+        &self.value
+    }
+
+    pub fn take<T>(self) -> GremlinResult<T>
+    where
+        T: FromGValue,
+    {
+        T::from_gvalue(*self.value)
+    }
+
+    pub fn borrow<'a, T>(&'a self) -> GremlinResult<&'a T>
+    where
+        T: BorrowFromGValue,
+    {
+        T::from_gvalue(&self.value)
+    }
+    pub fn label(&self) -> &String {
+        &self.label
     }
 }

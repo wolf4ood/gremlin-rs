@@ -1,5 +1,5 @@
+use crate::conversion::{BorrowFromGValue, FromGValue};
 use crate::structure::{Edge, Path, Property, Vertex, VertexProperty};
-use crate::FromGValue;
 use crate::GremlinResult;
 use chrono;
 use std::collections::{HashMap, VecDeque};
@@ -33,6 +33,13 @@ impl GValue {
     pub fn take<T>(self) -> GremlinResult<T>
     where
         T: FromGValue,
+    {
+        T::from_gvalue(self)
+    }
+
+    pub fn borrow<'a, T>(&'a self) -> GremlinResult<&'a T>
+    where
+        T: BorrowFromGValue,
     {
         T::from_gvalue(self)
     }
