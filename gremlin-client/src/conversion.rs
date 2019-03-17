@@ -1,5 +1,6 @@
 use crate::{
-    Edge, GValue, GremlinError, GremlinResult, List, Map, Path, Vertex, VertexProperty, GID,
+    Edge, GValue, GremlinError, GremlinResult, List, Map, Path, Property, Vertex, VertexProperty,
+    GID,
 };
 
 use std::collections::HashMap;
@@ -71,6 +72,7 @@ macro_rules! impl_from_galue {
 }
 
 impl_from_galue!(VertexProperty, GValue::VertexProperty);
+impl_from_galue!(Property, GValue::Property);
 impl_from_galue!(Map, GValue::Map);
 impl_from_galue!(List, GValue::List);
 impl_from_galue!(Vertex, GValue::Vertex);
