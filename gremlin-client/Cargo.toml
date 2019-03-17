@@ -4,6 +4,11 @@ name = "gremlin-client"
 version = "0.1.0"
 edition = "2018"
 license = "Apache-2.0"
+repository = "https://github.com/wolf4ood/gremlin-rs"
+keywords = ["database", "graphs","tinkerpop"]
+categories = ["database"]
+readme = "README.md"
+
 
 [dependencies]
 serde = "1.0"
