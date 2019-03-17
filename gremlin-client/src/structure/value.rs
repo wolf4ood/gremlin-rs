@@ -37,7 +37,7 @@ impl GValue {
         T::from_gvalue(self)
     }
 
-    pub fn borrow<'a, T>(&'a self) -> GremlinResult<&'a T>
+    pub fn get<'a, T>(&'a self) -> GremlinResult<&'a T>
     where
         T: BorrowFromGValue,
     {
