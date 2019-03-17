@@ -1,0 +1,26 @@
+language: rust
+sudo: required
+services:
+  - docker
+
+
+rust:
+  - stable
+  - nightly
+
+
+env:
+  - GREMLIN_SERVER=3.4.0
+
+before_install:
+  - rustup component add rustfmt
+  - cargo fmt --all -- --check
+
+script:
+  - cargo test --all
+
+before_script:
+  - docker-compose -f docker-compose/docker-compose.yaml up -d 
+
+after_script:
+  - docker-compose -f docker-compose/docker-compose.yml down --remove-orphans
