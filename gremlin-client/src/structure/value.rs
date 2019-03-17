@@ -9,7 +9,6 @@ pub type List = Vec<GValue>;
 pub type Set = Vec<GValue>;
 pub type Date = chrono::DateTime<chrono::offset::Utc>;
 
-
 /// Represent possible values coming from the [Gremlin Server](http://tinkerpop.apache.org/docs/3.4.0/dev/io/)
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, PartialEq, Clone)]
