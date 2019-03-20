@@ -12,6 +12,7 @@ use std::collections::{HashMap, VecDeque};
 pub struct GremlinClient {
     pool: Pool<GremlinConnectionManager>,
     io: GraphSON,
+    alias: Option<String>,
 }
 
 impl GremlinClient {
@@ -28,7 +29,18 @@ impl GremlinClient {
         Ok(GremlinClient {
             pool,
             io: GraphSON::V3,
+            alias: None,
         })
+    }
+
+    /// Return a cloned client with the provided alias
+    pub fn alias<T>(&self, alias: T) -> GremlinClient
+    where
+        T: Into<String>,
+    {
+        let mut cloned = self.clone();
+        cloned.alias = Some(alias.into());
+        cloned
     }
 
     pub fn execute<T>(
@@ -51,6 +63,7 @@ impl GremlinClient {
             p.as_object()
                 .ok_or_else(|| GremlinError::Json(String::from("it should be an object")))?
                 .clone(),
+            self.alias.clone(),
         );
 
         self.send_message(message)

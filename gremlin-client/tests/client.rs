@@ -49,6 +49,22 @@ fn test_wrong_query() {
 }
 
 #[test]
+fn test_wrong_alias() {
+    let error = graph()
+        .alias("foo")
+        .execute("g.V()", &[])
+        .expect_err("it should return an error");
+
+    match error {
+        GremlinError::Request((code, message)) => {
+            assert_eq!(499, code);
+            assert_eq!("Could not alias [g] to [foo] as [foo] not in the Graph or TraversalSource global bindings",message)
+        }
+        _ => panic!("wrong error type"),
+    }
+}
+
+#[test]
 
 fn test_vertex_query() {
     let graph = graph();
