@@ -28,7 +28,7 @@ impl ToGValue for GID {
     }
 }
 
-macro_rules! impl_to_galue {
+macro_rules! impl_to_gvalue {
     ($t:ty, $v:path) => {
         impl ToGValue for $t {
             fn to_gvalue(&self) -> GValue {
@@ -38,10 +38,10 @@ macro_rules! impl_to_galue {
     };
 }
 
-impl_to_galue!(f32, GValue::Float);
-impl_to_galue!(f64, GValue::Double);
-impl_to_galue!(i32, GValue::Int32);
-impl_to_galue!(i64, GValue::Int64);
+impl_to_gvalue!(f32, GValue::Float);
+impl_to_gvalue!(f64, GValue::Double);
+impl_to_gvalue!(i32, GValue::Int32);
+impl_to_gvalue!(i64, GValue::Int64);
 
 impl ToGValue for &str {
     fn to_gvalue(&self) -> GValue {
