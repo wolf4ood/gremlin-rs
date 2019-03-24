@@ -41,7 +41,8 @@ pub use conversion::ToGValue;
 pub type GremlinResult<T> = Result<T, error::GremlinError>;
 
 pub use structure::{
-    Edge, GResultSet, GValue, List, Map, Path, Property, Vertex, VertexProperty, GID,
+    Edge, GResultSet, GValue, List, Map, Metric, Path, Property, TraversalMetrics, Vertex,
+    VertexProperty, GID,
 };
 
 mod client;

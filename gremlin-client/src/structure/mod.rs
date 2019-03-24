@@ -1,5 +1,6 @@
 mod edge;
 mod macros;
+mod metrics;
 mod path;
 mod property;
 mod result;
@@ -8,6 +9,7 @@ mod vertex;
 mod vertex_property;
 
 pub use self::edge::Edge;
+pub use self::metrics::{Metric, TraversalMetrics};
 pub use self::path::Path;
 pub use self::property::Property;
 pub use self::result::GResultSet;

@@ -1,7 +1,9 @@
 extern crate gremlin_client;
 
 use gremlin_client::{Edge, GValue, Map, Vertex};
-use gremlin_client::{GremlinClient, GremlinError, GremlinResult, ToGValue, VertexProperty};
+use gremlin_client::{
+    GremlinClient, GremlinError, GremlinResult, ToGValue, TraversalMetrics, VertexProperty,
+};
 
 fn connect() -> GremlinResult<GremlinClient> {
     GremlinClient::connect(("localhost", 8182))
@@ -247,4 +249,35 @@ fn test_edge_creation() {
 
     assert_eq!(&mark, edge.out_v());
     assert_eq!(&frank, edge.in_v());
+}
+
+#[test]
+fn test_profile() {
+    let graph = graph();
+
+    let metrics = graph
+        .execute("g.V().limit(1).profile()", &[])
+        .expect("should return a profile")
+        .filter_map(Result::ok)
+        .map(|f| f.take::<TraversalMetrics>())
+        .collect::<Result<Vec<_>, _>>()
+        .expect("It should be ok");
+
+    assert_eq!(1, metrics.len());
+
+    let t = &metrics[0];
+
+    assert_eq!(true, t.duration() > &0.0);
+
+    let steps = t.metrics();
+
+    assert_ne!(0, steps.len());
+
+    assert_eq!(
+        100.0,
+        steps
+            .iter()
+            .map(|s| s.perc_duration())
+            .fold(0.0, |acc, x| acc + x)
+    );
 }

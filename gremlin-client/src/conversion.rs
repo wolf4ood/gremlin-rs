@@ -1,6 +1,6 @@
 use crate::{
-    Edge, GValue, GremlinError, GremlinResult, List, Map, Path, Property, Vertex, VertexProperty,
-    GID,
+    Edge, GValue, GremlinError, GremlinResult, List, Map, Metric, Path, Property, TraversalMetrics,
+    Vertex, VertexProperty, GID,
 };
 
 use std::collections::HashMap;
@@ -84,6 +84,8 @@ impl_from_gvalue!(f64, GValue::Double);
 impl_from_gvalue!(i32, GValue::Int32);
 impl_from_gvalue!(i64, GValue::Int64);
 impl_from_gvalue!(uuid::Uuid, GValue::Uuid);
+impl_from_gvalue!(Metric, GValue::Metric);
+impl_from_gvalue!(TraversalMetrics, GValue::TraversalMetrics);
 impl_from_gvalue!(chrono::DateTime<chrono::Utc>, GValue::Date);
 
 #[doc(hidden)]

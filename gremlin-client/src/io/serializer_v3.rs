@@ -1,4 +1,6 @@
-use crate::structure::{Edge, GValue, List, Path, Property, Vertex, VertexProperty, GID};
+use crate::structure::{
+    Edge, GValue, List, Map, Metric, Path, Property, TraversalMetrics, Vertex, VertexProperty, GID,
+};
 use crate::GremlinError;
 use crate::GremlinResult;
 use chrono::offset::TimeZone;
@@ -161,6 +163,85 @@ where
 
     Ok(Path::new(labels, objects).into())
 }
+
+pub fn deserialize_metrics<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
+where
+    T: Fn(&Value) -> GremlinResult<GValue>,
+{
+    let mut metrics = reader(&val)?.take::<Map>()?;
+
+    let duration = metrics
+        .remove("dur")
+        .ok_or_else(|| {
+            GremlinError::Json(String::from("Field dur not found in g:TraversalMetrics"))
+        })?
+        .take::<f64>()?;
+
+    let m = metrics
+        .remove("metrics")
+        .ok_or_else(|| {
+            GremlinError::Json(String::from(
+                "Field metrics not found in g:TraversalMetrics",
+            ))
+        })?
+        .take::<List>()?
+        .drain(0..)
+        .map(|e| e.take::<Metric>())
+        .filter_map(Result::ok)
+        .collect();
+
+    Ok(TraversalMetrics::new(duration, m).into())
+}
+
+pub fn deserialize_metric<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
+where
+    T: Fn(&Value) -> GremlinResult<GValue>,
+{
+    let mut metric = reader(&val)?.take::<Map>()?;
+
+    let duration = metric
+        .remove("dur")
+        .ok_or_else(|| GremlinError::Json(String::from("Field dur not found in metrics")))?
+        .take::<f64>()?;
+
+    let id = metric
+        .remove("id")
+        .ok_or_else(|| GremlinError::Json(String::from("Field id not found in metrics")))?
+        .take::<String>()?;
+
+    let name = metric
+        .remove("name")
+        .ok_or_else(|| GremlinError::Json(String::from("Field name not found in metrics")))?
+        .take::<String>()?;
+
+    let mut counts = metric
+        .remove("counts")
+        .ok_or_else(|| GremlinError::Json(String::from("Field counts not found in metrics")))?
+        .take::<Map>()?;
+
+    let traversers = counts
+        .remove("traverserCount")
+        .ok_or_else(|| GremlinError::Json(String::from("Field dur not found in metrics")))?
+        .take::<i64>()?;
+
+    let count = counts
+        .remove("elementCount")
+        .ok_or_else(|| GremlinError::Json(String::from("Field dur not found in metrics")))?
+        .take::<i64>()?;
+
+    let annotations = metric
+        .remove("annotations")
+        .ok_or_else(|| GremlinError::Json(String::from("Field counts not found in metrics")))?
+        .take::<Map>()?;
+
+    let perc_duration = annotations
+        .get("percentDur")
+        .ok_or_else(|| GremlinError::Json(String::from("Field dur not found in metrics")))?
+        .get::<f64>()?;
+
+    Ok(Metric::new(id, name, duration, count, traversers, *perc_duration).into())
+}
+
 pub fn deserialize_vertex_property<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -200,7 +281,9 @@ g_serielizer!(deserializer_v3, {
     "g:VertexProperty" => deserialize_vertex_property,
     "g:Property" => deserialize_property,
     "g:Edge" => deserialize_edge,
-    "g:Path" => deserialize_path
+    "g:Path" => deserialize_path,
+    "g:TraversalMetrics" => deserialize_metrics,
+    "g:Metrics" => deserialize_metric
 });
 
 fn deserialize_vertex_properties<T>(
@@ -250,7 +333,9 @@ mod tests {
 
     use crate::{edge, vertex};
 
-    use crate::structure::{GValue, Path, Property, Vertex, VertexProperty, GID};
+    use crate::structure::{
+        GValue, Metric, Path, Property, TraversalMetrics, Vertex, VertexProperty, GID,
+    };
     use chrono::offset::TimeZone;
     use std::collections::HashMap;
 
@@ -447,7 +532,7 @@ mod tests {
     }
 
     #[test]
-    fn test_() {
+    fn test_path() {
         let value = json!({"@type":"g:Path","@value":{"labels":{"@type":"g:List","@value":[{"@type":"g:Set","@value":[]},{"@type":"g:Set","@value":[]},{"@type":"g:Set","@value":[]}]},"objects":{"@type":"g:List","@value":[{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":1},"label":"person"}},{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":10},"label":"software"}},{"@type":"g:Vertex","@value":{"id":{"@type":"g:Int32","@value":11},"label":"software"}}]}}});
 
         let result = deserializer_v3(&value).expect("Failed to deserialize a Path");
@@ -463,5 +548,31 @@ mod tests {
             ],
         );
         assert_eq!(result, path.into());
+    }
+
+    #[test]
+    fn test_traversal_metrics() {
+        let value = serde_json::from_str(r#"{"@type":"g:TraversalMetrics","@value":{"@type":"g:Map","@value":["dur",{"@type":"g:Double","@value":0.004},"metrics",{"@type":"g:List","@value":[{"@type":"g:Metrics","@value":{"@type":"g:Map","@value":["dur",{"@type":"g:Double","@value":100.0},"counts",{"@type":"g:Map","@value":["traverserCount",{"@type":"g:Int64","@value":4},"elementCount",{"@type":"g:Int64","@value":4}]},"name","TinkerGraphStep(vertex,[~label.eq(person)])","annotations",{"@type":"g:Map","@value":["percentDur",{"@type":"g:Double","@value":25.0}]},"id","7.0.0()"]}},{"@type":"g:Metrics","@value":{"@type":"g:Map","@value":["dur",{"@type":"g:Double","@value":100.0},"counts",{"@type":"g:Map","@value":["traverserCount",{"@type":"g:Int64","@value":13},"elementCount",{"@type":"g:Int64","@value":13}]},"name","VertexStep(OUT,vertex)","annotations",{"@type":"g:Map","@value":["percentDur",{"@type":"g:Double","@value":25.0}]},"id","2.0.0()"]}},{"@type":"g:Metrics","@value":{"@type":"g:Map","@value":["dur",{"@type":"g:Double","@value":100.0},"counts",{"@type":"g:Map","@value":["traverserCount",{"@type":"g:Int64","@value":7},"elementCount",{"@type":"g:Int64","@value":7}]},"name","VertexStep(OUT,vertex)","annotations",{"@type":"g:Map","@value":["percentDur",{"@type":"g:Double","@value":25.0}]},"id","3.0.0()"]}},{"@type":"g:Metrics","@value":{"@type":"g:Map","@value":["dur",{"@type":"g:Double","@value":100.0},"counts",{"@type":"g:Map","@value":["traverserCount",{"@type":"g:Int64","@value":1},"elementCount",{"@type":"g:Int64","@value":1}]},"name","TreeStep","annotations",{"@type":"g:Map","@value":["percentDur",{"@type":"g:Double","@value":25.0}]},"id","4.0.0()"]}}]}]}}"#).expect("Error parsing json");
+
+        let result = deserializer_v3(&value).expect("Failed to deserialize a TraversalMetrics");
+
+        let traversal_metrics = TraversalMetrics::new(
+            0.004,
+            vec![
+                Metric::new(
+                    "7.0.0()",
+                    "TinkerGraphStep(vertex,[~label.eq(person)])",
+                    100.0,
+                    4,
+                    4,
+                    25.0,
+                ),
+                Metric::new("2.0.0()", "VertexStep(OUT,vertex)", 100.0, 13, 13, 25.0),
+                Metric::new("3.0.0()", "VertexStep(OUT,vertex)", 100.0, 7, 7, 25.0),
+                Metric::new("4.0.0()", "TreeStep", 100.0, 1, 1, 25.0),
+            ],
+        );
+
+        assert_eq!(result, traversal_metrics.into());
     }
 }
