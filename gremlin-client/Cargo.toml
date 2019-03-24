@@ -27,4 +27,4 @@ features = ["sync","sync-ssl"]
 
 [dependencies.uuid]
 features = ["serde", "v4"]
-version = "0.5.1"
+version = "0.7.2"
