@@ -2,6 +2,7 @@ use crate::structure::GValue;
 use std::error::Error;
 use std::fmt::Display;
 use websocket::WebSocketError;
+use uuid::parser::ParseError;
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug)]
@@ -14,7 +15,7 @@ pub enum GremlinError {
     Json(String),
     Request((i16, String)),
     Serde(serde_json::Error),
-    Uuid(uuid::ParseError),
+    Uuid(ParseError),
 }
 
 impl From<WebSocketError> for GremlinError {
@@ -34,8 +35,8 @@ impl From<serde_json::Error> for GremlinError {
         GremlinError::Serde(e)
     }
 }
-impl From<uuid::ParseError> for GremlinError {
-    fn from(e: uuid::ParseError) -> GremlinError {
+impl From<ParseError> for GremlinError {
+    fn from(e: ParseError) -> GremlinError {
         GremlinError::Uuid(e)
     }
 }
