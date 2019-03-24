@@ -1,8 +1,8 @@
 use crate::structure::GValue;
 use std::error::Error;
 use std::fmt::Display;
-use websocket::WebSocketError;
 use uuid::parser::ParseError;
+use websocket::WebSocketError;
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug)]
