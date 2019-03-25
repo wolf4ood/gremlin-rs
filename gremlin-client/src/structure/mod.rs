@@ -9,7 +9,7 @@ mod vertex;
 mod vertex_property;
 
 pub use self::edge::Edge;
-pub use self::metrics::{Metric, TraversalMetrics};
+pub use self::metrics::{IntermediateRepr, Metric, TraversalExplanation, TraversalMetrics};
 pub use self::path::Path;
 pub use self::property::Property;
 pub use self::result::GResultSet;

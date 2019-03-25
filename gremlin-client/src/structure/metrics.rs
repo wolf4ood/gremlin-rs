@@ -1,4 +1,53 @@
 #[derive(Debug, PartialEq, Clone)]
+pub struct TraversalExplanation {
+    final_t: Vec<String>,
+    original: Vec<String>,
+    intermediate: Vec<IntermediateRepr>,
+}
+
+impl TraversalExplanation {
+    pub fn final_t(&self) -> &Vec<String> {
+        &self.final_t
+    }
+    pub fn original(&self) -> &Vec<String> {
+        &self.original
+    }
+
+    pub fn intermediate(&self) -> &Vec<IntermediateRepr> {
+        &self.intermediate
+    }
+}
+#[derive(Debug, PartialEq, Clone)]
+pub struct IntermediateRepr {
+    traversal: Vec<String>,
+    strategy: String,
+    category: String,
+}
+
+impl IntermediateRepr {
+    pub fn new(traversal: Vec<String>, strategy: String, category: String) -> IntermediateRepr {
+        IntermediateRepr {
+            traversal,
+            strategy,
+            category,
+        }
+    }
+}
+impl TraversalExplanation {
+    pub fn new(
+        original: Vec<String>,
+        final_t: Vec<String>,
+        intermediate: Vec<IntermediateRepr>,
+    ) -> TraversalExplanation {
+        TraversalExplanation {
+            final_t,
+            original,
+            intermediate,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct TraversalMetrics {
     duration: f64,
     metrics: Vec<Metric>,

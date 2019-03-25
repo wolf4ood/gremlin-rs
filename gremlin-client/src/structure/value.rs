@@ -1,5 +1,8 @@
 use crate::conversion::{BorrowFromGValue, FromGValue};
-use crate::structure::{Edge, Metric, Path, Property, TraversalMetrics, Vertex, VertexProperty};
+use crate::structure::{
+    Edge, IntermediateRepr, Metric, Path, Property, TraversalExplanation, TraversalMetrics, Vertex,
+    VertexProperty,
+};
 use crate::GremlinResult;
 use chrono;
 use std::collections::{HashMap, VecDeque};
@@ -30,6 +33,8 @@ pub enum GValue {
     Path(Path),
     TraversalMetrics(TraversalMetrics),
     Metric(Metric),
+    TraversalExplanation(TraversalExplanation),
+    IntermediateRepr(IntermediateRepr),
 }
 
 impl GValue {
@@ -141,6 +146,11 @@ impl From<TraversalMetrics> for GValue {
     }
 }
 
+impl From<TraversalExplanation> for GValue {
+    fn from(val: TraversalExplanation) -> Self {
+        GValue::TraversalExplanation(val)
+    }
+}
 impl From<Metric> for GValue {
     fn from(val: Metric) -> Self {
         GValue::Metric(val)

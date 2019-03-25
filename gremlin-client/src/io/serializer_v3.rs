@@ -1,5 +1,6 @@
 use crate::structure::{
-    Edge, GValue, List, Map, Metric, Path, Property, TraversalMetrics, Vertex, VertexProperty, GID,
+    Edge, GValue, IntermediateRepr, List, Map, Metric, Path, Property, TraversalExplanation,
+    TraversalMetrics, Vertex, VertexProperty, GID,
 };
 use crate::GremlinError;
 use crate::GremlinResult;
@@ -242,6 +243,91 @@ where
     Ok(Metric::new(id, name, duration, count, traversers, *perc_duration).into())
 }
 
+pub fn deserialize_explain<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
+where
+    T: Fn(&Value) -> GremlinResult<GValue>,
+{
+    let mut explain = reader(&val)?.take::<Map>()?;
+
+    let original = explain
+        .remove("original")
+        .ok_or_else(|| {
+            GremlinError::Json(String::from(
+                "Field original not found in traversal explanation",
+            ))
+        })?
+        .take::<List>()?
+        .drain(0..)
+        .map(|s| s.take::<String>())
+        .filter_map(Result::ok)
+        .collect();
+
+    let finals = explain
+        .remove("final")
+        .ok_or_else(|| {
+            GremlinError::Json(String::from(
+                "Field final not found in traversal explanation",
+            ))
+        })?
+        .take::<List>()?
+        .drain(0..)
+        .map(|s| s.take::<String>())
+        .filter_map(Result::ok)
+        .collect();
+
+    let intermediate = explain
+        .remove("intermediate")
+        .ok_or_else(|| {
+            GremlinError::Json(String::from(
+                "Field intermediate not found in traversal explanation",
+            ))
+        })?
+        .take::<List>()?
+        .drain(0..)
+        .map(|s| s.take::<Map>())
+        .filter_map(Result::ok)
+        .map(map_intermediate)
+        .filter_map(Result::ok)
+        .collect();
+
+    Ok(TraversalExplanation::new(original, finals, intermediate).into())
+}
+
+fn map_intermediate(mut m: Map) -> GremlinResult<IntermediateRepr> {
+    let traversal = m
+        .remove("traversal")
+        .ok_or_else(|| {
+            GremlinError::Json(String::from(
+                "Field intermediate not found in traversal explanation",
+            ))
+        })?
+        .take::<List>()?
+        .drain(0..)
+        .map(|s| s.take::<String>())
+        .filter_map(Result::ok)
+        .collect();
+
+    let strategy = m
+        .remove("strategy")
+        .ok_or_else(|| {
+            GremlinError::Json(String::from(
+                "Field strategy not found in traversal explanation",
+            ))
+        })?
+        .take::<String>()?;
+
+    let category = m
+        .remove("category")
+        .ok_or_else(|| {
+            GremlinError::Json(String::from(
+                "Field category not found in traversal explanation",
+            ))
+        })?
+        .take::<String>()?;
+
+    Ok(IntermediateRepr::new(traversal, strategy, category))
+}
+
 pub fn deserialize_vertex_property<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -283,7 +369,8 @@ g_serielizer!(deserializer_v3, {
     "g:Edge" => deserialize_edge,
     "g:Path" => deserialize_path,
     "g:TraversalMetrics" => deserialize_metrics,
-    "g:Metrics" => deserialize_metric
+    "g:Metrics" => deserialize_metric,
+    "g:TraversalExplanation" => deserialize_explain
 });
 
 fn deserialize_vertex_properties<T>(

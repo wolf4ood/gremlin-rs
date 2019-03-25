@@ -2,7 +2,8 @@ extern crate gremlin_client;
 
 use gremlin_client::{Edge, GValue, Map, Vertex};
 use gremlin_client::{
-    GremlinClient, GremlinError, GremlinResult, ToGValue, TraversalMetrics, VertexProperty,
+    GremlinClient, GremlinError, GremlinResult, ToGValue, TraversalExplanation, TraversalMetrics,
+    VertexProperty,
 };
 
 fn connect() -> GremlinResult<GremlinClient> {
@@ -280,4 +281,39 @@ fn test_profile() {
             .map(|s| s.perc_duration())
             .fold(0.0, |acc, x| acc + x)
     );
+}
+
+#[test]
+fn test_explain() {
+    let graph = graph();
+
+    let metrics = graph
+        .execute("g.V().limit(1).explain()", &[])
+        .expect("should return a profile")
+        .filter_map(Result::ok)
+        .map(|f| f.take::<TraversalExplanation>())
+        .collect::<Result<Vec<_>, _>>()
+        .expect("It should be ok");
+
+    assert_eq!(1, metrics.len());
+
+    let t = &metrics[0];
+
+    assert_eq!(
+        &vec![
+            String::from("GraphStep(vertex,[])"),
+            String::from("RangeGlobalStep(0,1)")
+        ],
+        t.original()
+    );
+
+    assert_eq!(
+        &vec![
+            String::from("TinkerGraphStep(vertex,[])"),
+            String::from("RangeGlobalStep(0,1)"),
+            String::from("ReferenceElementStep")
+        ],
+        t.final_t()
+    );
+    assert_eq!(15, t.intermediate().len());
 }
