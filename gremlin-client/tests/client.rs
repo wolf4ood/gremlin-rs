@@ -315,5 +315,4 @@ fn test_explain() {
         ],
         t.final_t()
     );
-    assert_eq!(15, t.intermediate().len());
 }
