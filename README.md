@@ -9,6 +9,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Docs](https://docs.rs/gremlin-client/badge.svg)](https://docs.rs/gremlin-client)
 [![dependency status](https://deps.rs/repo/github/wolf4ood/gremlin-rs/status.svg)](https://deps.rs/repo/github/wolf4ood/gremlin-rs)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e29ea9b1c90a47f797d259de04eb595b)](https://www.codacy.com/app/wolf4ood/gremlin-rs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wolf4ood/gremlin-rs&amp;utm_campaign=Badge_Grade)
 
 
 
