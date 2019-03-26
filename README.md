@@ -6,6 +6,7 @@
 [![Build Status](https://travis-ci.org/wolf4ood/gremlin-rs.svg?branch=master)](https://travis-ci.org/wolf4ood/gremlin-rs)
 [![Codecov Status](https://codecov.io/gh/wolf4ood/gremlin-rs/branch/master/graph/badge.svg)](https://codecov.io/gh/wolf4ood/gremlin-rs)
 [![Crates.io](https://img.shields.io/crates/v/gremlin-client.svg)](https://crates.io/crates/gremlin-client)
+[![Crates.io Download](https://img.shields.io/crates/d/gremlin-client.svg)](https://crates.io/crates/gremlin-client)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Docs](https://docs.rs/gremlin-client/badge.svg)](https://docs.rs/gremlin-client)
 [![dependency status](https://deps.rs/repo/github/wolf4ood/gremlin-rs/status.svg)](https://deps.rs/repo/github/wolf4ood/gremlin-rs)
