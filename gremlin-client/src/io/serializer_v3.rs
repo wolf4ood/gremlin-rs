@@ -1,3 +1,7 @@
+//! GraphSON V3 [docs](http://tinkerpop.apache.org/docs/current/dev/io/)
+//! 
+
+
 use crate::structure::{
     Edge, GValue, IntermediateRepr, List, Map, Metric, Path, Property, TraversalExplanation,
     TraversalMetrics, Vertex, VertexProperty, GID,
@@ -9,6 +13,9 @@ use chrono::Utc;
 use serde_json::Value;
 use std::collections::HashMap;
 
+
+
+// Deserialize a JSON value to a GID 
 pub fn deserialize_id<T>(reader: &T, val: &Value) -> GremlinResult<GID>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -27,6 +34,7 @@ where
     }
 }
 
+// Date deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_date_2)
 pub fn deserialize_date<T>(_: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -35,6 +43,8 @@ where
     Ok(GValue::from(Utc.timestamp(val, 0)))
 }
 
+
+// Long deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_long_2)
 pub fn deserialize_g64<T>(_: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -43,6 +53,7 @@ where
     Ok(GValue::from(val))
 }
 
+// UUID deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_uuid_2)
 pub fn deserialize_uuid<T>(_: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -52,6 +63,7 @@ where
     Ok(GValue::Uuid(uuid))
 }
 
+// Integer deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_integer_2)
 pub fn deserialize_g32<T>(_: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -60,6 +72,7 @@ where
     Ok(GValue::from(val))
 }
 
+// Float deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_float_2)
 pub fn deserialize_f32<T>(_: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -67,7 +80,7 @@ where
     let val = expect_float!(val);
     Ok(GValue::from(val))
 }
-
+// Double deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_float_2)
 pub fn deserialize_f64<T>(_: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -76,6 +89,7 @@ where
     Ok(GValue::from(val))
 }
 
+// List deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_list)
 pub fn deserialize_list<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -88,6 +102,7 @@ where
     Ok(elements.into())
 }
 
+// Map deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_map)
 pub fn deserialize_map<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -106,6 +121,7 @@ where
     Ok(map.into())
 }
 
+// Vertex deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_vertex_3)
 pub fn deserialize_vertex<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -125,6 +141,7 @@ where
     .into())
 }
 
+// Edge deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_edge_3)
 pub fn deserialize_edge<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -154,6 +171,8 @@ where
     .into())
 }
 
+
+// Path deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_path_3)
 pub fn deserialize_path<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -165,6 +184,7 @@ where
     Ok(Path::new(labels, objects).into())
 }
 
+// Traversal Metrics deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_traversalmetrics)
 pub fn deserialize_metrics<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -194,6 +214,7 @@ where
     Ok(TraversalMetrics::new(duration, m).into())
 }
 
+// Metrics deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_metrics)
 pub fn deserialize_metric<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -328,6 +349,8 @@ fn map_intermediate(mut m: Map) -> GremlinResult<IntermediateRepr> {
     Ok(IntermediateRepr::new(traversal, strategy, category))
 }
 
+
+// Vertex Property deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_vertexproperty_3)
 pub fn deserialize_vertex_property<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -341,6 +364,8 @@ where
     Ok(VertexProperty::new(id, label, v).into())
 }
 
+
+// Property deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_property_3)
 pub fn deserialize_property<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -353,6 +378,8 @@ where
     Ok(Property::new(label, v).into())
 }
 
+
+// deserialzer v3
 g_serielizer!(deserializer_v3, {
     "g:Int32" => deserialize_g32,
     "g:Int64" => deserialize_g64,
