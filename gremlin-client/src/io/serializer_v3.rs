@@ -1,6 +1,5 @@
 //! GraphSON V3 [docs](http://tinkerpop.apache.org/docs/current/dev/io/)
-//! 
-
+//!
 
 use crate::structure::{
     Edge, GValue, IntermediateRepr, List, Map, Metric, Path, Property, TraversalExplanation,
@@ -13,9 +12,7 @@ use chrono::Utc;
 use serde_json::Value;
 use std::collections::HashMap;
 
-
-
-// Deserialize a JSON value to a GID 
+// Deserialize a JSON value to a GID
 pub fn deserialize_id<T>(reader: &T, val: &Value) -> GremlinResult<GID>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
@@ -42,7 +39,6 @@ where
     let val = expect_i64!(val);
     Ok(GValue::from(Utc.timestamp(val, 0)))
 }
-
 
 // Long deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_long_2)
 pub fn deserialize_g64<T>(_: &T, val: &Value) -> GremlinResult<GValue>
@@ -170,7 +166,6 @@ where
     )
     .into())
 }
-
 
 // Path deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_path_3)
 pub fn deserialize_path<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
@@ -349,7 +344,6 @@ fn map_intermediate(mut m: Map) -> GremlinResult<IntermediateRepr> {
     Ok(IntermediateRepr::new(traversal, strategy, category))
 }
 
-
 // Vertex Property deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_vertexproperty_3)
 pub fn deserialize_vertex_property<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
@@ -364,7 +358,6 @@ where
     Ok(VertexProperty::new(id, label, v).into())
 }
 
-
 // Property deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_property_3)
 pub fn deserialize_property<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
@@ -377,7 +370,6 @@ where
     let v = reader(&val["value"])?;
     Ok(Property::new(label, v).into())
 }
-
 
 // deserialzer v3
 g_serielizer!(deserializer_v3, {
