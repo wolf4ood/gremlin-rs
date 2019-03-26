@@ -11,6 +11,14 @@ categories = ["database"]
 readme = "README.md"
 
 
+
+[badges]
+travis-ci = { repository = "wolf4ood/gremlin-rs" }
+codecov = { repository = "wolf4ood/gremlin-rs", branch = "master", service = "github" }
+is-it-maintained-issue-resolution = { repository = "wolf4ood/gremlin-rs" }
+is-it-maintained-open-issues = { repository = "wolf4ood/gremlin-rs" }
+maintenance = {status = "actively-developed"}
+
 [dependencies]
 serde = "1.0"
 serde_json = "1.0"
