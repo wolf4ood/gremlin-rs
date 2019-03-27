@@ -12,6 +12,10 @@ use chrono::Utc;
 use serde_json::Value;
 use std::collections::HashMap;
 
+static G_METRICS: &'static str = "g:Metrics";
+static G_TRAVERSAL_EXPLANATION: &'static str = "g:TraversalExplanation";
+static G_TRAVERSAL_METRICS: &'static str = "g:TraversalMetrics";
+
 // Deserialize a JSON value to a GID
 pub fn deserialize_id<T>(reader: &T, val: &Value) -> GremlinResult<GID>
 where
@@ -186,20 +190,9 @@ where
 {
     let mut metrics = reader(&val)?.take::<Map>()?;
 
-    let duration = metrics
-        .remove("dur")
-        .ok_or_else(|| {
-            GremlinError::Json(String::from("Field dur not found in g:TraversalMetrics"))
-        })?
-        .take::<f64>()?;
+    let duration = get_and_remove(&mut metrics, "dur", G_TRAVERSAL_METRICS)?.take::<f64>()?;
 
-    let m = metrics
-        .remove("metrics")
-        .ok_or_else(|| {
-            GremlinError::Json(String::from(
-                "Field metrics not found in g:TraversalMetrics",
-            ))
-        })?
+    let m = get_and_remove(&mut metrics, "metrics", G_TRAVERSAL_METRICS)?
         .take::<List>()?
         .drain(0..)
         .map(|e| e.take::<Metric>())
@@ -216,47 +209,18 @@ where
 {
     let mut metric = reader(&val)?.take::<Map>()?;
 
-    let duration = metric
-        .remove("dur")
-        .ok_or_else(|| GremlinError::Json(String::from("Field dur not found in metrics")))?
-        .take::<f64>()?;
+    let duration = get_and_remove(&mut metric, "dur", G_METRICS)?.take::<f64>()?;
+    let id = get_and_remove(&mut metric, "id", G_METRICS)?.take::<String>()?;
+    let name = get_and_remove(&mut metric, "name", G_METRICS)?.take::<String>()?;
 
-    let id = metric
-        .remove("id")
-        .ok_or_else(|| GremlinError::Json(String::from("Field id not found in metrics")))?
-        .take::<String>()?;
+    let mut counts = get_and_remove(&mut metric, "counts", G_METRICS)?.take::<Map>()?;
+    let traversers = get_and_remove(&mut counts, "traverserCount", G_METRICS)?.take::<i64>()?;
+    let count = get_and_remove(&mut counts, "elementCount", G_METRICS)?.take::<i64>()?;
 
-    let name = metric
-        .remove("name")
-        .ok_or_else(|| GremlinError::Json(String::from("Field name not found in metrics")))?
-        .take::<String>()?;
+    let mut annotations = get_and_remove(&mut metric, "annotations", G_METRICS)?.take::<Map>()?;
+    let perc_duration = get_and_remove(&mut annotations, "percentDur", G_METRICS)?.take::<f64>()?;
 
-    let mut counts = metric
-        .remove("counts")
-        .ok_or_else(|| GremlinError::Json(String::from("Field counts not found in metrics")))?
-        .take::<Map>()?;
-
-    let traversers = counts
-        .remove("traverserCount")
-        .ok_or_else(|| GremlinError::Json(String::from("Field dur not found in metrics")))?
-        .take::<i64>()?;
-
-    let count = counts
-        .remove("elementCount")
-        .ok_or_else(|| GremlinError::Json(String::from("Field dur not found in metrics")))?
-        .take::<i64>()?;
-
-    let annotations = metric
-        .remove("annotations")
-        .ok_or_else(|| GremlinError::Json(String::from("Field counts not found in metrics")))?
-        .take::<Map>()?;
-
-    let perc_duration = annotations
-        .get("percentDur")
-        .ok_or_else(|| GremlinError::Json(String::from("Field dur not found in metrics")))?
-        .get::<f64>()?;
-
-    Ok(Metric::new(id, name, duration, count, traversers, *perc_duration).into())
+    Ok(Metric::new(id, name, duration, count, traversers, perc_duration).into())
 }
 
 pub fn deserialize_explain<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
@@ -265,39 +229,21 @@ where
 {
     let mut explain = reader(&val)?.take::<Map>()?;
 
-    let original = explain
-        .remove("original")
-        .ok_or_else(|| {
-            GremlinError::Json(String::from(
-                "Field original not found in traversal explanation",
-            ))
-        })?
+    let original = get_and_remove(&mut explain, "original", G_TRAVERSAL_EXPLANATION)?
         .take::<List>()?
         .drain(0..)
         .map(|s| s.take::<String>())
         .filter_map(Result::ok)
         .collect();
 
-    let finals = explain
-        .remove("final")
-        .ok_or_else(|| {
-            GremlinError::Json(String::from(
-                "Field final not found in traversal explanation",
-            ))
-        })?
+    let finals = get_and_remove(&mut explain, "final", G_TRAVERSAL_EXPLANATION)?
         .take::<List>()?
         .drain(0..)
         .map(|s| s.take::<String>())
         .filter_map(Result::ok)
         .collect();
 
-    let intermediate = explain
-        .remove("intermediate")
-        .ok_or_else(|| {
-            GremlinError::Json(String::from(
-                "Field intermediate not found in traversal explanation",
-            ))
-        })?
+    let intermediate = get_and_remove(&mut explain, "intermediate", G_TRAVERSAL_EXPLANATION)?
         .take::<List>()?
         .drain(0..)
         .map(|s| s.take::<Map>())
@@ -310,36 +256,16 @@ where
 }
 
 fn map_intermediate(mut m: Map) -> GremlinResult<IntermediateRepr> {
-    let traversal = m
-        .remove("traversal")
-        .ok_or_else(|| {
-            GremlinError::Json(String::from(
-                "Field intermediate not found in traversal explanation",
-            ))
-        })?
+    let traversal = get_and_remove(&mut m, "traversal", G_TRAVERSAL_EXPLANATION)?
         .take::<List>()?
         .drain(0..)
         .map(|s| s.take::<String>())
         .filter_map(Result::ok)
         .collect();
 
-    let strategy = m
-        .remove("strategy")
-        .ok_or_else(|| {
-            GremlinError::Json(String::from(
-                "Field strategy not found in traversal explanation",
-            ))
-        })?
-        .take::<String>()?;
+    let strategy = get_and_remove(&mut m, "strategy", G_TRAVERSAL_EXPLANATION)?.take::<String>()?;
 
-    let category = m
-        .remove("category")
-        .ok_or_else(|| {
-            GremlinError::Json(String::from(
-                "Field category not found in traversal explanation",
-            ))
-        })?
-        .take::<String>()?;
+    let category = get_and_remove(&mut m, "category", G_TRAVERSAL_EXPLANATION)?.take::<String>()?;
 
     Ok(IntermediateRepr::new(traversal, strategy, category))
 }
@@ -432,6 +358,10 @@ where
     }
 }
 
+fn get_and_remove(map: &mut Map, field: &str, owner: &str) -> GremlinResult<GValue> {
+    map.remove(field)
+        .ok_or_else(|| GremlinError::Json(format!("Field {} not found in {}", field, owner)))
+}
 // TESTS
 #[cfg(test)]
 mod tests {
