@@ -54,7 +54,7 @@ pub fn deserialize_uuid<T>(_: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
 {
-    let val = expect_string!(val);
+    let val = get_value!(val, Value::String)?;
     let uuid = uuid::Uuid::parse_str(&val)?;
     Ok(GValue::Uuid(uuid))
 }
@@ -90,7 +90,7 @@ pub fn deserialize_list<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
 {
-    let val = expect_array!(val);
+    let val = get_value!(val, Value::Array)?;
     let mut elements = Vec::with_capacity(val.len());
     for item in val {
         elements.push(reader(item)?)
@@ -103,14 +103,14 @@ pub fn deserialize_map<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
 {
-    let val = expect_array!(val);
+    let val = get_value!(val, Value::Array)?;
     let mut map = HashMap::new();
     if !val.is_empty() {
         let mut x = 0;
         while x < val.len() {
-            let key = expect_string!(val[x]);
+            let key = get_value!(&val[x], Value::String)?;
             let value = reader(&val[x + 1])?;
-            map.insert(String::from(key), value);
+            map.insert(key.clone(), value);
             x += 2;
         }
     }
@@ -122,10 +122,10 @@ pub fn deserialize_vertex<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
 {
-    let mut label = String::from("vertex");
-    if let Some(v) = val.get("label") {
-        label = String::from(expect_string!(v));
-    }
+    let label = val
+        .get("label")
+        .map(|f| get_value!(f, Value::String).map(Clone::clone))
+        .unwrap_or_else(|| Ok(String::from("vertex")))?;
 
     let id = deserialize_id(reader, &val["id"])?;
 
@@ -142,18 +142,18 @@ pub fn deserialize_edge<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
 {
-    let mut label = String::from("edge");
-    if let Some(v) = val.get("label") {
-        label = String::from(expect_string!(v));
-    }
+    let label = val
+        .get("label")
+        .map(|f| get_value!(f, Value::String).map(Clone::clone))
+        .unwrap_or_else(|| Ok(String::from("edge")))?;
 
     let id = deserialize_id(reader, &val["id"])?;
 
     let in_v_id = deserialize_id(reader, &val["inV"])?;
-    let in_v_label = String::from(expect_string!(&val["inVLabel"]));
+    let in_v_label = get_value!(&val["inVLabel"], Value::String)?.clone();
 
     let out_v_id = deserialize_id(reader, &val["outV"])?;
-    let out_v_label = String::from(expect_string!(&val["outVLabel"]));
+    let out_v_label = get_value!(&val["outVLabel"], Value::String)?.clone();
 
     Ok(Edge::new(
         id,
@@ -349,10 +349,11 @@ pub fn deserialize_vertex_property<T>(reader: &T, val: &Value) -> GremlinResult<
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
 {
-    let mut label = String::from("vertex_property");
-    if let Some(v) = val.get("label") {
-        label = String::from(expect_string!(v));
-    }
+    let label = val
+        .get("label")
+        .map(|f| get_value!(f, Value::String).map(Clone::clone))
+        .unwrap_or_else(|| Ok(String::from("vertex_property")))?;
+
     let id = deserialize_id(reader, &val["id"])?;
     let v = reader(&val["value"])?;
     Ok(VertexProperty::new(id, label, v).into())
@@ -363,10 +364,11 @@ pub fn deserialize_property<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
 {
-    let mut label = String::from("property");
-    if let Some(v) = val.get("key") {
-        label = String::from(expect_string!(v));
-    }
+    let label = val
+        .get("key")
+        .map(|f| get_value!(f, Value::String).map(Clone::clone))
+        .unwrap_or_else(|| Ok(String::from("property")))?;
+
     let v = reader(&val["value"])?;
     Ok(Property::new(label, v).into())
 }

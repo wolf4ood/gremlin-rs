@@ -1,12 +1,11 @@
 macro_rules! g_serielizer {
     ($name:ident, { $($key:expr => $value:ident),*}) => {
-
         pub fn $name(val: &Value) -> GremlinResult<GValue> {
             if let Value::String(ref s) = val {
                 Ok(s.clone().into())
             } else {
                 let _type = &val["@type"];
-                let _type = expect_string!(_type);
+                let _type = get_value!(_type,serde_json::Value::String)?.as_str();
                 let _value = &val["@value"];
 
                 match _type {
@@ -20,12 +19,12 @@ macro_rules! g_serielizer {
     };
 }
 
-macro_rules! expect_array {
-    ($value:expr) => {
-        match $value.as_array() {
-            Some(v) => Ok(v),
-            None => Err($crate::GremlinError::Json(String::from("Expected array"))),
-        }?;
+macro_rules! get_value {
+    ($value:expr,$v:path) => {
+        match $value {
+            $v(e) => Ok(e),
+            _ => Err($crate::GremlinError::Json(String::from(stringify!($v)))),
+        };
     };
 }
 
@@ -59,17 +58,6 @@ macro_rules! expect_double {
         match $value.as_f64() {
             Some(v) => Ok(v),
             None => Err($crate::GremlinError::Json(String::from("Expected double"))),
-        }?;
-    };
-}
-macro_rules! expect_string {
-    ($value:expr) => {
-        match $value.as_str() {
-            Some(v) => Ok(v),
-            None => Err($crate::GremlinError::Json(format!(
-                "Expected {} to be a String",
-                $value
-            ))),
         }?;
     };
 }
