@@ -37,6 +37,7 @@ impl Property {
     {
         T::from_gvalue(&self.value)
     }
+
     pub fn label(&self) -> &String {
         &self.label
     }
