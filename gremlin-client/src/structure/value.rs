@@ -1,7 +1,7 @@
 use crate::conversion::{BorrowFromGValue, FromGValue};
 use crate::structure::{
-    Edge, IntermediateRepr, Metric, Path, Property, TraversalExplanation, TraversalMetrics, Vertex,
-    VertexProperty,
+    Edge, IntermediateRepr, Metric, Path, Property, Token, TraversalExplanation, TraversalMetrics,
+    Vertex, VertexProperty,
 };
 use crate::GremlinResult;
 use chrono;
@@ -29,6 +29,7 @@ pub enum GValue {
     List(List),
     Set(Set),
     Map(Map),
+    Token(Token),
     String(String),
     Path(Path),
     TraversalMetrics(TraversalMetrics),
@@ -151,14 +152,22 @@ impl From<TraversalExplanation> for GValue {
         GValue::TraversalExplanation(val)
     }
 }
+
 impl From<Metric> for GValue {
     fn from(val: Metric) -> Self {
         GValue::Metric(val)
     }
 }
+
 impl From<Property> for GValue {
     fn from(val: Property) -> Self {
         GValue::Property(val)
+    }
+}
+
+impl From<Token> for GValue {
+    fn from(val: Token) -> Self {
+        GValue::Token(val)
     }
 }
 

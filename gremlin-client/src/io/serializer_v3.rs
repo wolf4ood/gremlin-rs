@@ -2,7 +2,7 @@
 //!
 
 use crate::structure::{
-    Edge, GValue, IntermediateRepr, List, Map, Metric, Path, Property, TraversalExplanation,
+    Edge, GValue, IntermediateRepr, List, Map, Metric, Path, Property, Token, TraversalExplanation,
     TraversalMetrics, Vertex, VertexProperty, GID,
 };
 use crate::GremlinError;
@@ -112,13 +112,38 @@ where
     if !val.is_empty() {
         let mut x = 0;
         while x < val.len() {
-            let key = get_value!(&val[x], Value::String)?;
+            let key = match &val[x] {
+                Value::String(s) => Ok(s.clone()),
+                Value::Object(_) => {
+                    let token_value: String = match reader(&val[x])? {
+                        GValue::Token(tk) => {
+                            let value = tk.value();
+                            Ok(value.clone())
+                        }
+                        _ => Err(GremlinError::Json(String::from(stringify!(o)))),
+                    }?;
+
+                    Ok(token_value)
+                }
+                _ => Err(GremlinError::Json(String::from(stringify!($v)))),
+            }?;
+
             let value = reader(&val[x + 1])?;
-            map.insert(key.clone(), value);
+            map.insert(key, value);
             x += 2;
         }
     }
     Ok(map.into())
+}
+
+// Token deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_t_2)
+pub fn deserialize_token<T>(_: &T, val: &Value) -> GremlinResult<GValue>
+where
+    T: Fn(&Value) -> GremlinResult<GValue>,
+{
+    let val = get_value!(val, Value::String)?;
+    let token = Token::new(val.clone());
+    Ok(GValue::Token(token))
 }
 
 // Vertex deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_vertex_3)
@@ -300,7 +325,7 @@ where
 }
 
 // deserialzer v3
-g_serielizer!(deserializer_v3, {
+g_serializer!(deserializer_v3, {
     "g:Int32" => deserialize_g32,
     "g:Int64" => deserialize_g64,
     "g:Float" => deserialize_f32,
@@ -310,6 +335,7 @@ g_serielizer!(deserializer_v3, {
     "g:List" => deserialize_list,
     "g:Set" => deserialize_list,
     "g:Map" => deserialize_map,
+    "g:T" => deserialize_token,
     "g:Vertex" => deserialize_vertex,
     "g:VertexProperty" => deserialize_vertex_property,
     "g:Property" => deserialize_property,
@@ -372,7 +398,7 @@ mod tests {
     use crate::{edge, vertex};
 
     use crate::structure::{
-        GValue, Metric, Path, Property, TraversalMetrics, Vertex, VertexProperty, GID,
+        GValue, Map, Metric, Path, Property, Token, TraversalMetrics, Vertex, VertexProperty, GID,
     };
     use chrono::offset::TimeZone;
     use std::collections::HashMap;
@@ -612,5 +638,44 @@ mod tests {
         );
 
         assert_eq!(result, traversal_metrics.into());
+    }
+
+    #[test]
+    fn test_token() {
+        let value = json!({
+            "@type": "g:T",
+            "@value": "id"
+        });
+        let result = deserializer_v3(&value).expect("Failed to deserialize a Token");
+
+        assert_eq!(result, GValue::Token(Token::new("id")));
+    }
+
+    #[test]
+    fn test_map_with_token() {
+        let value = json!({
+            "@type": "g:Map",
+             "@value": [
+                {"@type": "g:T","@value": "label"},
+                "person",
+                "name",
+                {"@type": "g:List","@value": ["marko"]}
+             ]
+        });
+
+        let result = deserializer_v3(&value).expect("Failed to deserialize a Token");
+
+        let value_map: Map = [
+            ("label".into(), GValue::String(String::from("person"))),
+            (
+                "name".into(),
+                GValue::List(vec![String::from("marko").into()]),
+            ),
+        ]
+        .iter()
+        .cloned()
+        .collect();
+
+        assert_eq!(result, GValue::Map(value_map));
     }
 }

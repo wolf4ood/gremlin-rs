@@ -1,4 +1,4 @@
-macro_rules! g_serielizer {
+macro_rules! g_serializer {
     ($name:ident, { $($key:expr => $value:ident),*}) => {
         pub fn $name(val: &Value) -> GremlinResult<GValue> {
             if let Value::String(ref s) = val {
@@ -12,7 +12,7 @@ macro_rules! g_serielizer {
                     $($key => {
                         $value(&$name,_value)
                     })*
-                    _ => Err($crate::GremlinError::Json(format!("Type {} not supporterd",_type)))
+                    _ => Err($crate::GremlinError::Json(format!("Type {} not supported",_type)))
                 }
             }
         }

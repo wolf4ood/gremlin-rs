@@ -1,6 +1,6 @@
 use crate::{
     Edge, GValue, GremlinError, GremlinResult, IntermediateRepr, List, Map, Metric, Path, Property,
-    TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
+    Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
 };
 
 use std::collections::HashMap;
@@ -75,6 +75,7 @@ impl_from_gvalue!(VertexProperty, GValue::VertexProperty);
 impl_from_gvalue!(Property, GValue::Property);
 impl_from_gvalue!(Map, GValue::Map);
 impl_from_gvalue!(List, GValue::List);
+impl_from_gvalue!(Token, GValue::Token);
 impl_from_gvalue!(Vertex, GValue::Vertex);
 impl_from_gvalue!(Edge, GValue::Edge);
 impl_from_gvalue!(Path, GValue::Path);
@@ -120,6 +121,7 @@ impl_borrow_from_gvalue!(Vertex, GValue::Vertex);
 impl_borrow_from_gvalue!(Edge, GValue::Edge);
 impl_borrow_from_gvalue!(Path, GValue::Path);
 impl_borrow_from_gvalue!(String, GValue::String);
+impl_borrow_from_gvalue!(Token, GValue::Token);
 impl_borrow_from_gvalue!(f32, GValue::Float);
 impl_borrow_from_gvalue!(f64, GValue::Double);
 impl_borrow_from_gvalue!(i32, GValue::Int32);
