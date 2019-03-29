@@ -1,5 +1,3 @@
-
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct Token {
     value: String,
@@ -7,10 +5,11 @@ pub struct Token {
 
 impl Token {
     pub fn new<T>(value: T) -> Token
-    where T: Into<String>
+    where
+        T: Into<String>,
     {
         Token {
-            value: value.into()
+            value: value.into(),
         }
     }
 

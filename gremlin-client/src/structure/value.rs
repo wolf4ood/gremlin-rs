@@ -1,7 +1,7 @@
 use crate::conversion::{BorrowFromGValue, FromGValue};
 use crate::structure::{
-    Edge, IntermediateRepr, Metric, Path, Property, Token, TraversalExplanation, TraversalMetrics, Vertex,
-    VertexProperty,
+    Edge, IntermediateRepr, Metric, Path, Property, Token, TraversalExplanation, TraversalMetrics,
+    Vertex, VertexProperty,
 };
 use crate::GremlinResult;
 use chrono;
