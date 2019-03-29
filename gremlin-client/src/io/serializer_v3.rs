@@ -449,7 +449,7 @@ mod tests {
         let mut map = HashMap::new();
         map.insert(String::from("a"), GValue::Int32(1));
         map.insert(String::from("b"), GValue::String(String::from("marko")));
-        assert_eq!(result, GValue::Map(map));
+        assert_eq!(result, GValue::from(map));
     }
 
     #[test]

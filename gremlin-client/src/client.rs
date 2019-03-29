@@ -6,7 +6,7 @@ use crate::{ConnectionOptions, GremlinError, GremlinResult};
 use crate::{GResultSet, GValue};
 use r2d2::Pool;
 use serde::Serialize;
-use std::collections::{HashMap, VecDeque};
+use std::collections::{BTreeMap, VecDeque};
 
 #[derive(Clone, Debug)]
 pub struct GremlinClient {
@@ -51,12 +51,12 @@ impl GremlinClient {
     where
         T: Into<String>,
     {
-        let map: HashMap<String, GValue> = params
+        let map: BTreeMap<String, GValue> = params
             .iter()
             .map(|(k, v)| (String::from(*k), v.to_gvalue()))
             .collect();
 
-        let p = self.io.write(&GValue::Map(map))?;
+        let p = self.io.write(&GValue::from(map))?;
 
         let message = gremlin(
             script.into(),

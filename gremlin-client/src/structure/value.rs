@@ -1,13 +1,12 @@
 use crate::conversion::{BorrowFromGValue, FromGValue};
 use crate::structure::{
-    Edge, IntermediateRepr, Metric, Path, Property, Token, TraversalExplanation, TraversalMetrics,
-    Vertex, VertexProperty,
+    Edge, IntermediateRepr, Map, Metric, Path, Property, Token, TraversalExplanation,
+    TraversalMetrics, Vertex, VertexProperty,
 };
 use crate::GremlinResult;
 use chrono;
-use std::collections::{HashMap, VecDeque};
+use std::collections::{BTreeMap, HashMap, VecDeque};
 
-pub type Map = HashMap<String, GValue>;
 pub type List = Vec<GValue>;
 pub type Set = Vec<GValue>;
 pub type Date = chrono::DateTime<chrono::offset::Utc>;
@@ -173,7 +172,13 @@ impl From<Token> for GValue {
 
 impl From<HashMap<String, GValue>> for GValue {
     fn from(val: HashMap<String, GValue>) -> Self {
-        GValue::Map(val)
+        GValue::Map(Map::from(val))
+    }
+}
+
+impl From<BTreeMap<String, GValue>> for GValue {
+    fn from(val: BTreeMap<String, GValue>) -> Self {
+        GValue::Map(Map::from(val))
     }
 }
 
