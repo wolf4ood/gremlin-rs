@@ -1,8 +1,9 @@
 use crate::structure::VertexProperty;
 use crate::structure::GID;
 use std::collections::HashMap;
+use std::hash::Hasher;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone)]
 pub struct Vertex {
     id: GID,
     label: String,
@@ -37,5 +38,19 @@ impl Vertex {
 
     pub fn property(&self, key: &str) -> Option<&VertexProperty> {
         self.properties.get(key).and_then(|v| v.get(0))
+    }
+}
+
+impl std::cmp::Eq for Vertex {}
+
+impl std::hash::Hash for Vertex {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+
+impl PartialEq for Vertex {
+    fn eq(&self, other: &Vertex) -> bool {
+        &self.id == other.id()
     }
 }

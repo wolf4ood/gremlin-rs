@@ -1,7 +1,8 @@
 use crate::structure::{Property, Vertex, GID};
 use std::collections::HashMap;
+use std::hash::Hasher;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone)]
 pub struct Edge {
     id: GID,
     label: String,
@@ -45,5 +46,19 @@ impl Edge {
     }
     pub fn out_v(&self) -> &Vertex {
         &self.out_v
+    }
+}
+
+impl std::cmp::Eq for Edge {}
+
+impl PartialEq for Edge {
+    fn eq(&self, other: &Edge) -> bool {
+        &self.id == other.id()
+    }
+}
+
+impl std::hash::Hash for Edge {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
     }
 }

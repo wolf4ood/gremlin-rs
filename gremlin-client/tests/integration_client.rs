@@ -316,3 +316,65 @@ fn test_explain() {
         t.final_t()
     );
 }
+
+#[test]
+
+fn test_group_count_vertex() {
+    let graph = graph();
+    let mark = create_vertex(&graph, "mark");
+    let frank = create_vertex(&graph, "frank");
+
+    create_edge(&graph, &mark, &frank, "knows");
+
+    let map = graph
+        .execute(
+            "g.V(identity).out().groupCount()",
+            &[("identity", mark.id())],
+        )
+        .expect("should fetch a groupCount")
+        .filter_map(Result::ok)
+        .map(|f| f.take::<Map>())
+        .collect::<Result<Vec<Map>, _>>()
+        .expect("It should be ok");
+
+    assert_eq!(1, map.len());
+
+    let first = &map[0];
+
+    assert_eq!(1, first.len());
+
+    let count = first.get(&frank);
+
+    assert_eq!(Some(&GValue::Int64(1)), count);
+}
+
+#[test]
+
+fn test_group_count_edge() {
+    let graph = graph();
+    let mark = create_vertex(&graph, "mark");
+    let frank = create_vertex(&graph, "frank");
+
+    let edge = create_edge(&graph, &mark, &frank, "knows");
+
+    let map = graph
+        .execute(
+            "g.V(identity).outE().groupCount()",
+            &[("identity", mark.id())],
+        )
+        .expect("should fetch a groupCount")
+        .filter_map(Result::ok)
+        .map(|f| f.take::<Map>())
+        .collect::<Result<Vec<Map>, _>>()
+        .expect("It should be ok");
+
+    assert_eq!(1, map.len());
+
+    let first = &map[0];
+
+    assert_eq!(1, first.len());
+
+    let count = first.get(&edge);
+
+    assert_eq!(Some(&GValue::Int64(1)), count);
+}

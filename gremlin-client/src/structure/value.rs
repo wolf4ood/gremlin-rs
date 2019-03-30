@@ -215,6 +215,8 @@ impl From<GKey> for GValue {
         match val {
             GKey::String(s) => GValue::String(s),
             GKey::Token(s) => GValue::String(s.value().clone()),
+            GKey::Vertex(v) => GValue::Vertex(v),
+            GKey::Edge(v) => GValue::Edge(v),
         }
     }
 }

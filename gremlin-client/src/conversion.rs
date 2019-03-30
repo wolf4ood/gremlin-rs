@@ -96,6 +96,8 @@ impl FromGValue for GKey {
         match v {
             GValue::String(s) => Ok(GKey::String(s)),
             GValue::Token(s) => Ok(GKey::String(s.value().clone())),
+            GValue::Vertex(s) => Ok(GKey::Vertex(s)),
+            GValue::Edge(s) => Ok(GKey::Edge(s)),
             _ => Err(GremlinError::Cast(format!(
                 "Cannot convert {:?} to {}",
                 v, "GKey"
