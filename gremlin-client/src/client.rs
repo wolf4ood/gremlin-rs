@@ -88,11 +88,8 @@ impl GremlinClient {
     fn send_message<T: Serialize>(&self, msg: Message<T>) -> GremlinResult<GResultSet> {
         let message = self.build_message(msg)?;
 
-        dbg!(&message);
-
         let mut conn = self.pool.get()?;
 
-        // let content_type = "application/json";
         let content_type = "application/vnd.gremlin-v3.0+json";
         let payload = String::from("") + content_type + &message;
         let mut binary = payload.into_bytes();
