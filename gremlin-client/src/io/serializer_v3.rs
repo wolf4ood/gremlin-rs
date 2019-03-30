@@ -1,9 +1,10 @@
 //! GraphSON V3 [docs](http://tinkerpop.apache.org/docs/current/dev/io/)
 //!
 
+use crate::conversion::FromGValue;
 use crate::structure::{
-    Edge, GValue, IntermediateRepr, List, Map, Metric, Path, Property, Token, TraversalExplanation,
-    TraversalMetrics, Vertex, VertexProperty, GID,
+    Edge, GKey, GValue, IntermediateRepr, List, Map, Metric, Path, Property, Token,
+    TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
 };
 use crate::GremlinError;
 use crate::GremlinResult;
@@ -112,22 +113,7 @@ where
     if !val.is_empty() {
         let mut x = 0;
         while x < val.len() {
-            let key = match &val[x] {
-                Value::String(s) => Ok(s.clone()),
-                Value::Object(_) => {
-                    let token_value: String = match reader(&val[x])? {
-                        GValue::Token(tk) => {
-                            let value = tk.value();
-                            Ok(value.clone())
-                        }
-                        _ => Err(GremlinError::Json(String::from(stringify!(o)))),
-                    }?;
-
-                    Ok(token_value)
-                }
-                _ => Err(GremlinError::Json(String::from(stringify!($v)))),
-            }?;
-
+            let key: GKey = FromGValue::from_gvalue(reader(&val[x])?)?;
             let value = reader(&val[x + 1])?;
             map.insert(key, value);
             x += 2;

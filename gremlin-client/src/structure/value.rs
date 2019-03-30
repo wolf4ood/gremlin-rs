@@ -176,6 +176,12 @@ impl From<HashMap<String, GValue>> for GValue {
     }
 }
 
+impl From<HashMap<GKey, GValue>> for GValue {
+    fn from(val: HashMap<GKey, GValue>) -> Self {
+        GValue::Map(Map::from(val))
+    }
+}
+
 impl From<BTreeMap<String, GValue>> for GValue {
     fn from(val: BTreeMap<String, GValue>) -> Self {
         GValue::Map(Map::from(val))
@@ -208,6 +214,7 @@ impl From<GKey> for GValue {
     fn from(val: GKey) -> Self {
         match val {
             GKey::String(s) => GValue::String(s),
+            GKey::Token(s) => GValue::String(s.value().clone()),
         }
     }
 }

@@ -1,6 +1,6 @@
 use crate::{
-    Edge, GValue, GremlinError, GremlinResult, IntermediateRepr, List, Map, Metric, Path, Property,
-    Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
+    Edge, GKey, GValue, GremlinError, GremlinResult, IntermediateRepr, List, Map, Metric, Path,
+    Property, Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
 };
 
 use std::collections::HashMap;
@@ -90,6 +90,19 @@ impl_from_gvalue!(TraversalMetrics, GValue::TraversalMetrics);
 impl_from_gvalue!(TraversalExplanation, GValue::TraversalExplanation);
 impl_from_gvalue!(IntermediateRepr, GValue::IntermediateRepr);
 impl_from_gvalue!(chrono::DateTime<chrono::Utc>, GValue::Date);
+
+impl FromGValue for GKey {
+    fn from_gvalue(v: GValue) -> GremlinResult<GKey> {
+        match v {
+            GValue::String(s) => Ok(GKey::String(s)),
+            GValue::Token(s) => Ok(GKey::String(s.value().clone())),
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot convert {:?} to {}",
+                v, "GKey"
+            ))),
+        }
+    }
+}
 
 #[doc(hidden)]
 pub trait BorrowFromGValue: Sized {

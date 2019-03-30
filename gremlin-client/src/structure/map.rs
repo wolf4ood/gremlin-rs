@@ -1,8 +1,15 @@
 use crate::structure::GValue;
+use crate::Token;
 use std::collections::{BTreeMap, HashMap};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Map(HashMap<GKey, GValue>);
+
+impl From<HashMap<GKey, GValue>> for Map {
+    fn from(val: HashMap<GKey, GValue>) -> Self {
+        Map(val)
+    }
+}
 
 impl From<HashMap<String, GValue>> for Map {
     fn from(val: HashMap<String, GValue>) -> Self {
@@ -57,6 +64,7 @@ impl std::iter::FromIterator<(String, GValue)> for Map {
 #[derive(Debug, PartialEq, Clone, Eq, Hash)]
 pub enum GKey {
     String(String),
+    Token(Token),
 }
 
 impl From<&str> for GKey {
