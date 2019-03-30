@@ -3,9 +3,9 @@ mod macros;
 mod serializer_v3;
 
 use crate::structure::GValue;
-use serde_json::Value;
+use serde_json::{json, Value};
 
-use crate::{GremlinError, GremlinResult};
+use crate::GremlinResult;
 
 #[derive(Debug, Clone)]
 pub enum GraphSON {
@@ -24,24 +24,36 @@ impl GraphSON {
 
     pub fn write(&self, value: &GValue) -> GremlinResult<Value> {
         match value {
-            GValue::Double(f) => Ok(Value::Number(
-                serde_json::Number::from_f64(*f)
-                    .ok_or_else(|| GremlinError::Json(String::from("Error serializing number")))?,
-            )),
-            GValue::Float(f) => Ok(Value::Number(
-                serde_json::Number::from_f64((*f).into())
-                    .ok_or_else(|| GremlinError::Json(String::from("Error serializing number")))?,
-            )),
-            GValue::Int32(f) => Ok(Value::Number(serde_json::Number::from(*f))),
-            GValue::Int64(f) => Ok(Value::Number(serde_json::Number::from(*f))),
+            GValue::Double(f) => Ok(json!({
+                "@type" : "g:Double",
+                "@value" : f
+            })),
+            GValue::Float(f) => Ok(json!({
+                "@type" : "g:Float",
+                "@value" : f
+            })),
+            GValue::Int32(f) => Ok(json!({
+                "@type" : "g:Int32",
+                "@value" : f
+            })),
+            GValue::Int64(f) => Ok(json!({
+                "@type" : "g:Int64",
+                "@value" : f
+            })),
             GValue::String(s) => Ok(Value::String(s.clone())),
 
             GValue::Map(map) => {
-                let v = map
-                    .iter()
-                    .map(|(k, v)| self.write(&v).map(|r| (k.clone(), r)))
-                    .collect::<Result<serde_json::Map<String, Value>, GremlinError>>()?;
-                Ok(Value::Object(v))
+                let mut params = vec![];
+
+                for (k, v) in map.iter() {
+                    params.push(self.write(&k.clone().into())?);
+                    params.push(self.write(&v)?);
+                }
+
+                Ok(json!({
+                    "@type" : "g:Map",
+                    "@value" : params
+                }))
             }
             _ => unimplemented!(),
         }

@@ -1,5 +1,4 @@
 use serde_derive::{Deserialize, Serialize};
-use serde_json::Map;
 use serde_json::Value;
 use uuid::Uuid;
 
@@ -31,35 +30,11 @@ pub struct ReponseStatus {
     pub message: String,
 }
 
-#[derive(Serialize)]
-pub struct GremlinScript {
-    gremlin: String,
-    bindings: Map<String, Value>,
-    aliases: Map<String, Value>,
-    language: String,
-}
-
-pub fn gremlin(
-    script: String,
-    bindings: Map<String, Value>,
-    alias: Option<String>,
-) -> Message<GremlinScript> {
-    let aliases = alias
-        .map(|s| {
-            let mut map = Map::new();
-            map.insert(String::from("g"), Value::String(s));
-            map
-        })
-        .unwrap_or_else(Map::new);
+pub fn message_with_args<T>(op: String, processor: String, args: T) -> Message<T> {
     Message {
         request_id: Uuid::new_v4(),
-        op: String::from("eval"),
-        processor: String::from(""),
-        args: GremlinScript {
-            gremlin: script,
-            bindings,
-            aliases,
-            language: String::from("gremlin-groovy"),
-        },
+        op,
+        processor,
+        args,
     }
 }

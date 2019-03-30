@@ -166,7 +166,7 @@ fn test_complex_vertex_creation_with_properties() {
         ("age", &22),
         ("name", &"mark"),
         ("score", &3.2),
-        ("date", &1551825863),
+        ("date", &(1551825863 as i64)),
     ];
     let mut properties = graph
         .execute(q, params)

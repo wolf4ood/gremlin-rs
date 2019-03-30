@@ -1,12 +1,12 @@
 use crate::io::GraphSON;
-use crate::message::{gremlin, Message, Response};
+use crate::message::{message_with_args, Message, Response};
 use crate::pool::GremlinConnectionManager;
 use crate::ToGValue;
 use crate::{ConnectionOptions, GremlinError, GremlinResult};
 use crate::{GResultSet, GValue};
 use r2d2::Pool;
 use serde::Serialize;
-use std::collections::{BTreeMap, VecDeque};
+use std::collections::{HashMap, VecDeque};
 
 #[derive(Clone, Debug)]
 pub struct GremlinClient {
@@ -51,20 +51,36 @@ impl GremlinClient {
     where
         T: Into<String>,
     {
-        let map: BTreeMap<String, GValue> = params
+        let mut args = HashMap::new();
+
+        args.insert(String::from("gremlin"), GValue::String(script.into()));
+        args.insert(
+            String::from("language"),
+            GValue::String(String::from("gremlin-groovy")),
+        );
+
+        let aliases = self
+            .alias
+            .clone()
+            .map(|s| {
+                let mut map = HashMap::new();
+                map.insert(String::from("g"), GValue::String(s));
+                map
+            })
+            .unwrap_or_else(HashMap::new);
+
+        args.insert(String::from("aliases"), GValue::from(aliases));
+
+        let bindings: HashMap<String, GValue> = params
             .iter()
             .map(|(k, v)| (String::from(*k), v.to_gvalue()))
             .collect();
 
-        let p = self.io.write(&GValue::from(map))?;
+        args.insert(String::from("bindings"), GValue::from(bindings));
 
-        let message = gremlin(
-            script.into(),
-            p.as_object()
-                .ok_or_else(|| GremlinError::Json(String::from("it should be an object")))?
-                .clone(),
-            self.alias.clone(),
-        );
+        let args = self.io.write(&GValue::from(args))?;
+
+        let message = message_with_args(String::from("eval"), String::default(), args);
 
         self.send_message(message)
     }
@@ -72,9 +88,12 @@ impl GremlinClient {
     fn send_message<T: Serialize>(&self, msg: Message<T>) -> GremlinResult<GResultSet> {
         let message = self.build_message(msg)?;
 
+        dbg!(&message);
+
         let mut conn = self.pool.get()?;
 
-        let content_type = "application/json";
+        // let content_type = "application/json";
+        let content_type = "application/vnd.gremlin-v3.0+json";
         let payload = String::from("") + content_type + &message;
         let mut binary = payload.into_bytes();
         binary.insert(0, content_type.len() as u8);

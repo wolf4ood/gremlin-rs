@@ -1,6 +1,6 @@
 use crate::conversion::{BorrowFromGValue, FromGValue};
 use crate::structure::{
-    Edge, IntermediateRepr, Map, Metric, Path, Property, Token, TraversalExplanation,
+    Edge, GKey, IntermediateRepr, Map, Metric, Path, Property, Token, TraversalExplanation,
     TraversalMetrics, Vertex, VertexProperty,
 };
 use crate::GremlinResult;
@@ -200,6 +200,14 @@ impl From<GValue> for VecDeque<GValue> {
             GValue::List(l) => VecDeque::from(l),
             GValue::Set(l) => VecDeque::from(l),
             _ => VecDeque::from(vec![val]),
+        }
+    }
+}
+
+impl From<GKey> for GValue {
+    fn from(val: GKey) -> Self {
+        match val {
+            GKey::String(s) => GValue::String(s),
         }
     }
 }
