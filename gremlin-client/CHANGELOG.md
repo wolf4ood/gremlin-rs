@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [#2](https://github.com/wolf4ood/gremlin-rs/issues/10) Added support for other types as keys in Map.
+- [#11](https://github.com/wolf4ood/gremlin-rs/issues/11) Support for V and E as keys in `Map`.
+- [#2](https://github.com/wolf4ood/gremlin-rs/issues/10) Added support for other types as keys in `Map`.
 
 ## [0.1.1] - 2019-03-27
 
