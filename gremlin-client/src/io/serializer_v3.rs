@@ -205,6 +205,7 @@ where
 
     let m = get_and_remove(&mut metrics, "metrics", G_TRAVERSAL_METRICS)?
         .take::<List>()?
+        .take()
         .drain(0..)
         .map(|e| e.take::<Metric>())
         .filter_map(Result::ok)
@@ -242,6 +243,7 @@ where
 
     let original = get_and_remove(&mut explain, "original", G_TRAVERSAL_EXPLANATION)?
         .take::<List>()?
+        .take()
         .drain(0..)
         .map(|s| s.take::<String>())
         .filter_map(Result::ok)
@@ -249,6 +251,7 @@ where
 
     let finals = get_and_remove(&mut explain, "final", G_TRAVERSAL_EXPLANATION)?
         .take::<List>()?
+        .take()
         .drain(0..)
         .map(|s| s.take::<String>())
         .filter_map(Result::ok)
@@ -256,6 +259,7 @@ where
 
     let intermediate = get_and_remove(&mut explain, "intermediate", G_TRAVERSAL_EXPLANATION)?
         .take::<List>()?
+        .take()
         .drain(0..)
         .map(|s| s.take::<Map>())
         .filter_map(Result::ok)
@@ -269,6 +273,7 @@ where
 fn map_intermediate(mut m: Map) -> GremlinResult<IntermediateRepr> {
     let traversal = get_and_remove(&mut m, "traversal", G_TRAVERSAL_EXPLANATION)?
         .take::<List>()?
+        .take()
         .drain(0..)
         .map(|s| s.take::<String>())
         .filter_map(Result::ok)
@@ -400,11 +405,14 @@ mod tests {
 
         assert_eq!(
             result,
-            GValue::List(vec![
-                GValue::Int32(1),
-                GValue::Int32(2),
-                GValue::String(String::from("3")),
-            ])
+            GValue::List(
+                vec![
+                    GValue::Int32(1),
+                    GValue::Int32(2),
+                    GValue::String(String::from("3")),
+                ]
+                .into()
+            )
         );
 
         // Set
@@ -417,12 +425,15 @@ mod tests {
 
         assert_eq!(
             result,
-            GValue::List(vec![
-                GValue::Int32(1),
-                GValue::Int32(2),
-                GValue::Float(2.0),
-                GValue::String(String::from("3")),
-            ])
+            GValue::List(
+                vec![
+                    GValue::Int32(1),
+                    GValue::Int32(2),
+                    GValue::Float(2.0),
+                    GValue::String(String::from("3")),
+                ]
+                .into()
+            )
         );
 
         // Map
@@ -587,15 +598,16 @@ mod tests {
 
         let result = deserializer_v3(&value).expect("Failed to deserialize a Path");
 
-        let empty = GValue::List(vec![]);
+        let empty: GValue = vec![].into();
 
         let path = Path::new(
-            GValue::List(vec![empty.clone(), empty.clone(), empty.clone()]),
+            vec![empty.clone(), empty.clone(), empty.clone()].into(),
             vec![
                 vertex!({ id => 1, label => "person", properties => {}}).into(),
                 vertex!({ id => 10, label => "software", properties => {}}).into(),
                 vertex!({ id => 11, label => "software", properties => {}}).into(),
-            ],
+            ]
+            .into(),
         );
         assert_eq!(result, path.into());
     }
@@ -655,7 +667,7 @@ mod tests {
             ("label".into(), GValue::String(String::from("person"))),
             (
                 "name".into(),
-                GValue::List(vec![String::from("marko").into()]),
+                GValue::List(vec![String::from("marko").into()].into()),
             ),
         ]
         .iter()

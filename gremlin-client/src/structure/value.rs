@@ -1,14 +1,12 @@
 use crate::conversion::{BorrowFromGValue, FromGValue};
 use crate::structure::{
-    Edge, GKey, IntermediateRepr, Map, Metric, Path, Property, Token, TraversalExplanation,
-    TraversalMetrics, Vertex, VertexProperty,
+    Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property, Set, Token,
+    TraversalExplanation, TraversalMetrics, Vertex, VertexProperty,
 };
 use crate::GremlinResult;
 use chrono;
 use std::collections::{BTreeMap, HashMap, VecDeque};
 
-pub type List = Vec<GValue>;
-pub type Set = Vec<GValue>;
 pub type Date = chrono::DateTime<chrono::offset::Utc>;
 
 /// Represent possible values coming from the [Gremlin Server](http://tinkerpop.apache.org/docs/3.4.0/dev/io/)
@@ -190,7 +188,7 @@ impl From<BTreeMap<String, GValue>> for GValue {
 
 impl From<Vec<GValue>> for GValue {
     fn from(val: Vec<GValue>) -> Self {
-        GValue::List(val)
+        GValue::List(List::new(val))
     }
 }
 
@@ -203,8 +201,8 @@ impl From<GValue> for Vec<GValue> {
 impl From<GValue> for VecDeque<GValue> {
     fn from(val: GValue) -> Self {
         match val {
-            GValue::List(l) => VecDeque::from(l),
-            GValue::Set(l) => VecDeque::from(l),
+            GValue::List(l) => VecDeque::from(l.take()),
+            GValue::Set(l) => VecDeque::from(l.take()),
             _ => VecDeque::from(vec![val]),
         }
     }

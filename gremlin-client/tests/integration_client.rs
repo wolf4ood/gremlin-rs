@@ -142,7 +142,7 @@ fn test_vertex_creation() {
     assert_eq!(1, value_map.len());
 
     assert_eq!(
-        Some(&GValue::List(vec![String::from("mark").into()])),
+        Some(&GValue::List(vec![String::from("mark").into()].into())),
         value_map[0].get("name")
     );
 }
