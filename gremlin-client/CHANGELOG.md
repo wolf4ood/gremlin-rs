@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#11](https://github.com/wolf4ood/gremlin-rs/issues/11) Support for V and E as keys in `Map`.
 - [#2](https://github.com/wolf4ood/gremlin-rs/issues/10) Added support for other types as keys in `Map`.
 
+### Changed
+
+- [#13](https://github.com/wolf4ood/gremlin-rs/issues/13) Refactor List/Set in their own types.
+
 ## [0.1.1] - 2019-03-27
 
 ### Added
