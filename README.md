@@ -60,3 +60,30 @@ fn main() -> Result<(), Box<std::error::Error>> {
 
 
 
+### Development
+
+
+#### Compiling
+
+```
+git clone https://github.com/wolf4ood/gremlin-rs.git
+cd gremlin-rs
+cargo build
+```
+
+
+#### Running Tests
+
+Some tests run against a running instance of Gremlin Server with a sample in-memory graph installed.
+
+You can use docker-compose to start an instance for testing. Use the env variable `GREMLIN_SERVER`
+in order to specify the version of the Gremlin Server
+
+```
+cd docker-compose
+export GREMLIN_SERVER=3.4.0
+docker-compose up -d
+cd ..
+cargo test
+```
+
