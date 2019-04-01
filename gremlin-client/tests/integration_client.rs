@@ -160,14 +160,19 @@ fn test_complex_vertex_creation_with_properties() {
             .property('age',age)
             .property('time',time)
             .property('score',score)
+            .property('uuid',uuid)
             .property('date',new Date(date))
+            .property('dateTime',dateTime)
             .propertyMap()"#;
 
+    let uuid = uuid::Uuid::new_v4();
     let params: &[(&str, &dyn ToGValue)] = &[
         ("age", &22),
         ("time", &(22 as i64)),
         ("name", &"mark"),
         ("score", &3.2),
+        ("uuid", &uuid),
+        ("dateTime", &chrono::Utc.timestamp(1551825863, 0)),
         ("date", &(1551825863 as i64)),
     ];
     let results = graph
@@ -180,7 +185,7 @@ fn test_complex_vertex_creation_with_properties() {
 
     let properties = &results[0];
 
-    assert_eq!(6, properties.len());
+    assert_eq!(8, properties.len());
 
     assert_eq!(
         &22,
@@ -216,6 +221,15 @@ fn test_complex_vertex_creation_with_properties() {
         .is_ok());
 
     assert_eq!(
+        &uuid,
+        properties["uuid"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<uuid::Uuid>()
+            .unwrap()
+    );
+
+    assert_eq!(
         &String::from("mark"),
         properties["name"].get::<List>().unwrap()[0]
             .get::<VertexProperty>()
@@ -230,6 +244,15 @@ fn test_complex_vertex_creation_with_properties() {
             .get::<VertexProperty>()
             .unwrap()
             .get::<f64>()
+            .unwrap()
+    );
+
+    assert_eq!(
+        &chrono::Utc.timestamp(1551825863, 0),
+        properties["dateTime"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<chrono::DateTime<chrono::Utc>>()
             .unwrap()
     );
 }

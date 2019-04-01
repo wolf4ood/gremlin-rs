@@ -40,7 +40,17 @@ impl GraphSON {
                 "@type" : "g:Int64",
                 "@value" : f
             })),
+
             GValue::String(s) => Ok(Value::String(s.clone())),
+
+            GValue::Uuid(s) => Ok(json!({
+                "@type" : "g:UUID",
+                "@value" : s.to_string()
+            })),
+            GValue::Date(d) => Ok(json!({
+                "@type" : "g:Date",
+                "@value" : d.timestamp()
+            })),
 
             GValue::Map(map) => {
                 let mut params = vec![];
@@ -55,7 +65,7 @@ impl GraphSON {
                     "@value" : params
                 }))
             }
-            _ => unimplemented!(),
+            _ => panic!("Type {:?} not supported.", value),
         }
     }
 }
