@@ -2,8 +2,8 @@ extern crate gremlin_client;
 
 use gremlin_client::{Edge, GValue, Map, Vertex};
 use gremlin_client::{
-    GremlinClient, GremlinError, GremlinResult, ToGValue, TraversalExplanation, TraversalMetrics,
-    VertexProperty,
+    GremlinClient, GremlinError, GremlinResult, List, ToGValue, TraversalExplanation,
+    TraversalMetrics, VertexProperty,
 };
 
 fn connect() -> GremlinResult<GremlinClient> {
@@ -158,66 +158,79 @@ fn test_complex_vertex_creation_with_properties() {
             .property('id',UUID.randomUUID())
             .property('name',name)
             .property('age',age)
+            .property('time',time)
             .property('score',score)
             .property('date',new Date(date))
-            .properties()"#;
+            .propertyMap()"#;
 
     let params: &[(&str, &dyn ToGValue)] = &[
         ("age", &22),
+        ("time", &(22 as i64)),
         ("name", &"mark"),
         ("score", &3.2),
         ("date", &(1551825863 as i64)),
     ];
-    let mut properties = graph
+    let results = graph
         .execute(q, params)
         .expect("it should execute addV")
         .filter_map(Result::ok)
-        .map(|f| f.take::<VertexProperty>())
-        .collect::<Result<Vec<VertexProperty>, _>>()
+        .map(|f| f.take::<Map>())
+        .collect::<Result<Vec<Map>, _>>()
         .expect("It should be ok");
 
-    properties.sort_by(|a, b| a.label().cmp(b.label()));
+    let properties = &results[0];
 
-    assert_eq!(5, properties.len());
+    assert_eq!(6, properties.len());
 
     assert_eq!(
-        22,
-        properties[0]
-            .clone()
-            .take::<i32>()
-            .expect("It should be aa integer")
+        &22,
+        properties["age"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<i32>()
+            .unwrap()
     );
 
     assert_eq!(
-        chrono::Utc.timestamp(1551825863, 0),
-        properties[1]
-            .clone()
-            .take::<chrono::DateTime<chrono::Utc>>()
-            .expect("It should be a Date")
-    );
-
-    assert_ne!(
-        uuid::Uuid::new_v4(),
-        properties[2]
-            .clone()
-            .take::<uuid::Uuid>()
-            .expect("It should be an integer")
+        &22,
+        properties["time"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<i64>()
+            .unwrap()
     );
 
     assert_eq!(
-        String::from("mark"),
-        properties[3]
-            .clone()
-            .take::<String>()
-            .expect("It should be a string")
+        &chrono::Utc.timestamp(1551825863, 0),
+        properties["date"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<chrono::DateTime<chrono::Utc>>()
+            .unwrap()
+    );
+
+    assert!(properties["id"].get::<List>().unwrap()[0]
+        .get::<VertexProperty>()
+        .unwrap()
+        .get::<uuid::Uuid>()
+        .is_ok());
+
+    assert_eq!(
+        &String::from("mark"),
+        properties["name"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<String>()
+            .unwrap()
     );
 
     assert_eq!(
-        3.2,
-        properties[4]
-            .clone()
-            .take::<f64>()
-            .expect("It should be a double")
+        &3.2,
+        properties["score"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<f64>()
+            .unwrap()
     );
 }
 
