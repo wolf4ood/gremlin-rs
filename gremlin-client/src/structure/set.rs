@@ -13,6 +13,10 @@ impl Set {
     pub(crate) fn take(self) -> Vec<GValue> {
         self.0
     }
+
+    pub fn iter(&self) -> impl Iterator<Item = &GValue> {
+        self.0.iter()
+    }
 }
 
 impl Into<Set> for Vec<GValue> {
@@ -20,11 +24,3 @@ impl Into<Set> for Vec<GValue> {
         Set(self)
     }
 }
-
-// impl std::ops::Index<usize> for List {
-//     type Output = GValue;
-
-//     fn index(&self, key: usize) -> &GValue {
-//         self.0.get(key).expect("no entry found for key")
-//     }
-// }

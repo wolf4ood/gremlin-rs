@@ -11,6 +11,10 @@ impl List {
     pub(crate) fn take(self) -> Vec<GValue> {
         self.0
     }
+
+    pub fn iter(&self) -> impl Iterator<Item = &GValue> {
+        self.0.iter()
+    }
 }
 
 impl Into<List> for Vec<GValue> {
