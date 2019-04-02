@@ -12,7 +12,7 @@ pub struct Edge {
 }
 
 impl Edge {
-    pub fn new<T>(
+    pub(crate) fn new<T>(
         id: GID,
         label: T,
         in_v_id: GID,

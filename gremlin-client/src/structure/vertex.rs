@@ -11,13 +11,11 @@ pub struct Vertex {
 }
 
 impl Vertex {
-    pub fn with_label<T>(id: GID, label: T) -> Vertex
-    where
-        T: Into<String>,
-    {
-        Self::new(id, label, HashMap::new())
-    }
-    pub fn new<T>(id: GID, label: T, properties: HashMap<String, Vec<VertexProperty>>) -> Vertex
+    pub(crate) fn new<T>(
+        id: GID,
+        label: T,
+        properties: HashMap<String, Vec<VertexProperty>>,
+    ) -> Vertex
     where
         T: Into<String>,
     {
