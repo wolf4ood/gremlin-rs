@@ -4,7 +4,7 @@ use crate::GValue;
 pub struct List(Vec<GValue>);
 
 impl List {
-    pub fn new(elements: Vec<GValue>) -> Self {
+    pub(crate) fn new(elements: Vec<GValue>) -> Self {
         List(elements)
     }
 
