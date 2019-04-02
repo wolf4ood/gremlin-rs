@@ -2,6 +2,8 @@ use crate::structure::{Edge, GValue, Vertex};
 use crate::Token;
 use std::collections::{BTreeMap, HashMap};
 
+/// Represent a Map<[GKey](struct.GKey),[GValue](struct.GValue)> which has ability to allow for non-String keys.
+/// TinkerPop type [here](http://tinkerpop.apache.org/docs/current/dev/io/#_map) 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Map(HashMap<GKey, GValue>);
 
@@ -32,11 +34,12 @@ impl Map {
     {
         self.0.remove(&key.into())
     }
-
+    /// Iterate all key-value pairs
     pub fn iter(&self) -> impl Iterator<Item = (&GKey, &GValue)> {
         self.0.iter()
     }
 
+    ///Returns a reference to the value corresponding to the key.
     pub fn get<T>(&self, key: T) -> Option<&GValue>
     where
         T: Into<GKey>,
@@ -44,10 +47,12 @@ impl Map {
         self.0.get(&key.into())
     }
 
+    /// Returns the number of elements in the map.
     pub fn len(&self) -> usize {
         self.0.len()
     }
 
+    /// Returns true if the map contains no elements.
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
@@ -68,6 +73,8 @@ impl std::iter::FromIterator<(String, GValue)> for Map {
             .collect())
     }
 }
+
+/// Possible key types in a [Map](struct.Map)
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, PartialEq, Clone, Eq, Hash)]
 pub enum GKey {
