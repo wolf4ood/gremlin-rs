@@ -3,7 +3,7 @@ use crate::Token;
 use std::collections::{BTreeMap, HashMap};
 
 /// Represent a Map<[GKey](struct.GKey),[GValue](struct.GValue)> which has ability to allow for non-String keys.
-/// TinkerPop type [here](http://tinkerpop.apache.org/docs/current/dev/io/#_map) 
+/// TinkerPop type [here](http://tinkerpop.apache.org/docs/current/dev/io/#_map)
 #[derive(Debug, PartialEq, Clone)]
 pub struct Map(HashMap<GKey, GValue>);
 

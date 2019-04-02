@@ -6,7 +6,6 @@ use crate::GValue;
 pub struct Set(Vec<GValue>);
 
 impl Set {
-    
     pub(crate) fn take(self) -> Vec<GValue> {
         self.0
     }
