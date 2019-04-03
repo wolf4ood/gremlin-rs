@@ -47,6 +47,10 @@ impl Edge {
     pub fn out_v(&self) -> &Vertex {
         &self.out_v
     }
+
+    pub fn property(&self, key: &str) -> Option<&Property> {
+        self.properties.get(key)
+    }
 }
 
 impl std::cmp::Eq for Edge {}
