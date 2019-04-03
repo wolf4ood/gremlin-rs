@@ -9,7 +9,15 @@ fn main() -> Result<(), Box<std::error::Error>> {
         .map(|f| f.take::<Vertex>())
         .collect::<Result<Vec<Vertex>, _>>()?;
 
-    println!("{:#?}", results);
+    println!("Vertex count: {}", results.len());
+
+    let vertex = &results[0];
+
+    println!(
+        "Vertex with id: [{}] and label: [{}]",
+        vertex.id().get::<i64>()?,
+        vertex.label()
+    );
 
     Ok(())
 }
