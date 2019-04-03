@@ -1,4 +1,4 @@
-use crate::conversion::{BorrowFromGValue, FromGValue};
+use crate::conversion::{BorrowFromGID, BorrowFromGValue, FromGValue};
 use crate::structure::{
     Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property, Set, Token,
     TraversalExplanation, TraversalMetrics, Vertex, VertexProperty,
@@ -56,6 +56,15 @@ pub enum GID {
     String(String),
     Int32(i32),
     Int64(i64),
+}
+
+impl GID {
+    pub fn get<'a, T>(&'a self) -> GremlinResult<&'a T>
+    where
+        T: BorrowFromGID,
+    {
+        T::from_gid(self)
+    }
 }
 
 impl From<&'static str> for GID {

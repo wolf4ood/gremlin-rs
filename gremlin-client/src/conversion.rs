@@ -51,6 +51,8 @@ impl ToGValue for &str {
     }
 }
 
+// Take from GValue
+
 #[doc(hidden)]
 pub trait FromGValue: Sized {
     fn from_gvalue(v: GValue) -> GremlinResult<Self>;
@@ -108,6 +110,8 @@ impl FromGValue for GKey {
     }
 }
 
+// Borrow from GValue
+
 #[doc(hidden)]
 pub trait BorrowFromGValue: Sized {
     fn from_gvalue<'a>(v: &'a GValue) -> GremlinResult<&'a Self>;
@@ -145,3 +149,31 @@ impl_borrow_from_gvalue!(i32, GValue::Int32);
 impl_borrow_from_gvalue!(i64, GValue::Int64);
 impl_borrow_from_gvalue!(uuid::Uuid, GValue::Uuid);
 impl_borrow_from_gvalue!(chrono::DateTime<chrono::Utc>, GValue::Date);
+
+// Borrow from GID
+
+#[doc(hidden)]
+pub trait BorrowFromGID: Sized {
+    fn from_gid<'a>(v: &'a GID) -> GremlinResult<&'a Self>;
+}
+
+macro_rules! impl_borrow_from_gid {
+    ($t:ty, $v:path) => {
+        impl BorrowFromGID for $t {
+            fn from_gid<'a>(v: &'a GID) -> GremlinResult<&'a $t> {
+                match v {
+                    $v(e) => Ok(e),
+                    _ => Err(GremlinError::Cast(format!(
+                        "Cannot convert {:?} to {}",
+                        v,
+                        stringify!($t)
+                    ))),
+                }
+            }
+        }
+    };
+}
+
+impl_borrow_from_gid!(String, GID::String);
+impl_borrow_from_gid!(i32, GID::Int32);
+impl_borrow_from_gid!(i64, GID::Int64);
