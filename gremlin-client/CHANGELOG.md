@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2019-04-04
+
 ### Added
 
 - [#11](https://github.com/wolf4ood/gremlin-rs/issues/11) Support for V and E as keys in `Map`.
