@@ -1,24 +1,12 @@
-extern crate gremlin_client;
-
 use gremlin_client::{Edge, GValue, Map, Vertex};
 use gremlin_client::{
-    GremlinClient, GremlinError, GremlinResult, List, ToGValue, TraversalExplanation,
-    TraversalMetrics, VertexProperty,
+    GremlinClient, GremlinError, List, ToGValue, TraversalExplanation, TraversalMetrics,
+    VertexProperty,
 };
 
-fn connect() -> GremlinResult<GremlinClient> {
-    GremlinClient::connect(("localhost", 8182))
-}
+mod common;
 
-fn expect_client() -> GremlinClient {
-    connect().expect("It should connect")
-}
-
-fn graph() -> GremlinClient {
-    let client = expect_client();
-
-    client
-}
+use common::{expect_client, graph};
 
 #[test]
 fn test_client_connection_ok() {

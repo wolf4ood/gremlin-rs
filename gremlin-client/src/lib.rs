@@ -44,6 +44,7 @@ pub use structure::{
     Edge, GKey, GResultSet, GValue, IntermediateRepr, List, Map, Metric, Path, Property, Token,
     TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
 };
+pub mod process;
 
 mod client;
 mod connection;
@@ -51,6 +52,7 @@ mod error;
 mod io;
 mod message;
 mod pool;
+
 mod structure;
 
 mod conversion;

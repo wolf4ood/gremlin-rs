@@ -177,3 +177,28 @@ macro_rules! impl_borrow_from_gid {
 impl_borrow_from_gid!(String, GID::String);
 impl_borrow_from_gid!(i32, GID::Int32);
 impl_borrow_from_gid!(i64, GID::Int64);
+
+// Conversion to GID
+
+pub trait ToGID {
+    fn to_gid(&self) -> GID;
+}
+
+macro_rules! impl_to_gid {
+    ($t:ty, $v:path) => {
+        impl ToGID for $t {
+            fn to_gid(&self) -> GID {
+                $v(*self)
+            }
+        }
+    };
+}
+
+impl_to_gid!(i32, GID::Int32);
+impl_to_gid!(i64, GID::Int64);
+
+impl ToGID for &str {
+    fn to_gid(&self) -> GID {
+        GID::String(String::from(*self))
+    }
+}
