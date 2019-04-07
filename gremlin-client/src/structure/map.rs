@@ -7,6 +7,15 @@ use std::collections::{BTreeMap, HashMap};
 #[derive(Debug, PartialEq, Clone)]
 pub struct Map(HashMap<GKey, GValue>);
 
+
+impl Map {
+
+
+    pub (crate) fn empty() -> Map {
+        Map(HashMap::default())
+    }
+}
+
 impl From<HashMap<GKey, GValue>> for Map {
     fn from(val: HashMap<GKey, GValue>) -> Self {
         Map(val)

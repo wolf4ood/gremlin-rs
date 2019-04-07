@@ -199,11 +199,13 @@ pub fn deserialize_metrics<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
 {
+    dbg!(val);
+
     let mut metrics = reader(&val)?.take::<Map>()?;
 
-    let duration = get_and_remove(&mut metrics, "dur", G_TRAVERSAL_METRICS)?.take::<f64>()?;
+    let duration = remove_or_else(&mut metrics, "dur", G_TRAVERSAL_METRICS)?.take::<f64>()?;
 
-    let m = get_and_remove(&mut metrics, "metrics", G_TRAVERSAL_METRICS)?
+    let m = remove_or_else(&mut metrics, "metrics", G_TRAVERSAL_METRICS)?
         .take::<List>()?
         .take()
         .drain(0..)
@@ -221,18 +223,40 @@ where
 {
     let mut metric = reader(&val)?.take::<Map>()?;
 
-    let duration = get_and_remove(&mut metric, "dur", G_METRICS)?.take::<f64>()?;
-    let id = get_and_remove(&mut metric, "id", G_METRICS)?.take::<String>()?;
-    let name = get_and_remove(&mut metric, "name", G_METRICS)?.take::<String>()?;
+    let duration = remove_or_else(&mut metric, "dur", G_METRICS)?.take::<f64>()?;
+    let id = remove_or_else(&mut metric, "id", G_METRICS)?.take::<String>()?;
+    let name = remove_or_else(&mut metric, "name", G_METRICS)?.take::<String>()?;
 
-    let mut counts = get_and_remove(&mut metric, "counts", G_METRICS)?.take::<Map>()?;
-    let traversers = get_and_remove(&mut counts, "traverserCount", G_METRICS)?.take::<i64>()?;
-    let count = get_and_remove(&mut counts, "elementCount", G_METRICS)?.take::<i64>()?;
+    let mut counts = remove_or_else(&mut metric, "counts", G_METRICS)?.take::<Map>()?;
+    let traversers = remove_or_else(&mut counts, "traverserCount", G_METRICS)?.take::<i64>()?;
+    let count = remove_or_else(&mut counts, "elementCount", G_METRICS)?.take::<i64>()?;
 
-    let mut annotations = get_and_remove(&mut metric, "annotations", G_METRICS)?.take::<Map>()?;
-    let perc_duration = get_and_remove(&mut annotations, "percentDur", G_METRICS)?.take::<f64>()?;
+    let mut annotations = remove(&mut metric, "annotations", G_METRICS)
+        .map(|e| e.take::<Map>())
+        .unwrap_or_else(|| Ok(Map::empty()))?;
 
-    Ok(Metric::new(id, name, duration, count, traversers, perc_duration).into())
+    let perc_duration = remove(&mut annotations, "percentDur", G_METRICS)
+        .map(|e| e.take::<f64>())
+        .unwrap_or_else(|| Ok(0.0))?;
+
+    let nested: GremlinResult<Vec<Metric>> = remove(&mut metric, "metrics", G_METRICS)
+        .map(|e| e.take::<List>())
+        .unwrap_or_else(|| Ok(List::new(vec![])))?
+        .take()
+        .into_iter()
+        .map(|e| e.take::<Metric>())
+        .collect();
+
+    Ok(Metric::new(
+        id,
+        name,
+        duration,
+        count,
+        traversers,
+        perc_duration,
+        nested?,
+    )
+    .into())
 }
 
 pub fn deserialize_explain<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
@@ -241,7 +265,7 @@ where
 {
     let mut explain = reader(&val)?.take::<Map>()?;
 
-    let original = get_and_remove(&mut explain, "original", G_TRAVERSAL_EXPLANATION)?
+    let original = remove_or_else(&mut explain, "original", G_TRAVERSAL_EXPLANATION)?
         .take::<List>()?
         .take()
         .drain(0..)
@@ -249,7 +273,7 @@ where
         .filter_map(Result::ok)
         .collect();
 
-    let finals = get_and_remove(&mut explain, "final", G_TRAVERSAL_EXPLANATION)?
+    let finals = remove_or_else(&mut explain, "final", G_TRAVERSAL_EXPLANATION)?
         .take::<List>()?
         .take()
         .drain(0..)
@@ -257,7 +281,7 @@ where
         .filter_map(Result::ok)
         .collect();
 
-    let intermediate = get_and_remove(&mut explain, "intermediate", G_TRAVERSAL_EXPLANATION)?
+    let intermediate = remove_or_else(&mut explain, "intermediate", G_TRAVERSAL_EXPLANATION)?
         .take::<List>()?
         .take()
         .drain(0..)
@@ -271,7 +295,7 @@ where
 }
 
 fn map_intermediate(mut m: Map) -> GremlinResult<IntermediateRepr> {
-    let traversal = get_and_remove(&mut m, "traversal", G_TRAVERSAL_EXPLANATION)?
+    let traversal = remove_or_else(&mut m, "traversal", G_TRAVERSAL_EXPLANATION)?
         .take::<List>()?
         .take()
         .drain(0..)
@@ -279,9 +303,9 @@ fn map_intermediate(mut m: Map) -> GremlinResult<IntermediateRepr> {
         .filter_map(Result::ok)
         .collect();
 
-    let strategy = get_and_remove(&mut m, "strategy", G_TRAVERSAL_EXPLANATION)?.take::<String>()?;
+    let strategy = remove_or_else(&mut m, "strategy", G_TRAVERSAL_EXPLANATION)?.take::<String>()?;
 
-    let category = get_and_remove(&mut m, "category", G_TRAVERSAL_EXPLANATION)?.take::<String>()?;
+    let category = remove_or_else(&mut m, "category", G_TRAVERSAL_EXPLANATION)?.take::<String>()?;
 
     Ok(IntermediateRepr::new(traversal, strategy, category))
 }
@@ -375,9 +399,13 @@ where
     }
 }
 
-fn get_and_remove(map: &mut Map, field: &str, owner: &str) -> GremlinResult<GValue> {
-    map.remove(field)
+fn remove_or_else(map: &mut Map, field: &str, owner: &str) -> GremlinResult<GValue> {
+    remove(map, field, owner)
         .ok_or_else(|| GremlinError::Json(format!("Field {} not found in {}", field, owner)))
+}
+
+fn remove(map: &mut Map, field: &str, _owner: &str) -> Option<GValue> {
+    map.remove(field)
 }
 // TESTS
 #[cfg(test)]
@@ -628,10 +656,27 @@ mod tests {
                     4,
                     4,
                     25.0,
+                    vec![],
                 ),
-                Metric::new("2.0.0()", "VertexStep(OUT,vertex)", 100.0, 13, 13, 25.0),
-                Metric::new("3.0.0()", "VertexStep(OUT,vertex)", 100.0, 7, 7, 25.0),
-                Metric::new("4.0.0()", "TreeStep", 100.0, 1, 1, 25.0),
+                Metric::new(
+                    "2.0.0()",
+                    "VertexStep(OUT,vertex)",
+                    100.0,
+                    13,
+                    13,
+                    25.0,
+                    vec![],
+                ),
+                Metric::new(
+                    "3.0.0()",
+                    "VertexStep(OUT,vertex)",
+                    100.0,
+                    7,
+                    7,
+                    25.0,
+                    vec![],
+                ),
+                Metric::new("4.0.0()", "TreeStep", 100.0, 1, 1, 25.0, vec![]),
             ],
         );
 

@@ -77,6 +77,7 @@ pub struct Metric {
     count: i64,
     traversers: i64,
     perc_duration: f64,
+    nested: Vec<Metric>,
 }
 
 impl Metric {
@@ -109,6 +110,7 @@ impl Metric {
         count: i64,
         traversers: i64,
         perc_duration: f64,
+        nested: Vec<Metric>,
     ) -> Self
     where
         T: Into<String>,
@@ -121,6 +123,7 @@ impl Metric {
             count,
             traversers,
             perc_duration,
+            nested,
         }
     }
 }
