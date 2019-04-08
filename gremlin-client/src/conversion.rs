@@ -3,6 +3,7 @@ use crate::{
     Property, Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
 };
 
+
 use std::collections::HashMap;
 
 pub trait ToGValue {
@@ -50,6 +51,7 @@ impl ToGValue for &str {
         GValue::String(String::from(*self))
     }
 }
+
 
 // Take from GValue
 

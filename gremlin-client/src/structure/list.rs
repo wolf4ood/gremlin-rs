@@ -1,19 +1,17 @@
 use crate::GValue;
 
+
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct List(Vec<GValue>);
 
 impl List {
-    pub(crate) fn new(elements: Vec<GValue>) -> Self {
+    pub fn new(elements: Vec<GValue>) -> Self {
         List(elements)
     }
 
     pub(crate) fn take(self) -> Vec<GValue> {
         self.0
-    }
-
-    pub fn iter(&self) -> impl Iterator<Item = &GValue> {
-        self.0.iter()
     }
 }
 

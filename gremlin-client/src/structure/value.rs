@@ -1,4 +1,5 @@
 use crate::conversion::{BorrowFromGID, BorrowFromGValue, FromGValue};
+use crate::process::P;
 use crate::structure::{
     Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property, Set, Token,
     TraversalExplanation, TraversalMetrics, Vertex, VertexProperty,
@@ -33,6 +34,7 @@ pub enum GValue {
     Metric(Metric),
     TraversalExplanation(TraversalExplanation),
     IntermediateRepr(IntermediateRepr),
+    P(P),
 }
 
 impl GValue {
@@ -225,5 +227,12 @@ impl From<GKey> for GValue {
             GKey::Vertex(v) => GValue::Vertex(v),
             GKey::Edge(v) => GValue::Edge(v),
         }
+    }
+}
+
+impl From<P> for GValue {
+    fn from(val: P) -> GValue {
+        let P { operator, value } = val;
+        GValue::List(vec![operator.into(), *value].into())
     }
 }
