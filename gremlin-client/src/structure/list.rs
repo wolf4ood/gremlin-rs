@@ -1,7 +1,5 @@
 use crate::GValue;
 
-
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct List(Vec<GValue>);
 
