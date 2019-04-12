@@ -4,7 +4,7 @@
 use crate::conversion::FromGValue;
 use crate::structure::{
     Edge, GKey, GValue, IntermediateRepr, List, Map, Metric, Path, Property, Token,
-    TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
+    TraversalExplanation, TraversalMetrics, Traverser, Vertex, VertexProperty, GID,
 };
 use crate::GremlinError;
 use crate::GremlinResult;
@@ -339,6 +339,17 @@ where
     Ok(Property::new(label, v).into())
 }
 
+// Traverser deserializer [docs](http://tinkerpop.apache.org/docs/3.4.1/dev/io/#_traverser_2)
+pub fn deserialize_traverser<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
+where
+    T: Fn(&Value) -> GremlinResult<GValue>,
+{
+    let bulk = reader(&val["bulk"])?.take::<i64>()?;
+
+    let v = reader(&val["value"])?;
+    Ok(Traverser::new(bulk, v).into())
+}
+
 // deserialzer v3
 g_serializer!(deserializer_v3, {
     "g:Int32" => deserialize_g32,
@@ -358,7 +369,8 @@ g_serializer!(deserializer_v3, {
     "g:Path" => deserialize_path,
     "g:TraversalMetrics" => deserialize_metrics,
     "g:Metrics" => deserialize_metric,
-    "g:TraversalExplanation" => deserialize_explain
+    "g:TraversalExplanation" => deserialize_explain,
+    "g:Traverser" => deserialize_traverser
 });
 
 fn deserialize_vertex_properties<T>(

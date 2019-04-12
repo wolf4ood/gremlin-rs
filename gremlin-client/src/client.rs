@@ -1,6 +1,7 @@
 use crate::io::GraphSON;
 use crate::message::{message_with_args, Message, Response};
 use crate::pool::GremlinConnectionManager;
+use crate::process::bytecode::Bytecode;
 use crate::ToGValue;
 use crate::{ConnectionOptions, GremlinError, GremlinResult};
 use crate::{GResultSet, GValue};
@@ -85,7 +86,7 @@ impl GremlinClient {
         self.send_message(message)
     }
 
-    fn send_message<T: Serialize>(&self, msg: Message<T>) -> GremlinResult<GResultSet> {
+    pub(crate) fn send_message<T: Serialize>(&self, msg: Message<T>) -> GremlinResult<GResultSet> {
         let message = self.build_message(msg)?;
 
         let mut conn = self.pool.get()?;
@@ -102,6 +103,30 @@ impl GremlinClient {
         Ok(GResultSet::new(self.clone(), results, response, conn))
     }
 
+    pub(crate) fn submit_traversal(&self, bytecode: &Bytecode) -> GremlinResult<GResultSet> {
+        let mut args = HashMap::new();
+
+        args.insert(String::from("gremlin"), GValue::Bytecode(bytecode.clone()));
+
+        let aliases = self
+            .alias
+            .clone()
+            .or_else(|| Some(String::from("g")))
+            .map(|s| {
+                let mut map = HashMap::new();
+                map.insert(String::from("g"), GValue::String(s));
+                map
+            })
+            .unwrap_or_else(HashMap::new);
+
+        args.insert(String::from("aliases"), GValue::from(aliases));
+
+        let args = self.io.write(&GValue::from(args))?;
+
+        let message = message_with_args(String::from("bytecode"), String::from("traversal"), args);
+
+        self.send_message(message)
+    }
     pub(crate) fn read_response(
         &self,
         conn: &mut r2d2::PooledConnection<GremlinConnectionManager>,

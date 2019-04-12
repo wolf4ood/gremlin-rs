@@ -1,9 +1,10 @@
 mod anonymous;
-mod bytecode;
+pub(crate) mod bytecode;
 mod graph_traversal;
 mod graph_traversal_source;
 mod p;
 mod strategies;
+mod traversal;
 
 pub use anonymous::traversal;
 

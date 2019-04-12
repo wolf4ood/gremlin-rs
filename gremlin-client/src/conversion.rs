@@ -3,6 +3,8 @@ use crate::{
     Property, Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
 };
 
+use crate::structure::Traverser;
+
 use std::collections::HashMap;
 
 pub trait ToGValue {
@@ -94,6 +96,7 @@ impl_from_gvalue!(TraversalMetrics, GValue::TraversalMetrics);
 impl_from_gvalue!(TraversalExplanation, GValue::TraversalExplanation);
 impl_from_gvalue!(IntermediateRepr, GValue::IntermediateRepr);
 impl_from_gvalue!(chrono::DateTime<chrono::Utc>, GValue::Date);
+impl_from_gvalue!(Traverser, GValue::Traverser);
 
 impl FromGValue for GKey {
     fn from_gvalue(v: GValue) -> GremlinResult<GKey> {

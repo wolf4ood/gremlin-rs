@@ -1,6 +1,6 @@
 use crate::GValue;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Bytecode {
     source_instructions: Vec<Instruction>,
     step_instructions: Vec<Instruction>,
@@ -27,9 +27,13 @@ impl Bytecode {
         self.step_instructions
             .push(Instruction::new(step_name, args));
     }
+
+    pub fn steps(&self) -> &Vec<Instruction> {
+        &self.step_instructions
+    }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Instruction {
     operator: String,
     args: Vec<GValue>,
@@ -38,5 +42,9 @@ pub struct Instruction {
 impl Instruction {
     pub fn new(operator: String, args: Vec<GValue>) -> Instruction {
         Instruction { operator, args }
+    }
+
+    pub fn operator(&self) -> &String {
+        &self.operator
     }
 }

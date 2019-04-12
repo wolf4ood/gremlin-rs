@@ -2,7 +2,7 @@ use crate::conversion::ToGID;
 use crate::conversion::ToGValue;
 use crate::process::bytecode::Bytecode;
 use crate::process::graph_traversal::GraphTraversal;
-use crate::process::strategies::{RemoteStrategy, TraversalStrategy};
+use crate::process::strategies::{RemoteStrategy, TraversalStrategies, TraversalStrategy};
 use crate::structure::{Edge, Vertex};
 use crate::GremlinClient;
 use std::sync::Arc;
@@ -13,10 +13,10 @@ pub struct GraphTraversalSource {
 }
 
 impl GraphTraversalSource {
-    pub fn new(strategies: Vec<Box<TraversalStrategy>>) -> GraphTraversalSource {
+    pub fn new(strategies: TraversalStrategies) -> GraphTraversalSource {
         GraphTraversalSource {
             inner: Arc::new(InnerGraphTraversalSource {
-                strategies: strategies.into_iter().map(Arc::from).collect(),
+                strategies: strategies,
             }),
         }
     }
@@ -24,7 +24,7 @@ impl GraphTraversalSource {
     pub fn with_remote(&self, client: GremlinClient) -> GraphTraversalSource {
         let mut strategies = self.inner.strategies.clone();
 
-        strategies.push(Arc::new(RemoteStrategy::new(client)));
+        strategies.add_strategy(TraversalStrategy::Remote(RemoteStrategy::new(client)));
 
         GraphTraversalSource {
             inner: Arc::new(InnerGraphTraversalSource { strategies }),
@@ -56,7 +56,7 @@ impl GraphTraversalSource {
     }
 }
 pub struct InnerGraphTraversalSource {
-    strategies: Vec<Arc<TraversalStrategy>>,
+    strategies: TraversalStrategies,
 }
 
 // TESTS
@@ -65,12 +65,12 @@ mod tests {
 
     use super::GraphTraversalSource;
     use crate::process::bytecode::Bytecode;
+    use crate::process::strategies::TraversalStrategies;
     use crate::process::P;
-    use crate::GValue;
 
     #[test]
     fn v_traversal() {
-        let g = GraphTraversalSource::new(vec![]);
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
 
         let mut code = Bytecode::new();
 
@@ -81,7 +81,7 @@ mod tests {
 
     #[test]
     fn e_traversal() {
-        let g = GraphTraversalSource::new(vec![]);
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
 
         let mut code = Bytecode::new();
 
@@ -91,7 +91,7 @@ mod tests {
     }
     #[test]
     fn v_has_label_traversal() {
-        let g = GraphTraversalSource::new(vec![]);
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
 
         let mut code = Bytecode::new();
 
@@ -106,7 +106,7 @@ mod tests {
 
     #[test]
     fn v_has_traversal() {
-        let g = GraphTraversalSource::new(vec![]);
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
 
         let mut code = Bytecode::new();
 

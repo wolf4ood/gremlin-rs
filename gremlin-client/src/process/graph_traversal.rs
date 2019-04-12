@@ -1,22 +1,19 @@
+use crate::conversion::FromGValue;
 use crate::process::bytecode::Bytecode;
-use crate::process::p::{ToPredicate, P};
-use crate::process::strategies::TraversalStrategy;
-use crate::GValue;
+use crate::process::p::ToPredicate;
+use crate::process::strategies::TraversalStrategies;
+use crate::{GValue, GremlinResult};
 use std::marker::PhantomData;
-use std::sync::Arc;
 
-pub struct GraphTraversal<S, E> {
+pub struct GraphTraversal<S, E: FromGValue> {
     start: PhantomData<S>,
     end: PhantomData<E>,
-    strategies: Vec<Arc<TraversalStrategy>>,
+    strategies: TraversalStrategies,
     bytecode: Bytecode,
 }
 
-impl<S, E> GraphTraversal<S, E> {
-    pub fn new(
-        strategies: Vec<Arc<TraversalStrategy>>,
-        bytecode: Bytecode,
-    ) -> GraphTraversal<S, E> {
+impl<S, E: FromGValue> GraphTraversal<S, E> {
+    pub fn new(strategies: TraversalStrategies, bytecode: Bytecode) -> GraphTraversal<S, E> {
         GraphTraversal {
             start: PhantomData,
             end: PhantomData,
@@ -46,5 +43,9 @@ impl<S, E> GraphTraversal<S, E> {
             vec![String::from(key).into(), p.into()],
         );
         self
+    }
+
+    pub fn to_list(&self) -> GremlinResult<Vec<E>> {
+        self.strategies.apply(self)?.collect()
     }
 }

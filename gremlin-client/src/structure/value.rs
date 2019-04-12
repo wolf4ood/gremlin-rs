@@ -1,5 +1,7 @@
 use crate::conversion::{BorrowFromGID, BorrowFromGValue, FromGValue};
+use crate::process::bytecode::Bytecode;
 use crate::process::P;
+use crate::structure::traverser::Traverser;
 use crate::structure::{
     Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property, Set, Token,
     TraversalExplanation, TraversalMetrics, Vertex, VertexProperty,
@@ -7,7 +9,6 @@ use crate::structure::{
 use crate::GremlinResult;
 use chrono;
 use std::collections::{BTreeMap, HashMap, VecDeque};
-
 pub type Date = chrono::DateTime<chrono::offset::Utc>;
 
 /// Represent possible values coming from the [Gremlin Server](http://tinkerpop.apache.org/docs/3.4.0/dev/io/)
@@ -35,6 +36,8 @@ pub enum GValue {
     TraversalExplanation(TraversalExplanation),
     IntermediateRepr(IntermediateRepr),
     P(P),
+    Bytecode(Bytecode),
+    Traverser(Traverser),
 }
 
 impl GValue {
@@ -147,6 +150,12 @@ impl From<Edge> for GValue {
 impl From<VertexProperty> for GValue {
     fn from(val: VertexProperty) -> Self {
         GValue::VertexProperty(val)
+    }
+}
+
+impl From<Traverser> for GValue {
+    fn from(val: Traverser) -> Self {
+        GValue::Traverser(val)
     }
 }
 impl From<TraversalMetrics> for GValue {

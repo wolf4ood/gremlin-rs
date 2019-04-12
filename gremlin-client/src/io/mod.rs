@@ -52,6 +52,23 @@ impl GraphSON {
                 "@value" : d.timestamp()
             })),
 
+            GValue::Bytecode(code) => {
+                let steps: Vec<Value> = code
+                    .steps()
+                    .iter()
+                    .map(|m| {
+                        let mut instruction = vec![];
+                        instruction.push(Value::String(m.operator().clone()));
+                        Value::Array(instruction)
+                    })
+                    .collect();
+                Ok(json!({
+                    "@type" : "g:Bytecode",
+                    "@value" : {
+                        "step" : steps
+                    }
+                }))
+            }
             GValue::Map(map) => {
                 let mut params = vec![];
 
