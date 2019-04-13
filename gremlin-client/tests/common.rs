@@ -15,8 +15,27 @@ pub fn graph() -> GremlinClient {
 }
 
 pub fn create_vertex(graph: &GremlinClient, name: &str) -> Vertex {
+    create_vertex_with_label(graph, "person", name)
+}
+
+pub fn drop_vertices(graph: &GremlinClient, label: &str) -> GremlinResult<()> {
     graph
-        .execute("g.addV('person').property('name',name)", &[("name", &name)])
+        .execute("g.V().hasLabel(_label).drop()", &[("_label", &label)])
+        .map(|_| ())
+}
+
+pub fn drop_edges(graph: &GremlinClient, label: &str) -> GremlinResult<()> {
+    graph
+        .execute("g.E().hasLabel(_label).drop()", &[("_label", &label)])
+        .map(|_| ())
+}
+
+pub fn create_vertex_with_label(graph: &GremlinClient, label: &str, name: &str) -> Vertex {
+    graph
+        .execute(
+            "g.addV(_label).property('name',name)",
+            &[("_label", &label), ("name", &name)],
+        )
         .expect("it should execute addV")
         .filter_map(Result::ok)
         .map(|f| f.take::<Vertex>())
