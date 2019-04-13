@@ -52,6 +52,22 @@ impl GraphSON {
                 "@value" : d.timestamp()
             })),
 
+            GValue::List(d) => {
+                let elements: GremlinResult<Vec<Value>> = d.iter().map(|e| self.write(e)).collect();
+                Ok(json!({
+                    "@type" : "g:List",
+                    "@value" : elements?
+                }))
+            }
+
+            GValue::P(p) => Ok(json!({
+                "@type" : "g:P",
+                "@value" : {
+                    "predicate" : p.operator(),
+                    "value" : self.write(p.value())?
+                }
+            })),
+
             GValue::Bytecode(code) => {
                 let steps: GremlinResult<Vec<Value>> = code
                     .steps()

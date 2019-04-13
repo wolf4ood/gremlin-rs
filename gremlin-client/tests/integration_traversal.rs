@@ -56,6 +56,32 @@ fn test_simple_vertex_traversal_with_label() {
 }
 
 #[test]
+fn test_simple_vertex_traversal_with_label_and_has() {
+    let client = graph();
+
+    drop_vertices(&client, "test_simple_vertex_traversal_with_label_and_has").unwrap();
+
+    let vertex = create_vertex_with_label(
+        &client,
+        "test_simple_vertex_traversal_with_label_and_has",
+        "Traversal",
+    );
+
+    let g = traversal().with_remote(client);
+
+    let results = g
+        .v(&[])
+        .has_label(&["test_simple_vertex_traversal_with_label_and_has"])
+        .has("name", &"Traversal")
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(vertex.id(), results[0].id());
+}
+
+#[test]
 fn test_simple_edge_traversal() {
     let g = traversal().with_remote(graph());
 

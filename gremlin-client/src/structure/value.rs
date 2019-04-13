@@ -241,7 +241,6 @@ impl From<GKey> for GValue {
 
 impl From<P> for GValue {
     fn from(val: P) -> GValue {
-        let P { operator, value } = val;
-        GValue::List(vec![operator.into(), *value].into())
+        GValue::P(val)
     }
 }

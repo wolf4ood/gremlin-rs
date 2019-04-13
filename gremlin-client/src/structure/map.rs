@@ -96,6 +96,12 @@ impl From<&str> for GKey {
     }
 }
 
+impl From<String> for GKey {
+    fn from(val: String) -> Self {
+        GKey::String(val)
+    }
+}
+
 impl From<&Vertex> for GKey {
     fn from(val: &Vertex) -> Self {
         GKey::Vertex(val.clone())
