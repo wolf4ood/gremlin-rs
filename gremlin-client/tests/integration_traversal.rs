@@ -46,7 +46,7 @@ fn test_simple_vertex_traversal_with_label() {
 
     let results = g
         .v(&[])
-        .has_label(&["test_simple_vertex_traversal_with_label"])
+        .has_label("test_simple_vertex_traversal_with_label")
         .to_list()
         .unwrap();
 
@@ -71,7 +71,7 @@ fn test_simple_vertex_traversal_with_label_and_has() {
 
     let results = g
         .v(&[])
-        .has_label(&["test_simple_vertex_traversal_with_label_and_has"])
+        .has_label("test_simple_vertex_traversal_with_label_and_has")
         .has("name", "Traversal")
         .to_list()
         .unwrap();
@@ -123,7 +123,7 @@ fn test_simple_edge_traversal_with_label() {
 
     let results = g
         .e(&[])
-        .has_label(&["test_simple_edge_traversal_with_label"])
+        .has_label("test_simple_edge_traversal_with_label")
         .to_list()
         .unwrap();
 

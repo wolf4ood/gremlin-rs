@@ -101,7 +101,7 @@ mod tests {
             vec![String::from("person").into()],
         );
 
-        assert_eq!(&code, g.v(&[&1]).has_label(&["person"]).bytecode());
+        assert_eq!(&code, g.v(&[&1]).has_label("person").bytecode());
     }
 
     #[test]

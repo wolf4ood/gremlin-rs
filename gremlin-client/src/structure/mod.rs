@@ -1,4 +1,5 @@
 mod edge;
+mod label;
 mod list;
 mod macros;
 mod map;
@@ -25,6 +26,7 @@ pub use self::token::Token;
 pub use self::value::{GValue, GID};
 pub use self::vertex::Vertex;
 pub use self::vertex_property::VertexProperty;
+pub use label::Labels;
 pub use map::{GKey, Map};
 pub use p::P;
 pub use traverser::Traverser;

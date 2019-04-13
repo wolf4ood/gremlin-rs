@@ -1,6 +1,7 @@
 use crate::conversion::FromGValue;
 use crate::process::bytecode::Bytecode;
 use crate::process::strategies::TraversalStrategies;
+use crate::structure::Labels;
 use crate::structure::P as Predicate;
 use crate::{GValue, GremlinResult};
 use std::marker::PhantomData;
@@ -25,10 +26,18 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         &self.bytecode
     }
 
-    pub fn has_label(mut self, labels: &[&str]) -> Self {
+    pub fn has_label<L>(mut self, labels: L) -> Self
+    where
+        L: Into<Labels>,
+    {
         self.bytecode.add_step(
             String::from("hasLabel"),
-            labels.iter().map(|s| GValue::from(*s)).collect(),
+            labels
+                .into()
+                .0
+                .into_iter()
+                .map(|s| GValue::from(s))
+                .collect(),
         );
         self
     }
