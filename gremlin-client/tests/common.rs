@@ -18,12 +18,14 @@ pub fn create_vertex(graph: &GremlinClient, name: &str) -> Vertex {
     create_vertex_with_label(graph, "person", name)
 }
 
+#[allow(dead_code)]
 pub fn drop_vertices(graph: &GremlinClient, label: &str) -> GremlinResult<()> {
     graph
         .execute("g.V().hasLabel(_label).drop()", &[("_label", &label)])
         .map(|_| ())
 }
 
+#[allow(dead_code)]
 pub fn drop_edges(graph: &GremlinClient, label: &str) -> GremlinResult<()> {
     graph
         .execute("g.E().hasLabel(_label).drop()", &[("_label", &label)])
