@@ -1,7 +1,7 @@
 use crate::conversion::{BorrowFromGID, BorrowFromGValue, FromGValue};
 use crate::process::bytecode::Bytecode;
-use crate::process::P;
 use crate::structure::traverser::Traverser;
+use crate::structure::P;
 use crate::structure::{
     Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property, Set, Token,
     TraversalExplanation, TraversalMetrics, Vertex, VertexProperty,

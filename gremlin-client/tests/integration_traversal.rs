@@ -72,7 +72,7 @@ fn test_simple_vertex_traversal_with_label_and_has() {
     let results = g
         .v(&[])
         .has_label(&["test_simple_vertex_traversal_with_label_and_has"])
-        .has("name", &"Traversal")
+        .has("name", "Traversal")
         .to_list()
         .unwrap();
 

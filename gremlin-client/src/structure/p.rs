@@ -1,9 +1,5 @@
 use crate::{GValue, ToGValue};
 
-pub trait ToPredicate {
-    fn to_p(&self) -> P;
-}
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct P {
     pub(crate) operator: String,
@@ -36,14 +32,14 @@ impl P {
     }
 }
 
-impl ToPredicate for &str {
-    fn to_p(&self) -> P {
-        P::new("eq", (*self).into())
+impl Into<P> for &str {
+    fn into(self) -> P {
+        P::new("eq", (self).into())
     }
 }
 
-impl ToPredicate for i32 {
-    fn to_p(&self) -> P {
-        P::new("eq", (*self).into())
+impl Into<P> for i32 {
+    fn into(self) -> P {
+        P::new("eq", (self).into())
     }
 }

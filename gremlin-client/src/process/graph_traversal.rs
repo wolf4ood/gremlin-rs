@@ -1,7 +1,7 @@
 use crate::conversion::FromGValue;
 use crate::process::bytecode::Bytecode;
-use crate::process::p::ToPredicate;
 use crate::process::strategies::TraversalStrategies;
+use crate::structure::P as Predicate;
 use crate::{GValue, GremlinResult};
 use std::marker::PhantomData;
 
@@ -33,11 +33,11 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self
     }
 
-    pub fn has<P>(mut self, key: &str, predicate: &P) -> Self
+    pub fn has<P>(mut self, key: &str, predicate: P) -> Self
     where
-        P: ToPredicate,
+        P: Into<Predicate>,
     {
-        let p = predicate.to_p();
+        let p = predicate.into();
         self.bytecode.add_step(
             String::from("has"),
             vec![String::from(key).into(), p.into()],

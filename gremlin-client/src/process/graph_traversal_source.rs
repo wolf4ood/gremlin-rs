@@ -66,7 +66,7 @@ mod tests {
     use super::GraphTraversalSource;
     use crate::process::bytecode::Bytecode;
     use crate::process::strategies::TraversalStrategies;
-    use crate::process::P;
+    use crate::structure::P;
 
     #[test]
     fn v_traversal() {
@@ -125,7 +125,7 @@ mod tests {
 
         assert_eq!(
             &code,
-            g.v(&[&1]).has("name", &"marko").has("age", &23).bytecode()
+            g.v(&[&1]).has("name", "marko").has("age", 23).bytecode()
         );
     }
 }
