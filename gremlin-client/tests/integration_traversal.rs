@@ -131,3 +131,31 @@ fn test_simple_edge_traversal_with_label() {
 
     assert_eq!(e.id(), results[0].id());
 }
+
+#[test]
+fn test_vertex_out_traversal() {
+    let client = graph();
+
+    drop_edges(&client, "test_vertex_out_traversal").unwrap();
+
+    let v = create_vertex(&client, "Traversal");
+    let v1 = create_vertex(&client, "Traversal");
+
+    let _e = create_edge(&client, &v, &v1, "test_vertex_out_traversal");
+
+    let g = traversal().with_remote(client);
+
+    let results = g
+        .v(&[v.id()])
+        .out("test_vertex_out_traversal")
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(v1.id(), results[0].id());
+
+    let results = g.v(&[v.id()]).out("fake").to_list().unwrap();
+
+    assert_eq!(0, results.len());
+}

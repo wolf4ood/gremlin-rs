@@ -3,7 +3,7 @@ use crate::process::bytecode::Bytecode;
 use crate::process::strategies::TraversalStrategies;
 use crate::structure::Labels;
 use crate::structure::P as Predicate;
-use crate::{GValue, GremlinResult};
+use crate::{GValue, GremlinResult, Vertex};
 use std::marker::PhantomData;
 
 pub struct GraphTraversal<S, E: FromGValue> {
@@ -54,6 +54,22 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self
     }
 
+    pub fn out<L>(mut self, labels: L) -> GraphTraversal<S, Vertex>
+    where
+        L: Into<Labels>,
+    {
+        self.bytecode.add_step(
+            String::from("out"),
+            labels
+                .into()
+                .0
+                .into_iter()
+                .map(|s| GValue::from(s))
+                .collect(),
+        );
+
+        GraphTraversal::new(self.strategies, self.bytecode)
+    }
     pub fn to_list(&self) -> GremlinResult<Vec<E>> {
         self.strategies.apply(self)?.collect()
     }
