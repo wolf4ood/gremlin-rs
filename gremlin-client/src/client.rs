@@ -94,8 +94,6 @@ impl GremlinClient {
         let content_type = "application/vnd.gremlin-v3.0+json";
         let payload = String::from("") + content_type + &message;
 
-        dbg!(&payload);
-
         let mut binary = payload.into_bytes();
         binary.insert(0, content_type.len() as u8);
 

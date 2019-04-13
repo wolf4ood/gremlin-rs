@@ -199,8 +199,6 @@ pub fn deserialize_metrics<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
     T: Fn(&Value) -> GremlinResult<GValue>,
 {
-    dbg!(val);
-
     let mut metrics = reader(&val)?.take::<Map>()?;
 
     let duration = remove_or_else(&mut metrics, "dur", G_TRAVERSAL_METRICS)?.take::<f64>()?;
