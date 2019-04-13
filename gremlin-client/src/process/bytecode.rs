@@ -47,4 +47,8 @@ impl Instruction {
     pub fn operator(&self) -> &String {
         &self.operator
     }
+
+    pub fn args(&self) -> &Vec<GValue> {
+        &self.args
+    }
 }

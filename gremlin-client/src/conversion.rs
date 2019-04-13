@@ -205,3 +205,9 @@ impl ToGID for &str {
         GID::String(String::from(*self))
     }
 }
+
+impl ToGID for GID {
+    fn to_gid(&self) -> GID {
+        self.clone()
+    }
+}

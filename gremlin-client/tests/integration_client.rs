@@ -1,12 +1,11 @@
 use gremlin_client::{Edge, GValue, Map, Vertex};
 use gremlin_client::{
-    GremlinClient, GremlinError, List, ToGValue, TraversalExplanation, TraversalMetrics,
-    VertexProperty,
+    GremlinError, List, ToGValue, TraversalExplanation, TraversalMetrics, VertexProperty,
 };
 
 mod common;
 
-use common::{expect_client, graph};
+use common::{create_edge, create_vertex, expect_client, graph};
 
 #[test]
 fn test_client_connection_ok() {
@@ -86,32 +85,6 @@ fn test_edge_query() {
     assert_eq!("knows", edges[0].label());
 }
 
-fn create_vertex(graph: &GremlinClient, name: &str) -> Vertex {
-    graph
-        .execute("g.addV('person').property('name',name)", &[("name", &name)])
-        .expect("it should execute addV")
-        .filter_map(Result::ok)
-        .map(|f| f.take::<Vertex>())
-        .collect::<Result<Vec<Vertex>, _>>()
-        .expect("It should be ok")
-        .pop()
-        .expect("It should contain 1 element")
-}
-
-fn create_edge(graph: &GremlinClient, v: &Vertex, v1: &Vertex, name: &str) -> Edge {
-    graph
-        .execute(
-            "g.V(v1).as('a').V(v2).as('b').addE(rel).from('a').to('b')",
-            &[("rel", &name), ("v1", v.id()), ("v2", v1.id())],
-        )
-        .expect("it should execute addE")
-        .filter_map(Result::ok)
-        .map(|f| f.take::<Edge>())
-        .collect::<Result<Vec<Edge>, _>>()
-        .expect("It should be ok")
-        .pop()
-        .expect("It should contain 1 element")
-}
 #[test]
 fn test_vertex_creation() {
     let graph = graph();

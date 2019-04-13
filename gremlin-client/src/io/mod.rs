@@ -53,19 +53,24 @@ impl GraphSON {
             })),
 
             GValue::Bytecode(code) => {
-                let steps: Vec<Value> = code
+                let steps: GremlinResult<Vec<Value>> = code
                     .steps()
                     .iter()
                     .map(|m| {
                         let mut instruction = vec![];
                         instruction.push(Value::String(m.operator().clone()));
-                        Value::Array(instruction)
+
+                        let arguments: GremlinResult<Vec<Value>> =
+                            m.args().iter().map(|a| self.write(a)).collect();
+
+                        instruction.extend(arguments?);
+                        Ok(Value::Array(instruction))
                     })
                     .collect();
                 Ok(json!({
                     "@type" : "g:Bytecode",
                     "@value" : {
-                        "step" : steps
+                        "step" : steps?
                     }
                 }))
             }

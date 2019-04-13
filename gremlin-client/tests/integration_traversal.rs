@@ -2,7 +2,7 @@ use gremlin_client::process::traversal;
 
 mod common;
 
-use common::graph;
+use common::{create_edge, create_vertex, graph};
 
 #[test]
 fn test_simple_vertex_traversal() {
@@ -14,10 +14,43 @@ fn test_simple_vertex_traversal() {
 }
 
 #[test]
+fn test_simple_vertex_traversal_with_id() {
+    let client = graph();
+
+    let vertex = create_vertex(&client, "Traversal");
+
+    let g = traversal().with_remote(client);
+
+    let results = g.v(&[vertex.id()]).to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(vertex.id(), results[0].id());
+}
+
+#[test]
 fn test_simple_edge_traversal() {
     let g = traversal().with_remote(graph());
 
     let results = g.e(&[]).to_list().unwrap();
 
     assert!(results.len() > 0);
+}
+
+#[test]
+fn test_simple_edge_traversal_id() {
+    let client = graph();
+
+    let v = create_vertex(&client, "Traversal");
+    let v1 = create_vertex(&client, "Traversal");
+
+    let e = create_edge(&client, &v, &v1, "TraversalEdge");
+
+    let g = traversal().with_remote(client);
+
+    let results = g.e(&[e.id()]).to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(e.id(), results[0].id());
 }
