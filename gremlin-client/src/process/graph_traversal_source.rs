@@ -129,9 +129,6 @@ mod tests {
             vec![String::from("age").into(), P::new("eq", 23.into()).into()],
         );
 
-        assert_eq!(
-            &code,
-            g.v(1).has("name", "marko").has("age", 23).bytecode()
-        );
+        assert_eq!(&code, g.v(1).has("name", "marko").has("age", 23).bytecode());
     }
 }
