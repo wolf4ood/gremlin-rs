@@ -31,12 +31,20 @@
 //!
 //!
 //! ```
+//!
+
+mod client;
+mod connection;
+mod conversion;
+mod error;
+mod io;
+mod message;
+mod pool;
 
 pub use client::GremlinClient;
 pub use connection::ConnectionOptions;
-pub use error::GremlinError;
-
 pub use conversion::ToGValue;
+pub use error::GremlinError;
 
 pub type GremlinResult<T> = Result<T, error::GremlinError>;
 
@@ -45,14 +53,4 @@ pub use structure::{
     TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
 };
 pub mod process;
-
-mod client;
-mod connection;
-mod error;
-mod io;
-mod message;
-mod pool;
-
-mod structure;
-
-mod conversion;
+pub mod structure;

@@ -1,4 +1,4 @@
-use crate::conversion::{BorrowFromGID, BorrowFromGValue, FromGValue};
+use crate::conversion::{BorrowFromGValue, FromGValue};
 use crate::process::bytecode::Bytecode;
 use crate::structure::traverser::Traverser;
 use crate::structure::P;
@@ -53,39 +53,6 @@ impl GValue {
         T: BorrowFromGValue,
     {
         T::from_gvalue(self)
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub enum GID {
-    String(String),
-    Int32(i32),
-    Int64(i64),
-}
-
-impl GID {
-    pub fn get<'a, T>(&'a self) -> GremlinResult<&'a T>
-    where
-        T: BorrowFromGID,
-    {
-        T::from_gid(self)
-    }
-}
-
-impl From<&'static str> for GID {
-    fn from(val: &str) -> Self {
-        GID::String(String::from(val))
-    }
-}
-impl From<i32> for GID {
-    fn from(val: i32) -> Self {
-        GID::Int32(val)
-    }
-}
-
-impl From<i64> for GID {
-    fn from(val: i64) -> Self {
-        GID::Int64(val)
     }
 }
 

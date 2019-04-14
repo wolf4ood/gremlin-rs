@@ -10,7 +10,7 @@ use common::{
 fn test_simple_vertex_traversal() {
     let g = traversal().with_remote(graph());
 
-    let results = g.v(&[]).to_list().unwrap();
+    let results = g.v(()).to_list().unwrap();
 
     assert!(results.len() > 0);
 }
@@ -23,7 +23,7 @@ fn test_simple_vertex_traversal_with_id() {
 
     let g = traversal().with_remote(client);
 
-    let results = g.v(&[vertex.id()]).to_list().unwrap();
+    let results = g.v(vertex.id()).to_list().unwrap();
 
     assert_eq!(1, results.len());
 
@@ -45,7 +45,7 @@ fn test_simple_vertex_traversal_with_label() {
     let g = traversal().with_remote(client);
 
     let results = g
-        .v(&[])
+        .v(())
         .has_label("test_simple_vertex_traversal_with_label")
         .to_list()
         .unwrap();
@@ -70,7 +70,7 @@ fn test_simple_vertex_traversal_with_label_and_has() {
     let g = traversal().with_remote(client);
 
     let results = g
-        .v(&[])
+        .v(())
         .has_label("test_simple_vertex_traversal_with_label_and_has")
         .has("name", "Traversal")
         .to_list()
@@ -85,7 +85,7 @@ fn test_simple_vertex_traversal_with_label_and_has() {
 fn test_simple_edge_traversal() {
     let g = traversal().with_remote(graph());
 
-    let results = g.e(&[]).to_list().unwrap();
+    let results = g.e(()).to_list().unwrap();
 
     assert!(results.len() > 0);
 }
@@ -101,7 +101,7 @@ fn test_simple_edge_traversal_id() {
 
     let g = traversal().with_remote(client);
 
-    let results = g.e(&[e.id()]).to_list().unwrap();
+    let results = g.e(e.id()).to_list().unwrap();
 
     assert_eq!(1, results.len());
 
@@ -122,7 +122,7 @@ fn test_simple_edge_traversal_with_label() {
     let g = traversal().with_remote(client);
 
     let results = g
-        .e(&[])
+        .e(())
         .has_label("test_simple_edge_traversal_with_label")
         .to_list()
         .unwrap();
@@ -146,7 +146,7 @@ fn test_vertex_out_traversal() {
     let g = traversal().with_remote(client);
 
     let results = g
-        .v(&[v.id()])
+        .v(v.id())
         .out("test_vertex_out_traversal")
         .to_list()
         .unwrap();
@@ -155,7 +155,7 @@ fn test_vertex_out_traversal() {
 
     assert_eq!(v1.id(), results[0].id());
 
-    let results = g.v(&[v.id()]).out("fake").to_list().unwrap();
+    let results = g.v(v.id()).out("fake").to_list().unwrap();
 
     assert_eq!(0, results.len());
 }
