@@ -15,9 +15,7 @@ pub struct GraphTraversalSource {
 impl GraphTraversalSource {
     pub fn new(strategies: TraversalStrategies) -> GraphTraversalSource {
         GraphTraversalSource {
-            inner: Arc::new(InnerGraphTraversalSource {
-                strategies: strategies,
-            }),
+            inner: Arc::new(InnerGraphTraversalSource { strategies }),
         }
     }
 

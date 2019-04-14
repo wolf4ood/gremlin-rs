@@ -43,7 +43,7 @@ impl TraversalStrategies {
             iter = Some(strategy.apply(traversal)?);
         }
 
-        iter.map(|iter| Ok(iter))
-            .unwrap_or_else(|| Err(GremlinError::Generic(format!("Emppty traversal"))))
+        iter.map(Ok)
+            .unwrap_or_else(|| Err(GremlinError::Generic(String::from("Empty traversal"))))
     }
 }

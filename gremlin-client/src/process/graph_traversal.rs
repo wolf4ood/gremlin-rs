@@ -32,12 +32,7 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
     {
         self.bytecode.add_step(
             String::from("hasLabel"),
-            labels
-                .into()
-                .0
-                .into_iter()
-                .map(|s| GValue::from(s))
-                .collect(),
+            labels.into().0.into_iter().map(GValue::from).collect(),
         );
         self
     }
@@ -60,12 +55,7 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
     {
         self.bytecode.add_step(
             String::from("out"),
-            labels
-                .into()
-                .0
-                .into_iter()
-                .map(|s| GValue::from(s))
-                .collect(),
+            labels.into().0.into_iter().map(GValue::from).collect(),
         );
 
         GraphTraversal::new(self.strategies, self.bytecode)
