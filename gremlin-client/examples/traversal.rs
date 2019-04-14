@@ -9,5 +9,14 @@ fn main() -> Result<(), Box<std::error::Error>> {
 
     println!("{:?}", vertices);
 
+    let friends = g
+        .v(())
+        .has_label("person")
+        .has("name", "marko")
+        .out("knows")
+        .to_list()?;
+
+    println!("{:?}", friends);
+
     Ok(())
 }
