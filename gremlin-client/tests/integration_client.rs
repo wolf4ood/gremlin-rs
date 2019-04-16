@@ -75,7 +75,7 @@ fn test_vertex_query() {
 fn test_edge_query() {
     let graph = graph();
     let edges = graph
-        .execute("g.E().limit(1)", &[])
+        .execute("g.E().hasLabel('knows').limit(1)", &[])
         .expect("it should execute a query")
         .filter_map(Result::ok)
         .map(|f| f.take::<Edge>())
