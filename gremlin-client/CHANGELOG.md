@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [#12](https://github.com/wolf4ood/gremlin-rs/issues/12) GLV support (Base impl)
 
 ### Fixed
 
