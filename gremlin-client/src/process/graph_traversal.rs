@@ -37,6 +37,19 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self
     }
 
+    pub fn add_v<T>(mut self, label: T) -> GraphTraversal<Vertex, Vertex>
+    where
+        T: Into<Labels>,
+    {
+        self.bytecode.add_step(
+            String::from("addV"),
+            label.into().0.into_iter().map(GValue::from).collect(),
+        );
+
+        GraphTraversal::new(self.strategies, self.bytecode)
+    }
+
+   
     pub fn has<P>(mut self, key: &str, predicate: P) -> Self
     where
         P: Into<Predicate>,

@@ -159,3 +159,21 @@ fn test_vertex_out_traversal() {
 
     assert_eq!(0, results.len());
 }
+
+#[test]
+fn test_add_v() {
+    let g = traversal().with_remote(graph());
+
+    let results = g.add_v("person").to_list().unwrap();
+
+    assert!(results.len() > 0);
+
+    assert_eq!("person", results[0].label());
+
+    let results = g.add_v("person").add_v(()).to_list().unwrap();
+
+    assert!(results.len() > 0);
+
+    //default label
+    assert_eq!("vertex", results[0].label());
+}

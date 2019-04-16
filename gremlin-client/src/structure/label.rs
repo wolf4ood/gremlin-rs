@@ -5,3 +5,9 @@ impl Into<Labels> for &str {
         Labels(vec![String::from(self)])
     }
 }
+
+impl Into<Labels> for () {
+    fn into(self) -> Labels {
+        Labels(vec![])
+    }
+}

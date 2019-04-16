@@ -3,7 +3,8 @@ use crate::process::bytecode::Bytecode;
 use crate::process::graph_traversal::GraphTraversal;
 use crate::process::strategies::{RemoteStrategy, TraversalStrategies, TraversalStrategy};
 use crate::structure::GIDs;
-use crate::structure::{Edge, Vertex};
+use crate::structure::Labels;
+use crate::structure::{Edge, GValue, Vertex};
 use crate::GremlinClient;
 use std::sync::Arc;
 
@@ -39,6 +40,21 @@ impl GraphTraversalSource {
         code.add_step(
             String::from("V"),
             ids.into().0.iter().map(|id| id.to_gvalue()).collect(),
+        );
+
+        GraphTraversal::new(strategies, code)
+    }
+
+    pub fn add_v<T>(&self, label: T) -> GraphTraversal<Vertex, Vertex>
+    where
+        T: Into<Labels>,
+    {
+        let strategies = self.inner.strategies.clone();
+        let mut code = Bytecode::new();
+
+        code.add_step(
+            String::from("addV"),
+            label.into().0.into_iter().map(GValue::from).collect(),
         );
 
         GraphTraversal::new(strategies, code)
@@ -129,4 +145,22 @@ mod tests {
 
         assert_eq!(&code, g.v(1).has("name", "marko").has("age", 23).bytecode());
     }
+
+    #[test]
+    fn add_v_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("addV"), vec![String::from("person").into()]);
+
+        assert_eq!(&code, g.add_v("person").bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("addV"), vec![]);
+
+        assert_eq!(&code, g.add_v(()).bytecode());
+    }
+
 }
