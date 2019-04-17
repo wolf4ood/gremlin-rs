@@ -49,7 +49,6 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         GraphTraversal::new(self.strategies, self.bytecode)
     }
 
-   
     pub fn has<P>(mut self, key: &str, predicate: P) -> Self
     where
         P: Into<Predicate>,
