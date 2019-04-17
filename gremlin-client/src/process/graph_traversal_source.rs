@@ -163,4 +163,22 @@ mod tests {
         assert_eq!(&code, g.add_v(()).bytecode());
     }
 
+    #[test]
+    fn add_v_with_property_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("addV"), vec![String::from("person").into()]);
+        code.add_step(
+            String::from("property"),
+            vec![String::from("name").into(), String::from("marko").into()],
+        );
+
+        assert_eq!(
+            &code,
+            g.add_v("person").property("name", "marko").bytecode()
+        );
+    }
+
 }

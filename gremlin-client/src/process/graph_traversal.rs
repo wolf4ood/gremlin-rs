@@ -49,6 +49,16 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         GraphTraversal::new(self.strategies, self.bytecode)
     }
 
+    pub fn property<T>(mut self, key: &str, value: T) -> Self
+    where
+        T: Into<GValue>,
+    {
+        self.bytecode.add_step(
+            String::from("property"),
+            vec![String::from(key).into(), value.into()],
+        );
+        self
+    }
     pub fn has<P>(mut self, key: &str, predicate: P) -> Self
     where
         P: Into<Predicate>,

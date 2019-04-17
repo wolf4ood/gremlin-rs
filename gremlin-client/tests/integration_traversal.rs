@@ -1,4 +1,5 @@
 use gremlin_client::process::traversal;
+use gremlin_client::structure::{List, Map, VertexProperty};
 
 mod common;
 
@@ -176,4 +177,49 @@ fn test_add_v() {
 
     //default label
     assert_eq!("vertex", results[0].label());
+}
+
+#[test]
+fn test_add_v_with_properties() {
+    let client = graph();
+    let g = traversal().with_remote(client.clone());
+
+    let results = g
+        .add_v("person")
+        .property("name", "marko")
+        .property("age", 29)
+        .to_list()
+        .unwrap();
+
+    assert!(results.len() > 0);
+
+    assert_eq!("person", results[0].label());
+
+    let results = client
+        .execute("g.V(_id).propertyMap()", &[("_id", results[0].id())])
+        .expect("it should execute addV")
+        .filter_map(Result::ok)
+        .map(|f| f.take::<Map>())
+        .collect::<Result<Vec<Map>, _>>()
+        .expect("It should be ok");
+
+    let properties = &results[0];
+
+    assert_eq!(
+        &29,
+        properties["age"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<i32>()
+            .unwrap()
+    );
+
+    assert_eq!(
+        &"marko",
+        properties["name"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<String>()
+            .unwrap()
+    );
 }
