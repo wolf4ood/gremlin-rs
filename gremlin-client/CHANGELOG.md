@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - [#12](https://github.com/wolf4ood/gremlin-rs/issues/12) GLV support (Base impl)
+- [#16](https://github.com/wolf4ood/gremlin-rs/issues/16) Implemented addV Step
+- [#17](https://github.com/wolf4ood/gremlin-rs/issues/12) Implemented property Step
 
 ### Fixed
 
