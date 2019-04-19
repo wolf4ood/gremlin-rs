@@ -71,6 +71,16 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self
     }
 
+    pub fn as_<T>(mut self, alias: T) -> GraphTraversal<S, E>
+    where
+        T: Into<String>,
+    {
+        self.bytecode
+            .add_step(String::from("as"), vec![alias.into().into()]);
+
+        self
+    }
+
     pub fn out<L>(mut self, labels: L) -> GraphTraversal<S, Vertex>
     where
         L: Into<Labels>,

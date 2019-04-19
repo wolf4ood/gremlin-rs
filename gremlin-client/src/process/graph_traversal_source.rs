@@ -181,4 +181,16 @@ mod tests {
         );
     }
 
+    #[test]
+    fn as_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("as"), vec![String::from("a").into()]);
+
+        assert_eq!(&code, g.v(()).as_("a").bytecode());
+    }
+
 }
