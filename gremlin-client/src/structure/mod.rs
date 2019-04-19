@@ -1,4 +1,5 @@
 mod edge;
+mod either;
 mod gid;
 mod label;
 mod list;
@@ -28,6 +29,7 @@ pub use self::token::Token;
 pub use self::value::GValue;
 pub use self::vertex::Vertex;
 pub use self::vertex_property::VertexProperty;
+pub use either::*;
 pub use label::Labels;
 pub use map::{GKey, Map};
 pub use p::P;

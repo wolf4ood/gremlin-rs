@@ -60,6 +60,18 @@ impl GraphTraversalSource {
         GraphTraversal::new(strategies, code)
     }
 
+    pub fn add_e<T>(&self, label: T) -> GraphTraversal<Edge, Edge>
+    where
+        T: Into<String>,
+    {
+        let strategies = self.inner.strategies.clone();
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("addE"), vec![label.into().into()]);
+
+        GraphTraversal::new(strategies, code)
+    }
+
     pub fn e<T>(&self, ids: T) -> GraphTraversal<Edge, Edge>
     where
         T: Into<GIDs>,
@@ -179,6 +191,25 @@ mod tests {
             &code,
             g.add_v("person").property("name", "marko").bytecode()
         );
+    }
+
+    #[test]
+    fn add_e_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("addE"), vec![String::from("knows").into()]);
+
+        assert_eq!(&code, g.add_e("knows").bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("addE"), vec![String::from("knows").into()]);
+        code.add_step(String::from("from"), vec![String::from("a").into()]);
+        code.add_step(String::from("to"), vec![String::from("b").into()]);
+
+        assert_eq!(&code, g.add_e("knows").from("a").to("b").bytecode());
     }
 
     #[test]

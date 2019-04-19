@@ -103,6 +103,12 @@ impl From<Vertex> for GValue {
     }
 }
 
+impl From<&Vertex> for GValue {
+    fn from(val: &Vertex) -> Self {
+        GValue::Vertex(val.clone())
+    }
+}
+
 impl From<Path> for GValue {
     fn from(val: Path) -> Self {
         GValue::Path(val)

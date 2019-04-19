@@ -2,6 +2,7 @@
 mod macros;
 mod serializer_v3;
 
+use crate::conversion::ToGValue;
 use crate::structure::GValue;
 use serde_json::{json, Value};
 
@@ -87,6 +88,15 @@ impl GraphSON {
                     "@type" : "g:Bytecode",
                     "@value" : {
                         "step" : steps?
+                    }
+                }))
+            }
+            GValue::Vertex(v) => {
+                let id = self.write(&v.id().to_gvalue())?;
+                Ok(json!({
+                    "@type" : "g:Vertex",
+                    "@value" : {
+                        "id" :  id,
                     }
                 }))
             }

@@ -223,3 +223,55 @@ fn test_add_v_with_properties() {
             .unwrap()
     );
 }
+
+#[test]
+fn test_add_e() {
+    let client = graph();
+    let g = traversal().with_remote(client.clone());
+
+    let v = g
+        .add_v("person")
+        .property("name", "marko")
+        .property("age", 29)
+        .to_list()
+        .unwrap();
+
+    let v1 = g
+        .add_v("person")
+        .property("name", "marko")
+        .property("age", 29)
+        .to_list()
+        .unwrap();
+
+    let edges = g.add_e("knows").from(&v[0]).to(&v1[0]).to_list().unwrap();
+
+    assert!(edges.len() > 0);
+
+    assert_eq!("knows", edges[0].label());
+
+    let edges = g
+        .v(v[0].id())
+        .as_("a")
+        .out("knows")
+        .add_e("livesNear")
+        .from("a")
+        .property("year", 2009)
+        .to_list()
+        .unwrap();
+
+    assert!(edges.len() > 0);
+
+    assert_eq!("livesNear", edges[0].label());
+
+    let edges = g
+        .v(())
+        .as_("a")
+        .out("created")
+        .add_e("createdBy")
+        .to("a")
+        .property("acl", "public")
+        .to_list()
+        .unwrap();
+
+    assert_eq!("createdBy", edges[0].label());
+}
