@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#17](https://github.com/wolf4ood/gremlin-rs/issues/17) Implemented property Step
 - [#20](https://github.com/wolf4ood/gremlin-rs/issues/20) Implemented as Step
 - [#18](https://github.com/wolf4ood/gremlin-rs/issues/18) AddEdge Step
+- [#21](https://github.com/wolf4ood/gremlin-rs/issues/21) Implemented Remaining Vertex/Edge Step
 
 ### Fixed
 
