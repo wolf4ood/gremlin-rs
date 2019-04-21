@@ -115,6 +115,12 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         GraphTraversal::new(self.strategies, self.bytecode)
     }
 
+    pub fn out_v(mut self) -> GraphTraversal<S, Vertex> {
+        self.bytecode.add_step(String::from("outV"), vec![]);
+
+        GraphTraversal::new(self.strategies, self.bytecode)
+    }
+
     pub fn in_<L>(mut self, labels: L) -> GraphTraversal<S, Vertex>
     where
         L: Into<Labels>,
@@ -135,6 +141,12 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
             String::from("inE"),
             labels.into().0.into_iter().map(GValue::from).collect(),
         );
+
+        GraphTraversal::new(self.strategies, self.bytecode)
+    }
+
+    pub fn in_v(mut self) -> GraphTraversal<S, Vertex> {
+        self.bytecode.add_step(String::from("inV"), vec![]);
 
         GraphTraversal::new(self.strategies, self.bytecode)
     }

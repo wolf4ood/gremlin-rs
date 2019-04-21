@@ -176,6 +176,22 @@ fn test_traversal() {
     assert_eq!(v.id(), results[0].out_v().id());
     assert_eq!(v1.id(), results[0].in_v().id());
 
+    // OUT_E -> IN_V
+    let results = g
+        .v(v.id())
+        .out_e("test_vertex_out_traversal")
+        .in_v()
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(v1.id(), results[0].id());
+
+    let results = g.v(v.id()).out("fake").to_list().unwrap();
+
+    assert_eq!(0, results.len());
+
     // IN
     let results = g
         .v(v1.id())
@@ -205,6 +221,22 @@ fn test_traversal() {
 
     assert_eq!(v.id(), results[0].out_v().id());
     assert_eq!(v1.id(), results[0].in_v().id());
+
+    // IN_E -> OUT_V
+    let results = g
+        .v(v1.id())
+        .in_e("test_vertex_out_traversal")
+        .out_v()
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(v.id(), results[0].id());
+
+    let results = g.v(v1.id()).in_("fake").to_list().unwrap();
+
+    assert_eq!(0, results.len());
 }
 
 #[test]
