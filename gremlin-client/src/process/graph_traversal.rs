@@ -102,6 +102,19 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
 
         GraphTraversal::new(self.strategies, self.bytecode)
     }
+
+    pub fn out_e<L>(mut self, labels: L) -> GraphTraversal<S, Edge>
+    where
+        L: Into<Labels>,
+    {
+        self.bytecode.add_step(
+            String::from("outE"),
+            labels.into().0.into_iter().map(GValue::from).collect(),
+        );
+
+        GraphTraversal::new(self.strategies, self.bytecode)
+    }
+
     pub fn in_<L>(mut self, labels: L) -> GraphTraversal<S, Vertex>
     where
         L: Into<Labels>,
@@ -113,6 +126,19 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
 
         GraphTraversal::new(self.strategies, self.bytecode)
     }
+
+    pub fn in_e<L>(mut self, labels: L) -> GraphTraversal<S, Edge>
+    where
+        L: Into<Labels>,
+    {
+        self.bytecode.add_step(
+            String::from("inE"),
+            labels.into().0.into_iter().map(GValue::from).collect(),
+        );
+
+        GraphTraversal::new(self.strategies, self.bytecode)
+    }
+
     pub fn to_list(&self) -> GremlinResult<Vec<E>> {
         self.strategies.apply(self)?.collect()
     }
