@@ -134,7 +134,7 @@ fn test_simple_edge_traversal_with_label() {
 }
 
 #[test]
-fn test_vertex_out_traversal() {
+fn test_traversal() {
     let client = graph();
 
     drop_edges(&client, "test_vertex_out_traversal").unwrap();
@@ -146,6 +146,7 @@ fn test_vertex_out_traversal() {
 
     let g = traversal().with_remote(client);
 
+    // OUT
     let results = g
         .v(v.id())
         .out("test_vertex_out_traversal")
@@ -157,6 +158,21 @@ fn test_vertex_out_traversal() {
     assert_eq!(v1.id(), results[0].id());
 
     let results = g.v(v.id()).out("fake").to_list().unwrap();
+
+    assert_eq!(0, results.len());
+
+    // IN
+    let results = g
+        .v(v1.id())
+        .in_("test_vertex_out_traversal")
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(v.id(), results[0].id());
+
+    let results = g.v(v1.id()).in_("fake").to_list().unwrap();
 
     assert_eq!(0, results.len());
 }
