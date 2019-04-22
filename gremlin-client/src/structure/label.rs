@@ -11,3 +11,9 @@ impl Into<Labels> for () {
         Labels(vec![])
     }
 }
+
+impl Into<Labels> for Vec<&str> {
+    fn into(self) -> Labels {
+        Labels(self.into_iter().map(String::from).collect())
+    }
+}

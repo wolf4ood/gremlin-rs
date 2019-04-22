@@ -236,4 +236,39 @@ mod tests {
         assert_eq!(&code, g.v(()).label().bytecode());
     }
 
+    #[test]
+    fn properties_step_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("properties"), vec![]);
+
+        assert_eq!(&code, g.v(()).properties(()).bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(
+            String::from("properties"),
+            vec![String::from("name").into()],
+        );
+
+        assert_eq!(&code, g.v(()).properties("name").bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(
+            String::from("properties"),
+            vec![String::from("name").into(), String::from("surname").into()],
+        );
+
+        assert_eq!(
+            &code,
+            g.v(()).properties(vec!["name", "surname"]).bytecode()
+        );
+    }
+
 }

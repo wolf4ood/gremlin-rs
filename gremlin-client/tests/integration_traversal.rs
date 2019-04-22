@@ -368,3 +368,28 @@ fn test_label_step() {
 
     assert_eq!("person", results[0]);
 }
+
+#[test]
+fn test_properties_step() {
+    let client = graph();
+
+    let vertex = create_vertex(&client, "Traversal");
+
+    let g = traversal().with_remote(client);
+
+    let results = g.v(vertex.id()).properties(()).to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!("Traversal", results[0].get::<String>().unwrap());
+
+    let results = g.v(vertex.id()).properties("name").to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!("Traversal", results[0].get::<String>().unwrap());
+
+    let results = g.v(vertex.id()).properties("fake").to_list().unwrap();
+
+    assert_eq!(0, results.len());
+}
