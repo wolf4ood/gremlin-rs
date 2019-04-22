@@ -224,4 +224,16 @@ mod tests {
         assert_eq!(&code, g.v(()).as_("a").bytecode());
     }
 
+    #[test]
+    fn label_step_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("label"), vec![]);
+
+        assert_eq!(&code, g.v(()).label().bytecode());
+    }
+
 }

@@ -151,6 +151,12 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         GraphTraversal::new(self.strategies, self.bytecode)
     }
 
+    pub fn label(mut self) -> GraphTraversal<S, String> {
+        self.bytecode.add_step(String::from("label"), vec![]);
+
+        GraphTraversal::new(self.strategies, self.bytecode)
+    }
+
     pub fn to_list(&self) -> GremlinResult<Vec<E>> {
         self.strategies.apply(self)?.collect()
     }

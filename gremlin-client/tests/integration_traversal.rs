@@ -353,3 +353,18 @@ fn test_add_e() {
 
     assert_eq!("createdBy", edges[0].label());
 }
+
+#[test]
+fn test_label_step() {
+    let client = graph();
+
+    let vertex = create_vertex(&client, "Traversal");
+
+    let g = traversal().with_remote(client);
+
+    let results = g.v(vertex.id()).label().to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!("person", results[0]);
+}
