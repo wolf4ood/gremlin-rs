@@ -271,4 +271,39 @@ mod tests {
         );
     }
 
+    #[test]
+    fn property_map_step_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("propertyMap"), vec![]);
+
+        assert_eq!(&code, g.v(()).property_map(()).bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(
+            String::from("propertyMap"),
+            vec![String::from("name").into()],
+        );
+
+        assert_eq!(&code, g.v(()).property_map("name").bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(
+            String::from("propertyMap"),
+            vec![String::from("name").into(), String::from("surname").into()],
+        );
+
+        assert_eq!(
+            &code,
+            g.v(()).property_map(vec!["name", "surname"]).bytecode()
+        );
+    }
+
 }

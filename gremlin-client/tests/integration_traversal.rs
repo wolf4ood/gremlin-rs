@@ -393,3 +393,50 @@ fn test_properties_step() {
 
     assert_eq!(0, results.len());
 }
+
+#[test]
+fn test_property_map() {
+    let client = graph();
+
+    let vertex = create_vertex(&client, "Traversal");
+
+    let g = traversal().with_remote(client);
+
+    let results = g.v(vertex.id()).property_map(()).to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    let properties = &results[0];
+
+    assert_eq!(
+        "Traversal",
+        properties["name"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<String>()
+            .unwrap()
+    );
+
+    let results = g.v(vertex.id()).property_map("name").to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    let properties = &results[0];
+
+    assert_eq!(
+        "Traversal",
+        properties["name"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<String>()
+            .unwrap()
+    );
+
+    let results = g.v(vertex.id()).property_map("fake").to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    let properties = &results[0];
+
+    assert_eq!(0, properties.len());
+}

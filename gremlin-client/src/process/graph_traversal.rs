@@ -4,7 +4,7 @@ use crate::process::strategies::TraversalStrategies;
 use crate::structure::Either2;
 use crate::structure::Labels;
 use crate::structure::P as Predicate;
-use crate::{structure::GProperty, Edge, GValue, GremlinResult, Vertex};
+use crate::{structure::GProperty, Edge, GValue, GremlinResult, Map, Vertex};
 use std::marker::PhantomData;
 
 pub struct GraphTraversal<S, E: FromGValue> {
@@ -187,6 +187,17 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
     {
         self.bytecode.add_step(
             String::from("properties"),
+            labels.into().0.into_iter().map(GValue::from).collect(),
+        );
+        GraphTraversal::new(self.strategies, self.bytecode)
+    }
+
+    pub fn property_map<L>(mut self, labels: L) -> GraphTraversal<S, Map>
+    where
+        L: Into<Labels>,
+    {
+        self.bytecode.add_step(
+            String::from("propertyMap"),
             labels.into().0.into_iter().map(GValue::from).collect(),
         );
         GraphTraversal::new(self.strategies, self.bytecode)
