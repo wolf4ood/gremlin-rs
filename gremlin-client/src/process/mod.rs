@@ -8,3 +8,4 @@ mod traversal;
 pub use anonymous::traversal;
 
 pub use graph_traversal::GraphTraversal;
+pub use graph_traversal_source::GraphTraversalSource;
