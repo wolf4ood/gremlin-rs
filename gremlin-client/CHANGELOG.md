@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#20](https://github.com/wolf4ood/gremlin-rs/issues/20) Implemented as Step
 - [#18](https://github.com/wolf4ood/gremlin-rs/issues/18) AddEdge Step
 - [#21](https://github.com/wolf4ood/gremlin-rs/issues/21) Implemented Remaining Vertex/Edge Step
+- [#19](https://github.com/wolf4ood/gremlin-rs/issues/19) properties + propertyMap Step
 
 ### Fixed
 
