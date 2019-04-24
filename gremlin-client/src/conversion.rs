@@ -113,6 +113,11 @@ impl FromGValue for GKey {
     }
 }
 
+impl FromGValue for GValue {
+    fn from_gvalue(v: GValue) -> GremlinResult<GValue> {
+        Ok(v)
+    }
+}
 // Borrow from GValue
 
 #[doc(hidden)]

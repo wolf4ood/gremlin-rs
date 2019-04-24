@@ -306,4 +306,23 @@ mod tests {
         );
     }
 
+    #[test]
+    fn values_step_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("values"), vec![]);
+
+        assert_eq!(&code, g.v(()).values(()).bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("values"), vec![String::from("name").into()]);
+
+        assert_eq!(&code, g.v(()).values("name").bytecode());
+    }
+
 }

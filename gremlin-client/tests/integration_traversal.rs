@@ -440,3 +440,32 @@ fn test_property_map() {
 
     assert_eq!(0, properties.len());
 }
+
+#[test]
+fn test_values() {
+    let client = graph();
+
+    let vertex = create_vertex(&client, "Traversal");
+
+    let g = traversal().with_remote(client);
+
+    let results = g.v(vertex.id()).values(()).to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!("Traversal", value.get::<String>().unwrap());
+
+    let results = g.v(vertex.id()).values("name").to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!("Traversal", value.get::<String>().unwrap());
+
+    let results = g.v(vertex.id()).values("fake").to_list().unwrap();
+
+    assert_eq!(0, results.len());
+}
