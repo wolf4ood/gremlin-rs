@@ -10,6 +10,8 @@ fn main() -> Result<(), Box<std::error::Error>> {
 
     chapter_32(&g)?;
 
+    chapter_321(&g)?;
+
     Ok(())
 }
 
@@ -48,6 +50,76 @@ fn chapter_32(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
         let results = g.v(()).has_label("airport").has("code", "DFW").to_list()?;
         Ok(format!("Found {} airports", results.len()))
     })?;
+
+    Ok(())
+}
+
+fn chapter_321(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
+    let chapter = "3.2.1";
+
+    example(
+        &g,
+        chapter,
+        "What property values are stored in the DFW vertex?",
+        |g| {
+            // Original traversal was g.V().has('airport','code','DFW').values()
+            // but has step with 3 parameters it's not supported in gremlin-rs DSL
+
+            let results = g
+                .v(())
+                .has_label("airport")
+                .has("code", "DFW")
+                .values(())
+                .to_list()?;
+            Ok(format!(
+                "Found values [{}] ",
+                results
+                    .iter()
+                    .map(|f| format!("{:?}", f))
+                    .collect::<Vec<String>>()
+                    .join(", ")
+            ))
+        },
+    )?;
+
+    example(&g, chapter, "Return just the city name property", |g| {
+        let results = g
+            .v(())
+            .has_label("airport")
+            .has("code", "DFW")
+            .values("city")
+            .to_list()?;
+        Ok(format!(
+            "Found values [{}] ",
+            results
+                .iter()
+                .map(|f| format!("{:?}", f))
+                .collect::<Vec<String>>()
+                .join(", ")
+        ))
+    })?;
+
+    example(
+        &g,
+        chapter,
+        "Return the 'runways' and 'icao' property values.",
+        |g| {
+            let results = g
+                .v(())
+                .has_label("airport")
+                .has("code", "DFW")
+                .values(vec!["runways", "icao"])
+                .to_list()?;
+            Ok(format!(
+                "Found values [{}] ",
+                results
+                    .iter()
+                    .map(|f| format!("{:?}", f))
+                    .collect::<Vec<String>>()
+                    .join(", ")
+            ))
+        },
+    )?;
 
     Ok(())
 }
