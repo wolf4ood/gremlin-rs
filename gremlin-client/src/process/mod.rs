@@ -2,6 +2,7 @@ mod anonymous;
 pub(crate) mod bytecode;
 mod graph_traversal;
 mod graph_traversal_source;
+mod step;
 mod strategies;
 mod traversal;
 

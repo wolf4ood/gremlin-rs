@@ -5,14 +5,18 @@ fn main() -> Result<(), Box<std::error::Error>> {
 
     let g = traversal().with_remote(client);
 
-    let vertices = g.v(()).has_label("person").has("name", "marko").to_list()?;
+    let vertices = g
+        .v(())
+        .has_label("person")
+        .has(("name", "marko"))
+        .to_list()?;
 
     println!("{:?}", vertices);
 
     let friends = g
         .v(())
         .has_label("person")
-        .has("name", "marko")
+        .has(("name", "marko"))
         .out("knows")
         .to_list()?;
 

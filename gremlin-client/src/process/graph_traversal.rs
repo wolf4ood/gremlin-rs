@@ -1,9 +1,9 @@
 use crate::conversion::FromGValue;
 use crate::process::bytecode::Bytecode;
+use crate::process::step::has::IntoHasStep;
 use crate::process::strategies::TraversalStrategies;
 use crate::structure::Either2;
 use crate::structure::Labels;
-use crate::structure::P as Predicate;
 use crate::{structure::GProperty, Edge, GValue, GremlinResult, Map, Vertex};
 use std::marker::PhantomData;
 
@@ -60,18 +60,26 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         );
         self
     }
-    pub fn has<P>(mut self, key: &str, predicate: P) -> Self
+    // pub fn has<P>(mut self, key: &str, predicate: P) -> Self
+    // where
+    //     P: Into<Predicate>,
+    // {
+    //     let p = predicate.into();
+    //     self.bytecode.add_step(
+    //         String::from("has"),
+    //         vec![String::from(key).into(), p.into()],
+    //     );
+    //     self
+    // }
+
+    pub fn has<A>(mut self, step: A) -> Self
     where
-        P: Into<Predicate>,
+        A: IntoHasStep,
     {
-        let p = predicate.into();
-        self.bytecode.add_step(
-            String::from("has"),
-            vec![String::from(key).into(), p.into()],
-        );
+        self.bytecode
+            .add_step(String::from("has"), step.into().to_params());
         self
     }
-
     pub fn as_<T>(mut self, alias: T) -> GraphTraversal<S, E>
     where
         T: Into<String>,
