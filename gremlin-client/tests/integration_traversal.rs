@@ -96,6 +96,19 @@ fn test_simple_vertex_traversal_with_label_and_has() {
     assert_eq!(1, results.len());
 
     assert_eq!(vertex.id(), results[0].id());
+
+    // with 1 param
+
+    let results = g
+        .v(())
+        .has_label("test_simple_vertex_traversal_with_label_and_has")
+        .has("name")
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(vertex.id(), results[0].id());
 }
 
 #[test]

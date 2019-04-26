@@ -175,6 +175,15 @@ mod tests {
         );
 
         assert_eq!(&code, g.v(()).has(("person", "name", "marko")).bytecode());
+
+        // has with 1 param
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("has"), vec![String::from("name").into()]);
+
+        assert_eq!(&code, g.v(()).has("name").bytecode());
     }
 
     #[test]

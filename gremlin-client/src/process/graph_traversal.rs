@@ -77,7 +77,7 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         A: IntoHasStep,
     {
         self.bytecode
-            .add_step(String::from("has"), step.into().to_params());
+            .add_step(String::from("has"), step.into_step().to_params());
         self
     }
     pub fn as_<T>(mut self, alias: T) -> GraphTraversal<S, E>

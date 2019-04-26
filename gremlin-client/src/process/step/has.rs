@@ -4,20 +4,29 @@ use crate::structure::P as Predicate;
 pub struct HasStep {
     label: Option<String>,
     key: String,
-    predicate: Predicate,
+    predicate: Option<Predicate>,
 }
 
 impl HasStep {
     pub fn to_params(self) -> Vec<GValue> {
-        match self.label {
-            Some(s) => vec![s.into(), self.key.into(), self.predicate.into()],
-            None => vec![self.key.into(), self.predicate.into()],
+        let mut params: Vec<GValue> = vec![];
+
+        if let Some(s) = self.label {
+            params.push(Into::into(s));
         }
+
+        params.push(Into::into(self.key));
+
+        if let Some(p) = self.predicate {
+            params.push(Into::into(p));
+        }
+
+        params
     }
 }
 
 pub trait IntoHasStep {
-    fn into(self) -> HasStep;
+    fn into_step(self) -> HasStep;
 }
 
 impl<A, B> IntoHasStep for (A, B)
@@ -25,11 +34,11 @@ where
     A: Into<String>,
     B: Into<Predicate>,
 {
-    fn into(self) -> HasStep {
+    fn into_step(self) -> HasStep {
         HasStep {
             label: None,
             key: self.0.into(),
-            predicate: self.1.into(),
+            predicate: Some(self.1.into()),
         }
     }
 }
@@ -40,11 +49,31 @@ where
     B: Into<String>,
     C: Into<Predicate>,
 {
-    fn into(self) -> HasStep {
+    fn into_step(self) -> HasStep {
         HasStep {
             label: Some(self.0.into()),
             key: self.1.into(),
-            predicate: self.2.into(),
+            predicate: Some(self.2.into()),
+        }
+    }
+}
+
+impl IntoHasStep for (String) {
+    fn into_step(self) -> HasStep {
+        HasStep {
+            label: None,
+            key: self,
+            predicate: None,
+        }
+    }
+}
+
+impl IntoHasStep for (&str) {
+    fn into_step(self) -> HasStep {
+        HasStep {
+            label: None,
+            key: String::from(self),
+            predicate: None,
         }
     }
 }
