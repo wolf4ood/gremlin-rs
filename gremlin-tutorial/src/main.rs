@@ -42,12 +42,16 @@ fn chapter_32(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
     })?;
 
     example(&g, chapter, "Find the DFW vertex", |g| {
-        let results = g.v(()).has("code", "DFW").to_list()?;
+        let results = g.v(()).has(("code", "DFW")).to_list()?;
         Ok(format!("Found DPW airport with id {:?}", results[0].id()))
     })?;
 
     example(&g, chapter, "Combining those two previous queries", |g| {
-        let results = g.v(()).has_label("airport").has("code", "DFW").to_list()?;
+        let results = g
+            .v(())
+            .has_label("airport")
+            .has(("code", "DFW"))
+            .to_list()?;
         Ok(format!("Found {} airports", results.len()))
     })?;
 
@@ -62,13 +66,9 @@ fn chapter_321(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
         chapter,
         "What property values are stored in the DFW vertex?",
         |g| {
-            // Original traversal was g.V().has('airport','code','DFW').values()
-            // but has step with 3 parameters it's not supported in gremlin-rs DSL
-
             let results = g
                 .v(())
-                .has_label("airport")
-                .has("code", "DFW")
+                .has(("airport", "code", "DFW"))
                 .values(())
                 .to_list()?;
             Ok(format!(
@@ -85,8 +85,7 @@ fn chapter_321(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
     example(&g, chapter, "Return just the city name property", |g| {
         let results = g
             .v(())
-            .has_label("airport")
-            .has("code", "DFW")
+            .has(("airport", "code", "DFW"))
             .values("city")
             .to_list()?;
         Ok(format!(
@@ -106,8 +105,7 @@ fn chapter_321(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
         |g| {
             let results = g
                 .v(())
-                .has_label("airport")
-                .has("code", "DFW")
+                .has(("airport", "code", "DFW"))
                 .values(vec!["runways", "icao"])
                 .to_list()?;
             Ok(format!(
