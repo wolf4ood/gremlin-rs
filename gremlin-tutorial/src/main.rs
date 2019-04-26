@@ -12,6 +12,8 @@ fn main() -> Result<(), Box<std::error::Error>> {
 
     chapter_321(&g)?;
 
+    chapter_322(&g)?;
+
     Ok(())
 }
 
@@ -119,5 +121,40 @@ fn chapter_321(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
         },
     )?;
 
+    Ok(())
+}
+
+fn chapter_322(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
+    let chapter = "3.2.2";
+
+    example(
+        &g,
+        chapter,
+        "Find all edges that have a 'dist' property",
+        |g| {
+            let property = "dist";
+            let results = g.e(()).has(property).to_list()?;
+            Ok(format!(
+                "Found [{}] edges with property {}",
+                results.len(),
+                property
+            ))
+        },
+    )?;
+
+    example(
+        &g,
+        chapter,
+        "Find all vertices that have a 'region' property",
+        |g| {
+            let property = "region";
+            let results = g.v(()).has(property).to_list()?;
+            Ok(format!(
+                "Found [{}] vertices with property {}",
+                results.len(),
+                property
+            ))
+        },
+    )?;
     Ok(())
 }
