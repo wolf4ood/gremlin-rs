@@ -159,6 +159,22 @@ mod tests {
             &code,
             g.v(1).has(("name", "marko")).has(("age", 23)).bytecode()
         );
+
+        // has with 3 params
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(
+            String::from("has"),
+            vec![
+                String::from("person").into(),
+                String::from("name").into(),
+                P::new("eq", String::from("marko").into()).into(),
+            ],
+        );
+
+        assert_eq!(&code, g.v(()).has(("person", "name", "marko")).bytecode());
     }
 
     #[test]

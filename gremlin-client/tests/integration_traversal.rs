@@ -80,6 +80,22 @@ fn test_simple_vertex_traversal_with_label_and_has() {
     assert_eq!(1, results.len());
 
     assert_eq!(vertex.id(), results[0].id());
+
+    // with 3 params
+
+    let results = g
+        .v(())
+        .has((
+            "test_simple_vertex_traversal_with_label_and_has",
+            "name",
+            "Traversal",
+        ))
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(vertex.id(), results[0].id());
 }
 
 #[test]

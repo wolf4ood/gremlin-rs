@@ -33,3 +33,18 @@ where
         }
     }
 }
+
+impl<A, B, C> IntoHasStep for (A, B, C)
+where
+    A: Into<String>,
+    B: Into<String>,
+    C: Into<Predicate>,
+{
+    fn into(self) -> HasStep {
+        HasStep {
+            label: Some(self.0.into()),
+            key: self.1.into(),
+            predicate: self.2.into(),
+        }
+    }
+}
