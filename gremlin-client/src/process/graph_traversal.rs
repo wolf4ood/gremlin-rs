@@ -60,17 +60,6 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         );
         self
     }
-    // pub fn has<P>(mut self, key: &str, predicate: P) -> Self
-    // where
-    //     P: Into<Predicate>,
-    // {
-    //     let p = predicate.into();
-    //     self.bytecode.add_step(
-    //         String::from("has"),
-    //         vec![String::from(key).into(), p.into()],
-    //     );
-    //     self
-    // }
 
     pub fn has<A>(mut self, step: A) -> Self
     where
