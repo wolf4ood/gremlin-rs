@@ -219,4 +219,9 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         );
         GraphTraversal::new(self.strategies, self.bytecode)
     }
+
+    pub fn count(mut self) -> GraphTraversal<S, i64> {
+        self.bytecode.add_step(String::from("count"), vec![]);
+        GraphTraversal::new(self.strategies, self.bytecode)
+    }
 }

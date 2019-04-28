@@ -511,3 +511,20 @@ fn test_values() {
 
     assert_eq!(0, results.len());
 }
+
+#[test]
+fn test_count() {
+    let client = graph();
+
+    let vertex = create_vertex_with_label(&client, "test_count", "Count");
+
+    let g = traversal().with_remote(client);
+
+    let results = g.v(vertex.id()).count().to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!(&1, value);
+}

@@ -362,4 +362,16 @@ mod tests {
         assert_eq!(&code, g.v(()).values("name").bytecode());
     }
 
+    #[test]
+    fn count_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("count"), vec![]);
+
+        assert_eq!(&code, g.v(()).count().bytecode());
+    }
+
 }
