@@ -528,3 +528,27 @@ fn test_count() {
 
     assert_eq!(&1, value);
 }
+
+#[test]
+fn test_group_count_step() {
+    let client = graph();
+
+    drop_vertices(&client, "test_group_count").unwrap();
+
+    let vertex = create_vertex_with_label(&client, "test_group_count", "Count");
+
+    let g = traversal().with_remote(client);
+
+    let results = g
+        .v(())
+        .has_label("test_group_count")
+        .group_count()
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!(&1, value[&vertex].get::<i64>().unwrap());
+}

@@ -224,4 +224,9 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self.bytecode.add_step(String::from("count"), vec![]);
         GraphTraversal::new(self.strategies, self.bytecode)
     }
+
+    pub fn group_count(mut self) -> GraphTraversal<S, Map> {
+        self.bytecode.add_step(String::from("groupCount"), vec![]);
+        GraphTraversal::new(self.strategies, self.bytecode)
+    }
 }
