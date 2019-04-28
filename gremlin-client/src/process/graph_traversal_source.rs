@@ -184,6 +184,15 @@ mod tests {
         code.add_step(String::from("has"), vec![String::from("name").into()]);
 
         assert_eq!(&code, g.v(()).has("name").bytecode());
+
+        // hasNot
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("hasNot"), vec![String::from("name").into()]);
+
+        assert_eq!(&code, g.v(()).has_not("name").bytecode());
     }
 
     #[test]

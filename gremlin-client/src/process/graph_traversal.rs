@@ -69,6 +69,15 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
             .add_step(String::from("has"), step.into_step().to_params());
         self
     }
+
+    pub fn has_not<A>(mut self, key: A) -> Self
+    where
+        A: Into<String>,
+    {
+        self.bytecode
+            .add_step(String::from("hasNot"), vec![key.into().into()]);
+        self
+    }
     pub fn as_<T>(mut self, alias: T) -> GraphTraversal<S, E>
     where
         T: Into<String>,
