@@ -386,4 +386,25 @@ mod tests {
         assert_eq!(&code, g.v(()).group_count().bytecode());
     }
 
+    #[test]
+    fn group_count_by_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("groupCount"), vec![]);
+        code.add_step(String::from("by"), vec![]);
+
+        assert_eq!(&code, g.v(()).group_count().by(()).bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("groupCount"), vec![]);
+        code.add_step(String::from("by"), vec!["name".into()]);
+
+        assert_eq!(&code, g.v(()).group_count().by("name").bytecode());
+    }
+
 }

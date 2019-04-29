@@ -1,5 +1,6 @@
 use crate::conversion::FromGValue;
 use crate::process::bytecode::Bytecode;
+use crate::process::step::by::IntoByStep;
 use crate::process::step::has::IntoHasStep;
 use crate::process::strategies::TraversalStrategies;
 use crate::structure::Either2;
@@ -228,5 +229,14 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
     pub fn group_count(mut self) -> GraphTraversal<S, Map> {
         self.bytecode.add_step(String::from("groupCount"), vec![]);
         GraphTraversal::new(self.strategies, self.bytecode)
+    }
+
+    pub fn by<A>(mut self, step: A) -> Self
+    where
+        A: IntoByStep,
+    {
+        self.bytecode
+            .add_step(String::from("by"), step.into_step().to_params());
+        self
     }
 }
