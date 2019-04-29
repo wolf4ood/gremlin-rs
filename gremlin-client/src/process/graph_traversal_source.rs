@@ -98,7 +98,7 @@ mod tests {
     use super::GraphTraversalSource;
     use crate::process::bytecode::Bytecode;
     use crate::process::strategies::TraversalStrategies;
-    use crate::structure::P;
+    use crate::structure::{P, T};
 
     #[test]
     fn v_traversal() {
@@ -405,6 +405,14 @@ mod tests {
         code.add_step(String::from("by"), vec!["name".into()]);
 
         assert_eq!(&code, g.v(()).group_count().by("name").bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("groupCount"), vec![]);
+        code.add_step(String::from("by"), vec![T::Label.into()]);
+
+        assert_eq!(&code, g.v(()).group_count().by(T::Label).bytecode());
     }
 
 }

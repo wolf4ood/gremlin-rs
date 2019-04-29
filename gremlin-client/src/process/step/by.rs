@@ -1,4 +1,4 @@
-use crate::structure::GValue;
+use crate::structure::{GValue, T};
 
 pub struct ByStep {
     params: Vec<GValue>,
@@ -29,5 +29,11 @@ impl IntoByStep for () {
 impl IntoByStep for &str {
     fn into_step(self) -> ByStep {
         ByStep::new(vec![String::from(self).into()])
+    }
+}
+
+impl IntoByStep for T {
+    fn into_step(self) -> ByStep {
+        ByStep::new(vec![self.into()])
     }
 }

@@ -3,7 +3,7 @@ mod macros;
 mod serializer_v3;
 
 use crate::conversion::ToGValue;
-use crate::structure::GValue;
+use crate::structure::{GValue, T};
 use serde_json::{json, Value};
 
 use crate::GremlinResult;
@@ -113,6 +113,20 @@ impl GraphSON {
                     "@value" : params
                 }))
             }
+            GValue::T(t) => {
+                let v = match t {
+                    T::Id => "id",
+                    T::Key => "key",
+                    T::Label => "label",
+                    T::Value => "value",
+                };
+
+                Ok(json!({
+                    "@type" : "g:T",
+                    "@value" : v
+                }))
+            }
+
             _ => panic!("Type {:?} not supported.", value),
         }
     }

@@ -1,11 +1,11 @@
 use crate::conversion::{BorrowFromGValue, FromGValue};
 use crate::process::bytecode::Bytecode;
 use crate::structure::traverser::Traverser;
-use crate::structure::P;
 use crate::structure::{
     Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property, Set, Token,
     TraversalExplanation, TraversalMetrics, Vertex, VertexProperty,
 };
+use crate::structure::{P, T};
 use crate::GremlinResult;
 use chrono;
 use std::collections::{BTreeMap, HashMap, VecDeque};
@@ -36,6 +36,7 @@ pub enum GValue {
     TraversalExplanation(TraversalExplanation),
     IntermediateRepr(IntermediateRepr),
     P(P),
+    T(T),
     Bytecode(Bytecode),
     Traverser(Traverser),
 }
@@ -215,5 +216,11 @@ impl From<GKey> for GValue {
 impl From<P> for GValue {
     fn from(val: P) -> GValue {
         GValue::P(val)
+    }
+}
+
+impl From<T> for GValue {
+    fn from(val: T) -> GValue {
+        GValue::T(val)
     }
 }
