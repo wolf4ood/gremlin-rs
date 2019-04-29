@@ -1,9 +1,22 @@
 use crate::conversion::FromGValue;
-use crate::process::bytecode::Bytecode;
 use crate::structure::Traverser;
 use crate::GResultSet;
 use crate::GremlinResult;
 use std::marker::PhantomData;
+
+mod anonymous;
+mod bytecode;
+mod graph_traversal;
+mod graph_traversal_source;
+mod step;
+mod strategies;
+pub use anonymous::traversal;
+
+pub use bytecode::Bytecode;
+pub use graph_traversal::GraphTraversal;
+pub use graph_traversal_source::GraphTraversalSource;
+
+pub use step::*;
 
 pub trait Traversal<S, E> {
     fn bytecode(&self) -> &Bytecode;

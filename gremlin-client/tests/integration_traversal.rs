@@ -1,4 +1,4 @@
-use gremlin_client::process::traversal;
+use gremlin_client::process::traversal::traversal;
 use gremlin_client::structure::{List, Map, VertexProperty, T};
 
 mod common;

@@ -1,8 +1,8 @@
 use crate::conversion::FromGValue;
-use crate::process::bytecode::Bytecode;
-use crate::process::step::by::IntoByStep;
-use crate::process::step::has::IntoHasStep;
-use crate::process::strategies::TraversalStrategies;
+use crate::process::traversal::Bytecode;
+use crate::process::traversal::step::by::IntoByStep;
+use crate::process::traversal::step::has::IntoHasStep;
+use crate::process::traversal::strategies::TraversalStrategies;
 use crate::structure::Either2;
 use crate::structure::Labels;
 use crate::{structure::GProperty, Edge, GValue, GremlinResult, Map, Vertex};

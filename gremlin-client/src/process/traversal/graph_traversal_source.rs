@@ -1,7 +1,9 @@
 use crate::conversion::ToGValue;
-use crate::process::bytecode::Bytecode;
-use crate::process::graph_traversal::GraphTraversal;
-use crate::process::strategies::{RemoteStrategy, TraversalStrategies, TraversalStrategy};
+use crate::process::traversal::strategies::{
+    RemoteStrategy, TraversalStrategies, TraversalStrategy,
+};
+use crate::process::traversal::Bytecode;
+use crate::process::traversal::GraphTraversal;
 use crate::structure::GIDs;
 use crate::structure::Labels;
 use crate::structure::{Edge, GValue, Vertex};
@@ -96,8 +98,8 @@ pub struct InnerGraphTraversalSource {
 mod tests {
 
     use super::GraphTraversalSource;
-    use crate::process::bytecode::Bytecode;
-    use crate::process::strategies::TraversalStrategies;
+    use crate::process::traversal::strategies::TraversalStrategies;
+    use crate::process::traversal::Bytecode;
     use crate::structure::{P, T};
 
     #[test]

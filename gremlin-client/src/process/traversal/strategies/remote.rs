@@ -1,7 +1,7 @@
 use crate::conversion::FromGValue;
 
 use crate::{
-    process::traversal::RemoteTraversalIterator, process::GraphTraversal, GremlinClient,
+    process::traversal::GraphTraversal, process::traversal::RemoteTraversalIterator, GremlinClient,
     GremlinResult,
 };
 

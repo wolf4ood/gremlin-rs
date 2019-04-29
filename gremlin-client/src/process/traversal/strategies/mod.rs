@@ -1,5 +1,5 @@
 mod remote;
-use crate::process::GraphTraversal;
+use crate::process::traversal::GraphTraversal;
 use crate::{GremlinError, GremlinResult};
 pub use remote::RemoteStrategy;
 

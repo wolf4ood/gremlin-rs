@@ -1,5 +1,5 @@
 use crate::conversion::{BorrowFromGValue, FromGValue};
-use crate::process::bytecode::Bytecode;
+use crate::process::traversal::Bytecode;
 use crate::structure::traverser::Traverser;
 use crate::structure::{
     Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property, Set, Token,

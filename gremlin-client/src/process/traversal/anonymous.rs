@@ -1,6 +1,6 @@
 use crate::client::GremlinClient;
-use crate::process::graph_traversal_source::GraphTraversalSource;
-use crate::process::strategies::TraversalStrategies;
+use crate::process::traversal::strategies::TraversalStrategies;
+use crate::process::traversal::GraphTraversalSource;
 
 pub struct AnonymousTraversalSource {}
 

@@ -1,7 +1,7 @@
 use crate::io::GraphSON;
 use crate::message::{message_with_args, Message, Response};
 use crate::pool::GremlinConnectionManager;
-use crate::process::bytecode::Bytecode;
+use crate::process::traversal::Bytecode;
 use crate::ToGValue;
 use crate::{ConnectionOptions, GremlinError, GremlinResult};
 use crate::{GResultSet, GValue};
