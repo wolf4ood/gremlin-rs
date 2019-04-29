@@ -580,3 +580,42 @@ fn test_group_count_step() {
 
     assert_eq!(&1, value["test_group_count"].get::<i64>().unwrap());
 }
+
+#[test]
+fn test_group_by_step() {
+    let client = graph();
+
+    drop_vertices(&client, "test_group_by_step").unwrap();
+
+    create_vertex_with_label(&client, "test_group_by_step", "Count");
+
+    let g = traversal().with_remote(client);
+
+    let results = g
+        .v(())
+        .has_label("test_group_by_step")
+        .group()
+        .by("name")
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!(1, value["Count"].get::<List>().unwrap().len());
+
+    let results = g
+        .v(())
+        .has_label("test_group_by_step")
+        .group()
+        .by(T::Label)
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!(1, value["test_group_by_step"].get::<List>().unwrap().len());
+}

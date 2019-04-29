@@ -15,6 +15,10 @@ impl List {
     pub fn iter(&self) -> impl Iterator<Item = &GValue> {
         self.0.iter()
     }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
 }
 
 impl Into<List> for Vec<GValue> {

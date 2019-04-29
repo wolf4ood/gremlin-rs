@@ -231,6 +231,11 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         GraphTraversal::new(self.strategies, self.bytecode)
     }
 
+    pub fn group(mut self) -> GraphTraversal<S, Map> {
+        self.bytecode.add_step(String::from("group"), vec![]);
+        GraphTraversal::new(self.strategies, self.bytecode)
+    }
+
     pub fn by<A>(mut self, step: A) -> Self
     where
         A: IntoByStep,
