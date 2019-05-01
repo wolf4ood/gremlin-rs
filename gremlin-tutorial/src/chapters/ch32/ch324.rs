@@ -51,5 +51,23 @@ pub fn chapter_324(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error
         Ok(format!("Found [{:?}] vertex types", results[0]))
     })?;
 
+    example(
+        &g,
+        chapter,
+        "How many airports are there in each country?",
+        |g| {
+            let results = g
+                .v(())
+                .has_label("airport")
+                .group_count()
+                .by("country")
+                .to_list()?;
+            Ok(format!(
+                "Found [{:?}] airport in Italy",
+                results[0]["IT"].get::<i64>()
+            ))
+        },
+    )?;
+
     Ok(())
 }
