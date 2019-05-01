@@ -1,4 +1,4 @@
-use gremlin_client::process::traversal::traversal;
+use gremlin_client::process::traversal::{traversal, __};
 use gremlin_client::structure::{List, Map, VertexProperty, T};
 
 mod common;
@@ -618,4 +618,21 @@ fn test_group_by_step() {
     let value = &results[0];
 
     assert_eq!(1, value["test_group_by_step"].get::<List>().unwrap().len());
+
+    //
+
+    let results = g
+        .v(())
+        .has_label("test_group_by_step")
+        .group()
+        .by(T::Label)
+        .by(__.count())
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!(&1, value["test_group_by_step"].get::<i64>().unwrap());
 }

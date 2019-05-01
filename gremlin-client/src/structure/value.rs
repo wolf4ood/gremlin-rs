@@ -224,3 +224,9 @@ impl From<T> for GValue {
         GValue::T(val)
     }
 }
+
+impl From<Bytecode> for GValue {
+    fn from(val: Bytecode) -> GValue {
+        GValue::Bytecode(val)
+    }
+}

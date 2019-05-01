@@ -4,17 +4,22 @@ use crate::GResultSet;
 use crate::GremlinResult;
 use std::marker::PhantomData;
 
-mod anonymous;
+mod anonymous_traversal_source;
 mod bytecode;
 mod graph_traversal;
 mod graph_traversal_source;
+mod remote;
 mod step;
 mod strategies;
-pub use anonymous::traversal;
+pub use remote::traversal;
 
 pub use bytecode::Bytecode;
 pub use graph_traversal::GraphTraversal;
 pub use graph_traversal_source::GraphTraversalSource;
+
+pub use anonymous_traversal_source::AnonymousTraversalSource;
+
+use lazy_static::lazy_static;
 
 pub use step::*;
 
@@ -46,4 +51,8 @@ impl<T: FromGValue> Iterator for RemoteTraversalIterator<T> {
             .map(|e| e.unwrap().take::<Traverser>())
             .map(|t| t.unwrap().take::<T>())
     }
+}
+
+lazy_static! {
+    pub static ref __: AnonymousTraversalSource = AnonymousTraversalSource::new();
 }

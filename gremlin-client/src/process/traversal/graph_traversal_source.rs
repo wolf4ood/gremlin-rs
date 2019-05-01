@@ -22,6 +22,10 @@ impl GraphTraversalSource {
         }
     }
 
+    pub fn empty() -> GraphTraversalSource {
+        GraphTraversalSource::new(TraversalStrategies::new(vec![]))
+    }
+
     pub fn with_remote(&self, client: GremlinClient) -> GraphTraversalSource {
         let mut strategies = self.inner.strategies.clone();
 
@@ -99,7 +103,7 @@ mod tests {
 
     use super::GraphTraversalSource;
     use crate::process::traversal::strategies::TraversalStrategies;
-    use crate::process::traversal::Bytecode;
+    use crate::process::traversal::{Bytecode, __};
     use crate::structure::{P, T};
 
     #[test]
@@ -444,6 +448,21 @@ mod tests {
         code.add_step(String::from("by"), vec![T::Label.into()]);
 
         assert_eq!(&code, g.v(()).group().by(T::Label).bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("group"), vec![]);
+        code.add_step(String::from("by"), vec![T::Label.into()]);
+        code.add_step(
+            String::from("by"),
+            vec![__.count().bytecode().clone().into()],
+        );
+
+        assert_eq!(
+            &code,
+            g.v(()).group().by(T::Label).by(__.count()).bytecode()
+        );
     }
 
 }

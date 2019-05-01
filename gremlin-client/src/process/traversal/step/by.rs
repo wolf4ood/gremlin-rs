@@ -1,3 +1,5 @@
+use crate::conversion::FromGValue;
+use crate::process::traversal::GraphTraversal;
 use crate::structure::{GValue, T};
 
 pub struct ByStep {
@@ -35,5 +37,11 @@ impl IntoByStep for &str {
 impl IntoByStep for T {
     fn into_step(self) -> ByStep {
         ByStep::new(vec![self.into()])
+    }
+}
+
+impl<S, E: FromGValue> IntoByStep for GraphTraversal<S, E> {
+    fn into_step(self) -> ByStep {
+        ByStep::new(vec![self.bytecode.into()])
     }
 }

@@ -1,18 +1,19 @@
 use crate::conversion::FromGValue;
-use crate::process::traversal::Bytecode;
 use crate::process::traversal::step::by::IntoByStep;
 use crate::process::traversal::step::has::IntoHasStep;
 use crate::process::traversal::strategies::TraversalStrategies;
+use crate::process::traversal::Bytecode;
 use crate::structure::Either2;
 use crate::structure::Labels;
 use crate::{structure::GProperty, Edge, GValue, GremlinResult, Map, Vertex};
 use std::marker::PhantomData;
 
+#[derive(Clone)]
 pub struct GraphTraversal<S, E: FromGValue> {
     start: PhantomData<S>,
     end: PhantomData<E>,
     strategies: TraversalStrategies,
-    bytecode: Bytecode,
+    pub(crate) bytecode: Bytecode,
 }
 
 impl<S, E: FromGValue> GraphTraversal<S, E> {
