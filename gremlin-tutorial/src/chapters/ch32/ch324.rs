@@ -1,5 +1,6 @@
 use crate::chapters::example;
 use gremlin_client::process::traversal::GraphTraversalSource;
+use gremlin_client::process::traversal::__;
 use gremlin_client::structure::T;
 
 pub fn chapter_324(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
@@ -44,6 +45,11 @@ pub fn chapter_324(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error
             Ok(format!("Found [{:?}] edge types", results[0]))
         },
     )?;
+
+    example(&g, chapter, "As above but using group()", |g| {
+        let results = g.v(()).group().by(T::Label).by(__.count()).to_list()?;
+        Ok(format!("Found [{:?}] vertex types", results[0]))
+    })?;
 
     Ok(())
 }
