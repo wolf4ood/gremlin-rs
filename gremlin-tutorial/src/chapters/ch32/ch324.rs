@@ -1,5 +1,5 @@
 use crate::chapters::example;
-use gremlin_client::process::GraphTraversalSource;
+use gremlin_client::process::traversal::GraphTraversalSource;
 use gremlin_client::structure::T;
 
 pub fn chapter_324(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {

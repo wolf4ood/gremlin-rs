@@ -1,4 +1,4 @@
-use gremlin_client::{process::traversal, GremlinClient};
+use gremlin_client::{process::traversal::traversal, GremlinClient};
 
 mod chapters;
 

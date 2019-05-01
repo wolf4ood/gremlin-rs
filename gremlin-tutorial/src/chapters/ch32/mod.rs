@@ -3,7 +3,7 @@ mod ch322;
 mod ch323;
 mod ch324;
 
-use gremlin_client::process::GraphTraversalSource;
+use gremlin_client::process::traversal::GraphTraversalSource;
 
 use crate::chapters::example;
 

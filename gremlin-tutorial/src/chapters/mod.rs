@@ -1,4 +1,4 @@
-use gremlin_client::process::GraphTraversalSource;
+use gremlin_client::process::traversal::GraphTraversalSource;
 
 mod ch32;
 
