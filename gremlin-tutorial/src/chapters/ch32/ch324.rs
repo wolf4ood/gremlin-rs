@@ -104,5 +104,38 @@ pub fn chapter_324(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error
         },
     )?;
 
+    
+
+    example(
+        &g,
+        chapter,
+        "How many airports in there in France (having first counted all countries)",
+        |g| {
+            let results = g
+                .v(())
+                .has_label("airport")
+                .group_count()
+                .by("country")
+                .select("FR")
+                .to_list()?;
+            Ok(format!("Found [{:?}] ", results[0]))
+        },
+    )?;
+
+    example(
+        &g,
+        chapter,
+        "// How many airports are there in France, Greece and Belgium respectively?",
+        |g| {
+            let results = g
+                .v(())
+                .has_label("airport")
+                .group_count()
+                .by("country")
+                .select(vec!["FR","GR","BE"])
+                .to_list()?;
+            Ok(format!("Found [{:?}] ", results[0]))
+        },
+    )?;
     Ok(())
 }
