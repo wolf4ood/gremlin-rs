@@ -104,8 +104,6 @@ pub fn chapter_324(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error
         },
     )?;
 
-    
-
     example(
         &g,
         chapter,
@@ -132,7 +130,7 @@ pub fn chapter_324(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error
                 .has_label("airport")
                 .group_count()
                 .by("country")
-                .select(vec!["FR","GR","BE"])
+                .select(vec!["FR", "GR", "BE"])
                 .to_list()?;
             Ok(format!("Found [{:?}] ", results[0]))
         },
