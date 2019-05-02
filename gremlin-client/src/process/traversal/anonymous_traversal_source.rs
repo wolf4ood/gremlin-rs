@@ -27,4 +27,8 @@ impl AnonymousTraversalSource {
     }
 }
 
-
+impl Default for AnonymousTraversalSource {
+    fn default() -> Self {
+        Self::new()
+    }
+}

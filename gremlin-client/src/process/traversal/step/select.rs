@@ -13,7 +13,7 @@ impl SelectStep {
 }
 
 impl SelectStep {
-    pub fn to_params(self) -> Vec<GValue> {
+    pub fn take_params(self) -> Vec<GValue> {
         self.params
     }
 }

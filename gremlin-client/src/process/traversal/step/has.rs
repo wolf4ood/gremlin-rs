@@ -8,7 +8,7 @@ pub struct HasStep {
 }
 
 impl HasStep {
-    pub fn to_params(self) -> Vec<GValue> {
+    pub fn take_params(self) -> Vec<GValue> {
         let mut params: Vec<GValue> = vec![];
 
         if let Some(s) = self.label {

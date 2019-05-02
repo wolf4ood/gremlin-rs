@@ -69,7 +69,7 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         A: IntoHasStep,
     {
         self.bytecode
-            .add_step(String::from("has"), step.into_step().to_params());
+            .add_step(String::from("has"), step.into_step().take_params());
         self
     }
 
@@ -243,7 +243,7 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         A: IntoByStep,
     {
         self.bytecode
-            .add_step(String::from("by"), step.into_step().to_params());
+            .add_step(String::from("by"), step.into_step().take_params());
         self
     }
 
@@ -252,7 +252,7 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         A: IntoSelectStep,
     {
         self.bytecode
-            .add_step(String::from("select"), step.into_step().to_params());
+            .add_step(String::from("select"), step.into_step().take_params());
         GraphTraversal::new(self.strategies, self.bytecode)
     }
 }
