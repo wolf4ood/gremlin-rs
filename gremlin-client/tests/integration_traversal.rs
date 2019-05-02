@@ -636,3 +636,29 @@ fn test_group_by_step() {
 
     assert_eq!(&1, value["test_group_by_step"].get::<i64>().unwrap());
 }
+
+#[test]
+fn test_select_step() {
+    let client = graph();
+
+    drop_vertices(&client, "test_select_step").unwrap();
+
+    create_vertex_with_label(&client, "test_select_step", "Count");
+
+    let g = traversal().with_remote(client);
+
+    let results = g
+        .v(())
+        .has_label("test_select_step")
+        .group_count()
+        .by("name")
+        .select("Count")
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!(&1, value.get::<i64>().unwrap());
+}

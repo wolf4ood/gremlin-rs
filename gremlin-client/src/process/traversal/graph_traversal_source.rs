@@ -465,4 +465,26 @@ mod tests {
         );
     }
 
+    #[test]
+    fn select_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("select"), vec!["name".into()]);
+
+        assert_eq!(&code, g.v(()).select("name").bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(
+            String::from("select"),
+            vec!["name".into(), "surname".into()],
+        );
+
+        assert_eq!(&code, g.v(()).select(vec!["name", "surname"]).bytecode());
+    }
+
 }
