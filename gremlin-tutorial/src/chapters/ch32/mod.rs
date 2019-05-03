@@ -2,6 +2,7 @@ mod ch321;
 mod ch322;
 mod ch323;
 mod ch324;
+mod ch331;
 
 use gremlin_client::process::traversal::GraphTraversalSource;
 
@@ -39,5 +40,6 @@ pub fn all() -> Vec<Box<Fn(&GraphTraversalSource) -> Result<(), Box<std::error::
         Box::new(ch322::chapter_322),
         Box::new(ch323::chapter_323),
         Box::new(ch324::chapter_324),
+        Box::new(ch331::chapter_331),
     ]
 }

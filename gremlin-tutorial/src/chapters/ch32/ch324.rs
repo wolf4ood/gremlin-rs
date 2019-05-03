@@ -123,7 +123,7 @@ pub fn chapter_324(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error
     example(
         &g,
         chapter,
-        "// How many airports are there in France, Greece and Belgium respectively?",
+        "How many airports are there in France, Greece and Belgium respectively?",
         |g| {
             let results = g
                 .v(())
