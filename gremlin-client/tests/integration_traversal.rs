@@ -662,3 +662,28 @@ fn test_select_step() {
 
     assert_eq!(&1, value.get::<i64>().unwrap());
 }
+
+#[test]
+fn test_fold_step() {
+    let client = graph();
+
+    drop_vertices(&client, "test_fold_step").unwrap();
+
+    create_vertex_with_label(&client, "test_fold_step", "Count");
+
+    let g = traversal().with_remote(client);
+
+    let results = g
+        .v(())
+        .has_label("test_fold_step")
+        .values("name")
+        .fold()
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!("Count", value[0].get::<String>().unwrap());
+}

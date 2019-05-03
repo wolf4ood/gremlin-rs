@@ -487,4 +487,17 @@ mod tests {
         assert_eq!(&code, g.v(()).select(vec!["name", "surname"]).bytecode());
     }
 
+    #[test]
+    fn fold_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("values"), vec!["name".into()]);
+        code.add_step(String::from("fold"), vec![]);
+
+        assert_eq!(&code, g.v(()).values("name").fold().bytecode());
+    }
+
 }
