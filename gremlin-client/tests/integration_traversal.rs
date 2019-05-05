@@ -1,5 +1,5 @@
 use gremlin_client::process::traversal::{traversal, __};
-use gremlin_client::structure::{List, Map, VertexProperty, T};
+use gremlin_client::structure::{List, Map, Vertex, VertexProperty, T};
 
 mod common;
 
@@ -686,4 +686,28 @@ fn test_fold_step() {
     let value = &results[0];
 
     assert_eq!("Count", value[0].get::<String>().unwrap());
+}
+
+#[test]
+fn test_path_step() {
+    let client = graph();
+
+    drop_vertices(&client, "test_path_step").unwrap();
+
+    let v = create_vertex_with_label(&client, "test_path_step", "Count");
+
+    let g = traversal().with_remote(client);
+
+    let results = g
+        .v(())
+        .has_label("test_path_step")
+        .path()
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!(v.id(), value.objects()[0].get::<Vertex>().unwrap().id());
 }

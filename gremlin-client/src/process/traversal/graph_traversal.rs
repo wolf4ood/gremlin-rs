@@ -6,7 +6,7 @@ use crate::process::traversal::strategies::TraversalStrategies;
 use crate::process::traversal::Bytecode;
 use crate::structure::Either2;
 use crate::structure::Labels;
-use crate::{structure::GProperty, Edge, GValue, GremlinResult, List, Map, Vertex};
+use crate::{structure::GProperty, Edge, GValue, GremlinResult, List, Map, Path, Vertex};
 use std::marker::PhantomData;
 
 #[derive(Clone)]
@@ -258,6 +258,11 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
 
     pub fn fold(mut self) -> GraphTraversal<S, List> {
         self.bytecode.add_step(String::from("fold"), vec![]);
+        GraphTraversal::new(self.strategies, self.bytecode)
+    }
+
+    pub fn path(mut self) -> GraphTraversal<S, Path> {
+        self.bytecode.add_step(String::from("path"), vec![]);
         GraphTraversal::new(self.strategies, self.bytecode)
     }
 }
