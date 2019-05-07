@@ -25,6 +25,13 @@ impl AnonymousTraversalSource {
     {
         self.traversal.clone().out(labels)
     }
+
+    pub fn values<L>(&self, labels: L) -> GraphTraversal<GValue, GValue>
+    where
+        L: Into<Labels>,
+    {
+        self.traversal.clone().values(labels)
+    }
 }
 
 impl Default for AnonymousTraversalSource {
