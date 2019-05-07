@@ -711,3 +711,24 @@ fn test_path_step() {
 
     assert_eq!(v.id(), value.objects()[0].get::<Vertex>().unwrap().id());
 }
+
+#[test]
+fn test_limit_step() {
+    let client = graph();
+
+    drop_vertices(&client, "test_limit_step").unwrap();
+
+    create_vertex_with_label(&client, "test_limit_step", "Count");
+    create_vertex_with_label(&client, "test_limit_step", "Count");
+
+    let g = traversal().with_remote(client);
+
+    let results = g
+        .v(())
+        .has_label("test_limit_step")
+        .limit(1)
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+}
