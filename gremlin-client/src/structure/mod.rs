@@ -17,6 +17,7 @@ mod traverser;
 mod value;
 mod vertex;
 mod vertex_property;
+mod scope;
 
 pub use self::edge::Edge;
 pub use self::gid::{GIDs, GID};
@@ -35,4 +36,5 @@ pub use label::Labels;
 pub use map::{GKey, Map};
 pub use p::P;
 pub use t::T;
+pub use scope::Scope;
 pub use traverser::Traverser;

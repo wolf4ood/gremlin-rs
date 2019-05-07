@@ -1,7 +1,9 @@
 use crate::conversion::FromGValue;
 use crate::process::traversal::step::by::IntoByStep;
 use crate::process::traversal::step::has::IntoHasStep;
+use crate::process::traversal::step::limit::LimitStep;
 use crate::process::traversal::step::select::IntoSelectStep;
+
 use crate::process::traversal::strategies::TraversalStrategies;
 use crate::process::traversal::Bytecode;
 use crate::structure::Either2;
@@ -264,5 +266,15 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
     pub fn path(mut self) -> GraphTraversal<S, Path> {
         self.bytecode.add_step(String::from("path"), vec![]);
         GraphTraversal::new(self.strategies, self.bytecode)
+    }
+
+    pub fn limit<A>(mut self, limit: A) -> GraphTraversal<S, E>
+    where
+        A: Into<LimitStep>,
+    {
+        self.bytecode
+            .add_step(String::from("limit"), limit.into().params());
+
+        self
     }
 }

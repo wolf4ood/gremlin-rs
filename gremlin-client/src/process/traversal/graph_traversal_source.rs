@@ -104,7 +104,7 @@ mod tests {
     use super::GraphTraversalSource;
     use crate::process::traversal::strategies::TraversalStrategies;
     use crate::process::traversal::{Bytecode, __};
-    use crate::structure::{P, T};
+    use crate::structure::{GValue, P, T};
 
     #[test]
     fn v_traversal() {
@@ -510,6 +510,18 @@ mod tests {
         code.add_step(String::from("path"), vec![]);
 
         assert_eq!(&code, g.v(()).path().bytecode());
+    }
+
+    #[test]
+    fn limit_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("limit"), vec![GValue::Int64(1)]);
+
+        assert_eq!(&code, g.v(()).limit(1).bytecode());
     }
 
 }
