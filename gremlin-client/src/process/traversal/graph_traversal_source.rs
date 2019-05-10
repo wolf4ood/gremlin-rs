@@ -524,4 +524,17 @@ mod tests {
         assert_eq!(&code, g.v(()).limit(1).bytecode());
     }
 
+    #[test]
+    fn dedup_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("values"), vec![]);
+        code.add_step(String::from("dedup"), vec![]);
+
+        assert_eq!(&code, g.v(()).values(()).dedup(()).bytecode());
+    }
+
 }

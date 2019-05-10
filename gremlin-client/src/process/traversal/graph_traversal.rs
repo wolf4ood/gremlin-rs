@@ -1,5 +1,6 @@
 use crate::conversion::FromGValue;
 use crate::process::traversal::step::by::IntoByStep;
+use crate::process::traversal::step::dedup::DedupStep;
 use crate::process::traversal::step::has::IntoHasStep;
 use crate::process::traversal::step::limit::LimitStep;
 use crate::process::traversal::step::select::IntoSelectStep;
@@ -274,6 +275,16 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
     {
         self.bytecode
             .add_step(String::from("limit"), limit.into().params());
+
+        self
+    }
+
+    pub fn dedup<A>(mut self, limit: A) -> GraphTraversal<S, E>
+    where
+        A: Into<DedupStep>,
+    {
+        self.bytecode
+            .add_step(String::from("dedup"), limit.into().params());
 
         self
     }
