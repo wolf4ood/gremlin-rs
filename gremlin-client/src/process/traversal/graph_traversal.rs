@@ -263,6 +263,10 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self.bytecode.add_step(String::from("fold"), vec![]);
         GraphTraversal::new(self.strategies, self.bytecode)
     }
+    pub fn unfold(mut self) -> GraphTraversal<S, E> {
+        self.bytecode.add_step(String::from("unfold"), vec![]);
+        self
+    }
 
     pub fn path(mut self) -> GraphTraversal<S, Path> {
         self.bytecode.add_step(String::from("path"), vec![]);

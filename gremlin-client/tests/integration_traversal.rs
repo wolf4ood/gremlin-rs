@@ -689,6 +689,37 @@ fn test_fold_step() {
 }
 
 #[test]
+fn test_unfold_step() {
+    let client = graph();
+
+    drop_vertices(&client, "test_unfold_step").unwrap();
+
+    let vertex = create_vertex_with_label(&client, "test_unfold_step", "Count");
+
+    let g = traversal().with_remote(client);
+
+    let results = g
+        .v(vertex.id())
+        .property_map(())
+        .unfold()
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!(
+        "Count",
+        value["name"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<String>()
+            .unwrap()
+    );
+}
+
+#[test]
 fn test_path_step() {
     let client = graph();
 

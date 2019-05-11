@@ -501,6 +501,19 @@ mod tests {
     }
 
     #[test]
+    fn unfold_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("propertyMap"), vec![]);
+        code.add_step(String::from("unfold"), vec![]);
+
+        assert_eq!(&code, g.v(()).property_map(()).unfold().bytecode());
+    }
+
+    #[test]
     fn path_test() {
         let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
 
