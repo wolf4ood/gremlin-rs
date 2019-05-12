@@ -24,11 +24,46 @@ impl P {
             value: Box::new(value),
         }
     }
-    pub fn eq<V>(value: &V) -> P
+    pub fn eq<V>(value: V) -> P
     where
         V: ToGValue,
     {
         P::new("eq", value.to_gvalue())
+    }
+
+    pub fn neq<V>(value: V) -> P
+    where
+        V: ToGValue,
+    {
+        P::new("neq", value.to_gvalue())
+    }
+
+    pub fn gt<V>(value: V) -> P
+    where
+        V: ToGValue,
+    {
+        P::new("gt", value.to_gvalue())
+    }
+
+    pub fn gte<V>(value: V) -> P
+    where
+        V: ToGValue,
+    {
+        P::new("gte", value.to_gvalue())
+    }
+
+    pub fn lt<V>(value: V) -> P
+    where
+        V: ToGValue,
+    {
+        P::new("lt", value.to_gvalue())
+    }
+
+    pub fn lte<V>(value: V) -> P
+    where
+        V: ToGValue,
+    {
+        P::new("lte", value.to_gvalue())
     }
 }
 

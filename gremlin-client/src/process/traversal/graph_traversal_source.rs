@@ -202,6 +202,78 @@ mod tests {
     }
 
     #[test]
+    fn v_has_traversal_with_p() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        // EQ
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![1.into()]);
+
+        code.add_step(
+            String::from("has"),
+            vec![String::from("age").into(), P::eq(23).into()],
+        );
+        assert_eq!(&code, g.v(1).has(("age", P::eq(23))).bytecode());
+
+        // NEQ
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![1.into()]);
+
+        code.add_step(
+            String::from("has"),
+            vec![String::from("age").into(), P::neq(23).into()],
+        );
+        assert_eq!(&code, g.v(1).has(("age", P::neq(23))).bytecode());
+
+        // GTE
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![1.into()]);
+
+        code.add_step(
+            String::from("has"),
+            vec![String::from("age").into(), P::gte(23).into()],
+        );
+
+        assert_eq!(&code, g.v(1).has(("age", P::gte(23))).bytecode());
+
+        // GT
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![1.into()]);
+
+        code.add_step(
+            String::from("has"),
+            vec![String::from("age").into(), P::gt(23).into()],
+        );
+
+        assert_eq!(&code, g.v(1).has(("age", P::gt(23))).bytecode());
+
+        // LTE
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![1.into()]);
+
+        code.add_step(
+            String::from("has"),
+            vec![String::from("age").into(), P::lte(23).into()],
+        );
+        assert_eq!(&code, g.v(1).has(("age", P::lte(23))).bytecode());
+
+        // LT
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![1.into()]);
+
+        code.add_step(
+            String::from("has"),
+            vec![String::from("age").into(), P::lt(23).into()],
+        );
+        assert_eq!(&code, g.v(1).has(("age", P::lt(23))).bytecode());
+    }
+    #[test]
     fn add_v_test() {
         let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
 
