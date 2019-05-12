@@ -2,8 +2,8 @@ use gremlin_client::process::traversal::GraphTraversalSource;
 
 mod ch311;
 mod ch32;
-mod ch34;
 mod ch33;
+mod ch34;
 
 fn example<T>(
     source: &GraphTraversalSource,
