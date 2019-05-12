@@ -2,6 +2,8 @@ use gremlin_client::process::traversal::GraphTraversalSource;
 
 mod ch311;
 mod ch32;
+mod ch34;
+mod ch33;
 
 fn example<T>(
     source: &GraphTraversalSource,
@@ -25,6 +27,8 @@ pub fn all() -> Vec<Box<Fn(&GraphTraversalSource) -> Result<(), Box<std::error::
     let mut chapters = vec![];
 
     chapters.append(&mut ch32::all());
+    chapters.append(&mut ch33::all());
+    chapters.append(&mut ch34::all());
     chapters.append(&mut ch311::all());
     chapters
 }
