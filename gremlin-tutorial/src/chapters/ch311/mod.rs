@@ -10,8 +10,9 @@ fn chapter_311(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
             .v(())
             .has(("runways", P::gte(5)))
             .values(vec!["code", "runways"])
+            .fold()
             .to_list()?;
-        Ok(format!("Found {} airports", results.len()))
+        Ok(format!("Found {:?} ", results[0]))
     })?;
 
     Ok(())
