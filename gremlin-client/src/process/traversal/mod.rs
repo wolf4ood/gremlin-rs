@@ -9,6 +9,7 @@ mod bytecode;
 mod graph_traversal;
 mod graph_traversal_source;
 mod remote;
+mod scope;
 mod step;
 mod strategies;
 pub use remote::traversal;
@@ -16,6 +17,7 @@ pub use remote::traversal;
 pub use bytecode::Bytecode;
 pub use graph_traversal::GraphTraversal;
 pub use graph_traversal_source::GraphTraversalSource;
+pub use scope::Scope;
 
 pub use anonymous_traversal_source::AnonymousTraversalSource;
 

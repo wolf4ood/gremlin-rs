@@ -1,4 +1,5 @@
-use crate::structure::{GValue, Scope};
+use crate::process::traversal::Scope;
+use crate::structure::GValue;
 
 pub struct LimitStep {
     limit: GValue,
