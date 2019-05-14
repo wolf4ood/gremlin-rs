@@ -785,3 +785,33 @@ fn test_dedup_step() {
 
     assert_eq!(1, results.len());
 }
+
+#[test]
+fn test_numerical_steps() {
+    let client = graph();
+
+    drop_vertices(&client, "test_numerical_steps").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    g.add_v("test_numerical_steps")
+        .property("age", 23)
+        .to_list()
+        .unwrap();
+    g.add_v("test_numerical_steps")
+        .property("age", 23)
+        .to_list()
+        .unwrap();
+
+    let results = g
+        .v(())
+        .has_label("test_numerical_steps")
+        .values("age")
+        .sum(())
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(&46, results[0].get::<i64>().unwrap());
+}

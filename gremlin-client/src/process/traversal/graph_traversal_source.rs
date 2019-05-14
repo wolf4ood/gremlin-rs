@@ -103,7 +103,7 @@ mod tests {
 
     use super::GraphTraversalSource;
     use crate::process::traversal::strategies::TraversalStrategies;
-    use crate::process::traversal::{Bytecode, __};
+    use crate::process::traversal::{Bytecode, Scope, __};
     use crate::structure::{GValue, P, T};
 
     #[test]
@@ -620,6 +620,19 @@ mod tests {
         code.add_step(String::from("dedup"), vec![]);
 
         assert_eq!(&code, g.v(()).values(()).dedup(()).bytecode());
+    }
+
+    #[test]
+    fn numerical_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("values"), vec!["test".into()]);
+        code.add_step(String::from("sum"), vec![Scope::Global.into()]);
+
+        assert_eq!(&code, g.v(()).values("test").sum(()).bytecode());
     }
 
 }

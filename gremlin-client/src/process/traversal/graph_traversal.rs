@@ -6,7 +6,7 @@ use crate::process::traversal::step::limit::LimitStep;
 use crate::process::traversal::step::select::IntoSelectStep;
 
 use crate::process::traversal::strategies::TraversalStrategies;
-use crate::process::traversal::Bytecode;
+use crate::process::traversal::{Bytecode, Scope};
 use crate::structure::Either2;
 use crate::structure::Labels;
 use crate::{structure::GProperty, Edge, GValue, GremlinResult, List, Map, Path, Vertex};
@@ -291,5 +291,15 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
             .add_step(String::from("dedup"), limit.into().params());
 
         self
+    }
+
+    pub fn sum<A>(mut self, scope: A) -> GraphTraversal<S, GValue>
+    where
+        A: Into<Scope>,
+    {
+        self.bytecode
+            .add_step(String::from("sum"), vec![scope.into().into()]);
+
+        GraphTraversal::new(self.strategies, self.bytecode)
     }
 }
