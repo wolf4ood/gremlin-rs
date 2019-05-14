@@ -5,7 +5,7 @@ use gremlin_client::structure::P;
 fn chapter_311(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
     let chapter = "3.11";
 
-    example(&g, chapter, "// Airports with at least 5 runways", |g| {
+    example(&g, chapter, "Airports with at least 5 runways", |g| {
         let results = g
             .v(())
             .has(("runways", P::gte(5)))
