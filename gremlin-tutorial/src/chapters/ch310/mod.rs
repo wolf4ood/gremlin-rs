@@ -22,6 +22,19 @@ fn chapter_310(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
         },
     )?;
 
+    example(&g, chapter, "Maximum value - longest runway", |g| {
+        let results = g
+            .v(())
+            .has_label("airport")
+            .values("longest")
+            .max(())
+            .to_list()?;
+        Ok(format!(
+            "Max longest runway {:?} ",
+            results[0].get::<i32>().unwrap()
+        ))
+    })?;
+
     Ok(())
 }
 
