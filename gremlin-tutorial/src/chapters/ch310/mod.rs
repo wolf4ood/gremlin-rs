@@ -53,6 +53,19 @@ fn chapter_310(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
         ))
     })?;
 
+    example(&g, chapter, "Minimum value - shortest runway", |g| {
+        let results = g
+            .v(())
+            .has_label("airport")
+            .values("longest")
+            .min(())
+            .to_list()?;
+        Ok(format!(
+            "Shortest runway {:?} ",
+            results[0].get::<i32>().unwrap()
+        ))
+    })?;
+
     Ok(())
 }
 
