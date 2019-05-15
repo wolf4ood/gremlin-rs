@@ -312,4 +312,14 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
 
         GraphTraversal::new(self.strategies, self.bytecode)
     }
+
+    pub fn mean<A>(mut self, scope: A) -> GraphTraversal<S, GValue>
+    where
+        A: Into<Scope>,
+    {
+        self.bytecode
+            .add_step(String::from("mean"), vec![scope.into().into()]);
+
+        GraphTraversal::new(self.strategies, self.bytecode)
+    }
 }

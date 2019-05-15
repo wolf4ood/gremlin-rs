@@ -803,6 +803,7 @@ fn test_numerical_steps() {
         .to_list()
         .unwrap();
 
+    // sum
     let results = g
         .v(())
         .has_label("test_numerical_steps")
@@ -815,6 +816,7 @@ fn test_numerical_steps() {
 
     assert_eq!(&46, results[0].get::<i64>().unwrap());
 
+    // max
     let results = g
         .v(())
         .has_label("test_numerical_steps")
@@ -826,4 +828,18 @@ fn test_numerical_steps() {
     assert_eq!(1, results.len());
 
     assert_eq!(&26, results[0].get::<i32>().unwrap());
+
+    // mean
+
+    let results = g
+        .v(())
+        .has_label("test_numerical_steps")
+        .values("age")
+        .mean(())
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(&23.0, results[0].get::<f64>().unwrap());
 }

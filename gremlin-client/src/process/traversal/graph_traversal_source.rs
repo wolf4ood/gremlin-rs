@@ -626,6 +626,7 @@ mod tests {
     fn numerical_test() {
         let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
 
+        // sum
         let mut code = Bytecode::new();
 
         code.add_step(String::from("V"), vec![]);
@@ -634,6 +635,7 @@ mod tests {
 
         assert_eq!(&code, g.v(()).values("test").sum(()).bytecode());
 
+        // max
         let mut code = Bytecode::new();
 
         code.add_step(String::from("V"), vec![]);
@@ -641,6 +643,16 @@ mod tests {
         code.add_step(String::from("max"), vec![Scope::Global.into()]);
 
         assert_eq!(&code, g.v(()).values("test").max(()).bytecode());
+
+        // mean
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("values"), vec!["test".into()]);
+        code.add_step(String::from("mean"), vec![Scope::Global.into()]);
+
+        assert_eq!(&code, g.v(()).values("test").mean(()).bytecode());
     }
 
 }
