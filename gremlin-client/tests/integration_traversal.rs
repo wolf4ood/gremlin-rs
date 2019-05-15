@@ -842,4 +842,18 @@ fn test_numerical_steps() {
     assert_eq!(1, results.len());
 
     assert_eq!(&23.0, results[0].get::<f64>().unwrap());
+
+    // min
+
+    let results = g
+        .v(())
+        .has_label("test_numerical_steps")
+        .values("age")
+        .min(())
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(&20, results[0].get::<i32>().unwrap());
 }

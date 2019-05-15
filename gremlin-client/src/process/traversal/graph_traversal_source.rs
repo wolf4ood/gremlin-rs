@@ -653,6 +653,16 @@ mod tests {
         code.add_step(String::from("mean"), vec![Scope::Global.into()]);
 
         assert_eq!(&code, g.v(()).values("test").mean(()).bytecode());
+
+        // min
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("values"), vec!["test".into()]);
+        code.add_step(String::from("min"), vec![Scope::Global.into()]);
+
+        assert_eq!(&code, g.v(()).values("test").min(()).bytecode());
     }
 
 }
