@@ -795,11 +795,11 @@ fn test_numerical_steps() {
     let g = traversal().with_remote(client);
 
     g.add_v("test_numerical_steps")
-        .property("age", 23)
+        .property("age", 26)
         .to_list()
         .unwrap();
     g.add_v("test_numerical_steps")
-        .property("age", 23)
+        .property("age", 20)
         .to_list()
         .unwrap();
 
@@ -814,4 +814,16 @@ fn test_numerical_steps() {
     assert_eq!(1, results.len());
 
     assert_eq!(&46, results[0].get::<i64>().unwrap());
+
+    let results = g
+        .v(())
+        .has_label("test_numerical_steps")
+        .values("age")
+        .max(())
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(&26, results[0].get::<i32>().unwrap());
 }

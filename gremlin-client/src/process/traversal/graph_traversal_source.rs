@@ -633,6 +633,14 @@ mod tests {
         code.add_step(String::from("sum"), vec![Scope::Global.into()]);
 
         assert_eq!(&code, g.v(()).values("test").sum(()).bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("values"), vec!["test".into()]);
+        code.add_step(String::from("max"), vec![Scope::Global.into()]);
+
+        assert_eq!(&code, g.v(()).values("test").max(()).bytecode());
     }
 
 }
