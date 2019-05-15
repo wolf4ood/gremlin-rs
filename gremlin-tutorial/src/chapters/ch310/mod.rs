@@ -22,6 +22,24 @@ fn chapter_310(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
         },
     )?;
 
+    example(
+        &g,
+        chapter,
+        "Statistical mean (average) value - average number of runways per airport",
+        |g| {
+            let results = g
+                .v(())
+                .has_label("airport")
+                .values("runways")
+                .mean(())
+                .to_list()?;
+            Ok(format!(
+                "Average runways {:?} ",
+                results[0].get::<f64>().unwrap()
+            ))
+        },
+    )?;
+
     example(&g, chapter, "Maximum value - longest runway", |g| {
         let results = g
             .v(())
