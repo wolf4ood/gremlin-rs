@@ -1,5 +1,5 @@
 use gremlin_client::process::traversal::{traversal, __};
-use gremlin_client::structure::{List, Map, Vertex, VertexProperty, T};
+use gremlin_client::structure::{List, Map, Vertex, VertexProperty, P, T};
 
 mod common;
 
@@ -856,4 +856,33 @@ fn test_numerical_steps() {
     assert_eq!(1, results.len());
 
     assert_eq!(&20, results[0].get::<i32>().unwrap());
+}
+
+#[test]
+fn test_has_with_p_steps() {
+    let client = graph();
+
+    drop_vertices(&client, "test_has_with_p_steps").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    g.add_v("test_has_with_p_steps")
+        .property("age", 26)
+        .to_list()
+        .unwrap();
+    let vertices = g
+        .add_v("test_has_with_p_steps")
+        .property("age", 20)
+        .to_list()
+        .unwrap();
+
+    let results = g
+        .v(())
+        .has(("test_has_with_p_steps", "age", P::within(vec![19, 20])))
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(vertices[0].id(), results[0].id());
 }

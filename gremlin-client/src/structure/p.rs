@@ -65,6 +65,13 @@ impl P {
     {
         P::new("lte", value.to_gvalue())
     }
+
+    pub fn within<V>(value: V) -> P
+    where
+        V: IntoRange,
+    {
+        P::new("within", value.into_range().values.into())
+    }
 }
 
 impl Into<P> for &str {
@@ -76,5 +83,38 @@ impl Into<P> for &str {
 impl Into<P> for i32 {
     fn into(self) -> P {
         P::new("eq", (self).into())
+    }
+}
+
+pub struct Range {
+    values: Vec<GValue>,
+}
+
+pub trait IntoRange {
+    fn into_range(self) -> Range;
+}
+
+impl<T> IntoRange for (T, T)
+where
+    T: ToGValue,
+{
+    fn into_range(self) -> Range {
+        let v1 = self.0.to_gvalue();
+        let v2 = self.1.to_gvalue();
+
+        Range {
+            values: vec![v1, v2],
+        }
+    }
+}
+
+impl<T> IntoRange for Vec<T>
+where
+    T: ToGValue,
+{
+    fn into_range(self) -> Range {
+        Range {
+            values: self.into_iter().map(|e| e.to_gvalue()).collect(),
+        }
     }
 }
