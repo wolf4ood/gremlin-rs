@@ -15,6 +15,31 @@ fn chapter_311(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
         Ok(format!("Found {:?} ", results[0]))
     })?;
 
+    example(&g, chapter, "Airports with less than 3 runways", |g| {
+        let results = g
+            .v(())
+            .has(("runways", P::lt(2)))
+            .values(vec!["code", "runways"])
+            .fold()
+            .to_list()?;
+        Ok(format!("Found {:?} airports", results[0].len()))
+    })?;
+
+    example(&g, chapter, "How many airports have 3 runways?", |g| {
+        let results = g.v(()).has(("runways", P::eq(3))).count().to_list()?;
+        Ok(format!("Found {:?} airports", results[0]))
+    })?;
+
+    example(
+        &g,
+        chapter,
+        "How many airports have anything but just 1 runway?",
+        |g| {
+            let results = g.v(()).has(("runways", P::neq(1))).count().to_list()?;
+            Ok(format!("Found {:?} airports", results[0]))
+        },
+    )?;
+
     Ok(())
 }
 
