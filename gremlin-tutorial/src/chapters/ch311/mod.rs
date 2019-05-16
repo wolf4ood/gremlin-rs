@@ -40,6 +40,14 @@ fn chapter_311(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
         },
     )?;
 
+    example(&g, chapter, " Airports with 1,2 or 3 runways.", |g| {
+        let results = g
+            .v(())
+            .has(("runways", P::within(vec![1, 2, 3])))
+            .count()
+            .to_list()?;
+        Ok(format!("Found {:?} airports", results[0]))
+    })?;
     Ok(())
 }
 
