@@ -885,4 +885,28 @@ fn test_has_with_p_steps() {
     assert_eq!(1, results.len());
 
     assert_eq!(vertices[0].id(), results[0].id());
+
+    let results = g
+        .v(())
+        .has_label("test_has_with_p_steps")
+        .values("age")
+        .is(20)
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(&20, results[0].get::<i32>().unwrap());
+
+    let results = g
+        .v(())
+        .has_label("test_has_with_p_steps")
+        .values("age")
+        .is(P::within(vec![19, 20]))
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(&20, results[0].get::<i32>().unwrap());
 }

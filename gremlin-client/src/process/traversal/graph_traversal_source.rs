@@ -283,6 +283,15 @@ mod tests {
             vec![String::from("age").into(), P::within((23, 26)).into()],
         );
         assert_eq!(&code, g.v(1).has(("age", P::within((23, 26)))).bytecode());
+
+        // IS
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![1.into()]);
+        code.add_step(String::from("values"), vec!["age".into()]);
+        code.add_step(String::from("is"), vec![P::eq(23).into()]);
+
+        assert_eq!(&code, g.v(1).values("age").is(23).bytecode());
     }
     #[test]
     fn add_v_test() {

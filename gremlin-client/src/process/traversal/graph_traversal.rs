@@ -9,7 +9,10 @@ use crate::process::traversal::strategies::TraversalStrategies;
 use crate::process::traversal::{Bytecode, Scope};
 use crate::structure::Either2;
 use crate::structure::Labels;
-use crate::{structure::GProperty, Edge, GValue, GremlinResult, List, Map, Path, Vertex};
+use crate::{
+    structure::GProperty, structure::IntoPredicate, Edge, GValue, GremlinResult, List, Map, Path,
+    Vertex,
+};
 use std::marker::PhantomData;
 
 #[derive(Clone)]
@@ -132,7 +135,6 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
 
         GraphTraversal::new(self.strategies, self.bytecode)
     }
-
     pub fn in_<L>(mut self, labels: L) -> GraphTraversal<S, Vertex>
     where
         L: Into<Labels>,
@@ -331,5 +333,15 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
             .add_step(String::from("min"), vec![scope.into().into()]);
 
         GraphTraversal::new(self.strategies, self.bytecode)
+    }
+
+    pub fn is<A>(mut self, val: A) -> GraphTraversal<S, E>
+    where
+        A: IntoPredicate,
+    {
+        self.bytecode
+            .add_step(String::from("is"), vec![val.into_predicate().into()]);
+
+        self
     }
 }
