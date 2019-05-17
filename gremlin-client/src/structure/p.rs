@@ -80,7 +80,12 @@ pub trait IntoPredicate {
 
 impl<T: ToGValue> IntoPredicate for T {
     fn into_predicate(self) -> P {
-        P::new("eq", (self).to_gvalue().into())
+        let val = (self).to_gvalue();
+        if let GValue::P(ref p) = val {
+            p.clone()
+        } else {
+            P::new("eq", val)
+        }
     }
 }
 
