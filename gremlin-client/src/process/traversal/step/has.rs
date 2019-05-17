@@ -1,5 +1,5 @@
 use crate::structure::GValue;
-use crate::structure::P as Predicate;
+use crate::structure::{IntoPredicate, P as Predicate};
 
 pub struct HasStep {
     label: Option<String>,
@@ -32,13 +32,13 @@ pub trait IntoHasStep {
 impl<A, B> IntoHasStep for (A, B)
 where
     A: Into<String>,
-    B: Into<Predicate>,
+    B: IntoPredicate,
 {
     fn into_step(self) -> HasStep {
         HasStep {
             label: None,
             key: self.0.into(),
-            predicate: Some(self.1.into()),
+            predicate: Some(self.1.into_predicate()),
         }
     }
 }
@@ -47,13 +47,13 @@ impl<A, B, C> IntoHasStep for (A, B, C)
 where
     A: Into<String>,
     B: Into<String>,
-    C: Into<Predicate>,
+    C: IntoPredicate,
 {
     fn into_step(self) -> HasStep {
         HasStep {
             label: Some(self.0.into()),
             key: self.1.into(),
-            predicate: Some(self.2.into()),
+            predicate: Some(self.2.into_predicate()),
         }
     }
 }

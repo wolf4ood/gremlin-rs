@@ -33,6 +33,6 @@ pub use self::vertex_property::{GProperty, VertexProperty};
 pub use either::*;
 pub use label::Labels;
 pub use map::{GKey, Map};
-pub use p::P;
+pub use p::{IntoPredicate, P};
 pub use t::T;
 pub use traverser::Traverser;

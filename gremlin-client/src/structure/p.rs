@@ -74,15 +74,13 @@ impl P {
     }
 }
 
-impl Into<P> for &str {
-    fn into(self) -> P {
-        P::new("eq", (self).into())
-    }
+pub trait IntoPredicate {
+    fn into_predicate(self) -> P;
 }
 
-impl Into<P> for i32 {
-    fn into(self) -> P {
-        P::new("eq", (self).into())
+impl<T: ToGValue> IntoPredicate for T {
+    fn into_predicate(self) -> P {
+        P::new("eq", (self).to_gvalue().into())
     }
 }
 
