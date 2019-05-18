@@ -4,6 +4,7 @@ use crate::process::traversal::step::dedup::DedupStep;
 use crate::process::traversal::step::has::IntoHasStep;
 use crate::process::traversal::step::limit::LimitStep;
 use crate::process::traversal::step::select::IntoSelectStep;
+use crate::process::traversal::step::where_step::IntoWhereStep;
 
 use crate::process::traversal::strategies::TraversalStrategies;
 use crate::process::traversal::{Bytecode, Scope};
@@ -342,6 +343,15 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self.bytecode
             .add_step(String::from("is"), vec![val.into_predicate().into()]);
 
+        self
+    }
+
+    pub fn where_<A>(mut self, step: A) -> GraphTraversal<S, E>
+    where
+        A: IntoWhereStep,
+    {
+        self.bytecode
+            .add_step(String::from("where"), step.into_step().take_params());
         self
     }
 }

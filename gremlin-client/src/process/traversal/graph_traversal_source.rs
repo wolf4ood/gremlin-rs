@@ -685,4 +685,18 @@ mod tests {
         assert_eq!(&code, g.v(()).values("test").min(()).bytecode());
     }
 
+    #[test]
+    fn where_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        // sum
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("values"), vec!["age".into()]);
+        code.add_step(String::from("where"), vec![P::eq(23).into()]);
+
+        assert_eq!(&code, g.v(()).values("age").where_(P::eq(23)).bytecode());
+    }
+
 }
