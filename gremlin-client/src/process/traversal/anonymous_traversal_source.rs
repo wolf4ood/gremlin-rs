@@ -1,3 +1,4 @@
+use crate::process::traversal::step::has::IntoHasStep;
 use crate::process::traversal::strategies::TraversalStrategies;
 use crate::process::traversal::Bytecode;
 use crate::process::traversal::GraphTraversal;
@@ -37,6 +38,13 @@ impl AnonymousTraversalSource {
         L: Into<Labels>,
     {
         self.traversal.clone().has_label(labels)
+    }
+
+    pub fn has<A>(&self, step: A) -> GraphTraversal<GValue, GValue>
+    where
+        A: IntoHasStep,
+    {
+        self.traversal.clone().has(step)
     }
 }
 
