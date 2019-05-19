@@ -715,4 +715,17 @@ mod tests {
         assert_eq!(&code, g.v(()).not(__.has_label("person")).bytecode());
     }
 
+    #[test]
+    fn order_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("values"), vec!["name".into()]);
+        code.add_step(String::from("order"), vec![Scope::Global.into()]);
+
+        assert_eq!(&code, g.v(()).values("name").order(()).bytecode());
+    }
+
 }

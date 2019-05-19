@@ -959,3 +959,34 @@ fn not_step_test() {
 
     assert_eq!(0, results.len());
 }
+
+#[test]
+fn order_step_test() {
+    let client = graph();
+
+    drop_vertices(&client, "order_step_test").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    g.add_v("order_step_test")
+        .property("name", "b")
+        .to_list()
+        .unwrap();
+
+    g.add_v("order_step_test")
+        .property("name", "a")
+        .to_list()
+        .unwrap();
+
+    let results = g
+        .v(())
+        .has_label("order_step_test")
+        .values("name")
+        .order(())
+        .to_list()
+        .unwrap();
+
+    assert_eq!(2, results.len());
+
+    assert_eq!("a", results[0].get::<String>().unwrap());
+}

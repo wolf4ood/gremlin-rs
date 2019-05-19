@@ -364,4 +364,14 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
             .add_step(String::from("not"), step.into_step().take_params());
         self
     }
+
+    pub fn order<A>(mut self, scope: A) -> GraphTraversal<S, E>
+    where
+        A: Into<Scope>,
+    {
+        self.bytecode
+            .add_step(String::from("order"), vec![scope.into().into()]);
+
+        self
+    }
 }
