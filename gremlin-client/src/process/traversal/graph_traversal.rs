@@ -3,6 +3,7 @@ use crate::process::traversal::step::by::IntoByStep;
 use crate::process::traversal::step::dedup::DedupStep;
 use crate::process::traversal::step::has::IntoHasStep;
 use crate::process::traversal::step::limit::LimitStep;
+use crate::process::traversal::step::not::IntoNotStep;
 use crate::process::traversal::step::select::IntoSelectStep;
 use crate::process::traversal::step::where_step::IntoWhereStep;
 
@@ -352,6 +353,15 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
     {
         self.bytecode
             .add_step(String::from("where"), step.into_step().take_params());
+        self
+    }
+
+    pub fn not<A>(mut self, step: A) -> GraphTraversal<S, E>
+    where
+        A: IntoNotStep,
+    {
+        self.bytecode
+            .add_step(String::from("not"), step.into_step().take_params());
         self
     }
 }

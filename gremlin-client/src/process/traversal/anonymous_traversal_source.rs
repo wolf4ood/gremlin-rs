@@ -32,6 +32,12 @@ impl AnonymousTraversalSource {
     {
         self.traversal.clone().values(labels)
     }
+    pub fn has_label<L>(&self, labels: L) -> GraphTraversal<GValue, GValue>
+    where
+        L: Into<Labels>,
+    {
+        self.traversal.clone().has_label(labels)
+    }
 }
 
 impl Default for AnonymousTraversalSource {

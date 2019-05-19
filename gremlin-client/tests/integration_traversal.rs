@@ -936,3 +936,26 @@ fn where_step_test() {
 
     assert_eq!(v[0].id(), results[0].id());
 }
+
+#[test]
+fn not_step_test() {
+    let client = graph();
+
+    drop_vertices(&client, "not_step_test").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    g.add_v("not_step_test")
+        .property("age", 26)
+        .to_list()
+        .unwrap();
+
+    let results = g
+        .v(())
+        .has_label("not_step_test")
+        .not(__.values("age").is(26))
+        .to_list()
+        .unwrap();
+
+    assert_eq!(0, results.len());
+}

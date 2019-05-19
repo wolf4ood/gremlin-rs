@@ -699,4 +699,20 @@ mod tests {
         assert_eq!(&code, g.v(()).values("age").where_(P::eq(23)).bytecode());
     }
 
+    #[test]
+    fn not_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        // sum
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(
+            String::from("not"),
+            vec![__.has_label("person").bytecode().clone().into()],
+        );
+
+        assert_eq!(&code, g.v(()).not(__.has_label("person")).bytecode());
+    }
+
 }
