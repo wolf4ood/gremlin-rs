@@ -46,6 +46,23 @@ impl IntoByStep for T {
     }
 }
 
+impl<'a> IntoByStep for (&str, Order) {
+    fn into_step(self) -> ByStep {
+        ByStep::new(vec![self.0.into(), self.1.into()])
+    }
+}
+
+impl IntoByStep for (String, Order) {
+    fn into_step(self) -> ByStep {
+        ByStep::new(vec![self.0.into(), self.1.into()])
+    }
+}
+
+impl<S, E: FromGValue> IntoByStep for (GraphTraversal<S, E>, Order) {
+    fn into_step(self) -> ByStep {
+        ByStep::new(vec![self.0.bytecode.into(), self.1.into()])
+    }
+}
 impl<S, E: FromGValue> IntoByStep for GraphTraversal<S, E> {
     fn into_step(self) -> ByStep {
         ByStep::new(vec![self.bytecode.into()])
