@@ -1,5 +1,5 @@
 use crate::chapters::example;
-use gremlin_client::process::traversal::GraphTraversalSource;
+use gremlin_client::process::traversal::{GraphTraversalSource, Order, __};
 
 fn chapter_312(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
     let chapter = "3.12";
@@ -53,6 +53,81 @@ fn chapter_312(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
                 .by("code")
                 .values(vec!["code", "icao"])
                 .fold()
+                .to_list()?;
+
+            Ok(format!("Found {:?} ", results[0]))
+        },
+    )?;
+
+    example(
+        &g,
+        chapter,
+        "Sort the first 20 airports returned in descending order",
+        |g| {
+            let results = g
+                .v(())
+                .has_label("airport")
+                .limit(20)
+                .values("code")
+                .order(())
+                .by(Order::Desc)
+                .fold()
+                .to_list()?;
+
+            Ok(format!("Found {:?} ", results[0]))
+        },
+    )?;
+
+    example(
+        &g,
+        chapter,
+        "Sort the first 20 airports returned in shuffle order",
+        |g| {
+            let results = g
+                .v(())
+                .has_label("airport")
+                .limit(20)
+                .values("code")
+                .order(())
+                .by(Order::Shuffle)
+                .fold()
+                .to_list()?;
+
+            Ok(format!("Found {:?} ", results[0]))
+        },
+    )?;
+
+    example(
+        &g,
+        chapter,
+        "List the 10 airports with the longest runways in decreasing order.",
+        |g| {
+            let results = g
+                .v(())
+                .has_label("airport")
+                .order(())
+                .by(("longest", Order::Shuffle))
+                .value_map(())
+                .select(vec!["code", "longest"])
+                .limit(10)
+                .to_list()?;
+
+            Ok(format!("Found {:?} ", results))
+        },
+    )?;
+
+    example(
+        &g,
+        chapter,
+        "sorts all the airports by longest runway in descending order and returns the valueMap for the first of those",
+        |g| {
+            let results = g
+                .v(())
+                .has_label("airport")
+                .order(())
+                .by((__.values("longest"), Order::Shuffle))
+                .limit(1)
+                .value_map(())
                 .to_list()?;
 
             Ok(format!("Found {:?} ", results[0]))
