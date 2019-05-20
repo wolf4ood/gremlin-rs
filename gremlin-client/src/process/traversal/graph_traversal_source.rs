@@ -461,6 +461,25 @@ mod tests {
     }
 
     #[test]
+    fn value_map_step_test() {
+        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("valueMap"), vec![]);
+
+        assert_eq!(&code, g.v(()).value_map(()).bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("valueMap"), vec![String::from("name").into()]);
+
+        assert_eq!(&code, g.v(()).value_map("name").bytecode());
+    }
+
+    #[test]
     fn count_test() {
         let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
 

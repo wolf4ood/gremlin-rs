@@ -513,6 +513,51 @@ fn test_values() {
 }
 
 #[test]
+fn test_value_map() {
+    let client = graph();
+
+    let g = traversal().with_remote(client);
+
+    let vertices = g
+        .add_v("test_value_map")
+        .property("name", "test")
+        .to_list()
+        .unwrap();
+
+    let vertex = &vertices[0];
+
+    let results = g.v(vertex.id()).value_map(()).to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!(
+        "test",
+        value["name"].get::<List>().unwrap()[0]
+            .get::<String>()
+            .unwrap()
+    );
+
+    let results = g.v(vertex.id()).value_map("name").to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!(
+        "test",
+        value["name"].get::<List>().unwrap()[0]
+            .get::<String>()
+            .unwrap()
+    );
+
+    let results = g.v(vertex.id()).value_map("fake").to_list().unwrap();
+
+    assert_eq!(0, results[0].len());
+}
+
+#[test]
 fn test_count() {
     let client = graph();
 

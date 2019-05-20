@@ -230,6 +230,17 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         GraphTraversal::new(self.strategies, self.bytecode)
     }
 
+    pub fn value_map<L>(mut self, labels: L) -> GraphTraversal<S, Map>
+    where
+        L: Into<Labels>,
+    {
+        self.bytecode.add_step(
+            String::from("valueMap"),
+            labels.into().0.into_iter().map(GValue::from).collect(),
+        );
+        GraphTraversal::new(self.strategies, self.bytecode)
+    }
+
     pub fn count(mut self) -> GraphTraversal<S, i64> {
         self.bytecode.add_step(String::from("count"), vec![]);
         GraphTraversal::new(self.strategies, self.bytecode)
