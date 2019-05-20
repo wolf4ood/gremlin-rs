@@ -1,5 +1,5 @@
 use crate::conversion::FromGValue;
-use crate::process::traversal::GraphTraversal;
+use crate::process::traversal::{GraphTraversal, Order};
 use crate::structure::{GValue, T};
 
 pub struct ByStep {
@@ -31,6 +31,12 @@ impl IntoByStep for () {
 impl IntoByStep for &str {
     fn into_step(self) -> ByStep {
         ByStep::new(vec![String::from(self).into()])
+    }
+}
+
+impl IntoByStep for Order {
+    fn into_step(self) -> ByStep {
+        ByStep::new(vec![self.into()])
     }
 }
 

@@ -1,5 +1,5 @@
 use crate::conversion::{BorrowFromGValue, FromGValue};
-use crate::process::traversal::{Bytecode, Scope};
+use crate::process::traversal::{Bytecode, Order, Scope};
 use crate::structure::traverser::Traverser;
 use crate::structure::{
     Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property, Set, Token,
@@ -40,6 +40,7 @@ pub enum GValue {
     Bytecode(Bytecode),
     Traverser(Traverser),
     Scope(Scope),
+    Order(Order),
 }
 
 impl GValue {
@@ -160,6 +161,12 @@ impl From<Property> for GValue {
 impl From<Scope> for GValue {
     fn from(val: Scope) -> Self {
         GValue::Scope(val)
+    }
+}
+
+impl From<Order> for GValue {
+    fn from(val: Order) -> Self {
+        GValue::Order(val)
     }
 }
 impl From<Token> for GValue {

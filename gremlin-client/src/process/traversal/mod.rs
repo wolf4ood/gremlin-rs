@@ -8,10 +8,12 @@ mod anonymous_traversal_source;
 mod bytecode;
 mod graph_traversal;
 mod graph_traversal_source;
+mod order;
 mod remote;
 mod scope;
 mod step;
 mod strategies;
+pub use order::Order;
 pub use remote::traversal;
 
 pub use bytecode::Bytecode;

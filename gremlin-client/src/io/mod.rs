@@ -3,7 +3,7 @@ mod macros;
 mod serializer_v3;
 
 use crate::conversion::ToGValue;
-use crate::process::traversal::Scope;
+use crate::process::traversal::{Order, Scope};
 use crate::structure::{GValue, T};
 use serde_json::{json, Value};
 
@@ -135,6 +135,19 @@ impl GraphSON {
 
                 Ok(json!({
                     "@type" : "g:Scope",
+                    "@value" : v
+                }))
+            }
+
+            GValue::Order(s) => {
+                let v = match s {
+                    Order::Asc => "asc",
+                    Order::Desc => "desc",
+                    Order::Shuffle => "shuffle",
+                };
+
+                Ok(json!({
+                    "@type" : "g:Order",
                     "@value" : v
                 }))
             }

@@ -103,7 +103,7 @@ mod tests {
 
     use super::GraphTraversalSource;
     use crate::process::traversal::strategies::TraversalStrategies;
-    use crate::process::traversal::{Bytecode, Scope, __};
+    use crate::process::traversal::{Bytecode, Order, Scope, __};
     use crate::structure::{GValue, P, T};
 
     #[test]
@@ -726,6 +726,18 @@ mod tests {
         code.add_step(String::from("order"), vec![Scope::Global.into()]);
 
         assert_eq!(&code, g.v(()).values("name").order(()).bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("values"), vec!["name".into()]);
+        code.add_step(String::from("order"), vec![Scope::Global.into()]);
+        code.add_step(String::from("by"), vec![Order::Desc.into()]);
+
+        assert_eq!(
+            &code,
+            g.v(()).values("name").order(()).by(Order::Desc).bytecode()
+        );
     }
 
 }

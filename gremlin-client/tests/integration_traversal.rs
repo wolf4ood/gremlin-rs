@@ -1,4 +1,4 @@
-use gremlin_client::process::traversal::{traversal, __};
+use gremlin_client::process::traversal::{traversal, Order, __};
 use gremlin_client::structure::{List, Map, Vertex, VertexProperty, P, T};
 
 mod common;
@@ -989,4 +989,17 @@ fn order_step_test() {
     assert_eq!(2, results.len());
 
     assert_eq!("a", results[0].get::<String>().unwrap());
+
+    let results = g
+        .v(())
+        .has_label("order_step_test")
+        .values("name")
+        .order(())
+        .by(Order::Desc)
+        .to_list()
+        .unwrap();
+
+    assert_eq!(2, results.len());
+
+    assert_eq!("b", results[0].get::<String>().unwrap());
 }
