@@ -14,7 +14,7 @@ mod scope;
 mod step;
 mod strategies;
 pub use order::Order;
-pub use remote::{traversal,Terminator};
+pub use remote::{traversal, SyncTerminator, Terminator};
 
 pub use bytecode::Bytecode;
 pub use graph_traversal::GraphTraversal;
