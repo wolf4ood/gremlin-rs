@@ -1,4 +1,5 @@
 mod remote;
+use crate::process::traversal::remote::Terminator;
 use crate::process::traversal::GraphTraversal;
 use crate::{GremlinError, GremlinResult};
 pub use remote::RemoteStrategy;
@@ -11,10 +12,13 @@ pub enum TraversalStrategy {
 }
 
 impl TraversalStrategy {
-    pub(crate) fn apply<S, E: FromGValue>(
+    pub(crate) fn apply<S, E: FromGValue, A>(
         &self,
-        traversal: &GraphTraversal<S, E>,
-    ) -> GremlinResult<impl Iterator<Item = GremlinResult<E>>> {
+        traversal: &GraphTraversal<S, E, A>,
+    ) -> GremlinResult<impl Iterator<Item = GremlinResult<E>>>
+    where
+        A: Terminator<E>,
+    {
         match self {
             TraversalStrategy::Remote(x) => x.apply(traversal),
         }
@@ -34,10 +38,13 @@ impl TraversalStrategies {
         self.strategies.push(strategy);
     }
 
-    pub(crate) fn apply<S, E: FromGValue>(
+    pub(crate) fn apply<S, E: FromGValue, A>(
         &self,
-        traversal: &GraphTraversal<S, E>,
-    ) -> GremlinResult<impl Iterator<Item = GremlinResult<E>>> {
+        traversal: &GraphTraversal<S, E, A>,
+    ) -> GremlinResult<impl Iterator<Item = GremlinResult<E>>>
+    where
+        A: Terminator<E>,
+    {
         let mut iter = None;
         for strategy in self.strategies.iter() {
             iter = Some(strategy.apply(traversal)?);

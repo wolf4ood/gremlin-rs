@@ -7,31 +7,30 @@ use crate::process::traversal::step::not::IntoNotStep;
 use crate::process::traversal::step::select::IntoSelectStep;
 use crate::process::traversal::step::where_step::IntoWhereStep;
 
-use crate::process::traversal::strategies::TraversalStrategies;
+use crate::process::traversal::remote::Terminator;
 use crate::process::traversal::{Bytecode, Scope};
 use crate::structure::Either2;
 use crate::structure::Labels;
 use crate::{
-    structure::GProperty, structure::IntoPredicate, Edge, GValue, GremlinResult, List, Map, Path,
-    Vertex,
+    structure::GProperty, structure::IntoPredicate, Edge, GValue, List, Map, Path, Vertex,
 };
 use std::marker::PhantomData;
 
 #[derive(Clone)]
-pub struct GraphTraversal<S, E: FromGValue> {
+pub struct GraphTraversal<S, E: FromGValue, T: Terminator<E>> {
     start: PhantomData<S>,
     end: PhantomData<E>,
-    strategies: TraversalStrategies,
     pub(crate) bytecode: Bytecode,
+    terminator: T,
 }
 
-impl<S, E: FromGValue> GraphTraversal<S, E> {
-    pub fn new(strategies: TraversalStrategies, bytecode: Bytecode) -> GraphTraversal<S, E> {
+impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
+    pub fn new(terminator: T, bytecode: Bytecode) -> GraphTraversal<S, E, T> {
         GraphTraversal {
             start: PhantomData,
             end: PhantomData,
             bytecode,
-            strategies,
+            terminator,
         }
     }
     pub fn bytecode(&self) -> &Bytecode {
@@ -49,21 +48,22 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self
     }
 
-    pub fn add_v<T>(mut self, label: T) -> GraphTraversal<Vertex, Vertex>
+    pub fn add_v<A>(mut self, label: A) -> GraphTraversal<Vertex, Vertex, T>
     where
-        T: Into<Labels>,
+        A: Into<Labels>,
+        T: Terminator<Vertex>,
     {
         self.bytecode.add_step(
             String::from("addV"),
             label.into().0.into_iter().map(GValue::from).collect(),
         );
 
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn property<T>(mut self, key: &str, value: T) -> Self
+    pub fn property<A>(mut self, key: &str, value: A) -> Self
     where
-        T: Into<GValue>,
+        A: Into<GValue>,
     {
         self.bytecode.add_step(
             String::from("property"),
@@ -89,9 +89,9 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
             .add_step(String::from("hasNot"), vec![key.into().into()]);
         self
     }
-    pub fn as_<T>(mut self, alias: T) -> GraphTraversal<S, E>
+    pub fn as_<A>(mut self, alias: A) -> Self
     where
-        T: Into<String>,
+        A: Into<String>,
     {
         self.bytecode
             .add_step(String::from("as"), vec![alias.into().into()]);
@@ -99,85 +99,100 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self
     }
 
-    pub fn add_e<T>(mut self, label: T) -> GraphTraversal<S, Edge>
+    pub fn add_e<A>(mut self, label: A) -> GraphTraversal<S, Edge, T>
     where
-        T: Into<String>,
+        A: Into<String>,
+        T: Terminator<Edge>,
     {
         self.bytecode
             .add_step(String::from("addE"), vec![label.into().into()]);
 
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
-    pub fn out<L>(mut self, labels: L) -> GraphTraversal<S, Vertex>
+
+    pub fn out<A>(mut self, labels: A) -> GraphTraversal<S, Vertex, T>
     where
-        L: Into<Labels>,
+        A: Into<Labels>,
+        T: Terminator<Vertex>,
     {
         self.bytecode.add_step(
             String::from("out"),
             labels.into().0.into_iter().map(GValue::from).collect(),
         );
 
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn out_e<L>(mut self, labels: L) -> GraphTraversal<S, Edge>
+    pub fn out_e<A>(mut self, labels: A) -> GraphTraversal<S, Edge, T>
     where
-        L: Into<Labels>,
+        A: Into<Labels>,
+        T: Terminator<Edge>,
     {
         self.bytecode.add_step(
             String::from("outE"),
             labels.into().0.into_iter().map(GValue::from).collect(),
         );
 
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn out_v(mut self) -> GraphTraversal<S, Vertex> {
+    pub fn out_v(mut self) -> GraphTraversal<S, Vertex, T>
+    where
+        T: Terminator<Vertex>,
+    {
         self.bytecode.add_step(String::from("outV"), vec![]);
 
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
-    pub fn in_<L>(mut self, labels: L) -> GraphTraversal<S, Vertex>
+    pub fn in_<A>(mut self, labels: A) -> GraphTraversal<S, Vertex, T>
     where
-        L: Into<Labels>,
+        A: Into<Labels>,
+        T: Terminator<Vertex>,
     {
         self.bytecode.add_step(
             String::from("in"),
             labels.into().0.into_iter().map(GValue::from).collect(),
         );
 
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn in_e<L>(mut self, labels: L) -> GraphTraversal<S, Edge>
+    pub fn in_e<A>(mut self, labels: A) -> GraphTraversal<S, Edge, T>
     where
-        L: Into<Labels>,
+        A: Into<Labels>,
+        T: Terminator<Edge>,
     {
         self.bytecode.add_step(
             String::from("inE"),
             labels.into().0.into_iter().map(GValue::from).collect(),
         );
 
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn in_v(mut self) -> GraphTraversal<S, Vertex> {
+    pub fn in_v(mut self) -> GraphTraversal<S, Vertex, T>
+    where
+        T: Terminator<Vertex>,
+    {
         self.bytecode.add_step(String::from("inV"), vec![]);
 
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn label(mut self) -> GraphTraversal<S, String> {
+    pub fn label(mut self) -> GraphTraversal<S, String, T>
+    where
+        T: Terminator<String>,
+    {
         self.bytecode.add_step(String::from("label"), vec![]);
 
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn to_list(&self) -> GremlinResult<Vec<E>> {
-        self.strategies.apply(self)?.collect()
+    pub fn to_list(&self) -> T::List {
+        self.terminator.to_list(self)
     }
 
-    pub fn from<A>(mut self, target: A) -> GraphTraversal<S, E>
+    pub fn from<A>(mut self, target: A) -> Self
     where
         A: Into<Either2<String, Vertex>>,
     {
@@ -187,7 +202,7 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self
     }
 
-    pub fn to<A>(mut self, target: A) -> GraphTraversal<S, E>
+    pub fn to<A>(mut self, target: A) -> Self
     where
         A: Into<Either2<String, Vertex>>,
     {
@@ -197,63 +212,76 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self
     }
 
-    pub fn properties<L>(mut self, labels: L) -> GraphTraversal<S, GProperty>
+    pub fn properties<L>(mut self, labels: L) -> GraphTraversal<S, GProperty, T>
     where
         L: Into<Labels>,
+        T: Terminator<GProperty>,
     {
         self.bytecode.add_step(
             String::from("properties"),
             labels.into().0.into_iter().map(GValue::from).collect(),
         );
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn property_map<L>(mut self, labels: L) -> GraphTraversal<S, Map>
+    pub fn property_map<L>(mut self, labels: L) -> GraphTraversal<S, Map, T>
     where
         L: Into<Labels>,
+        T: Terminator<Map>,
     {
         self.bytecode.add_step(
             String::from("propertyMap"),
             labels.into().0.into_iter().map(GValue::from).collect(),
         );
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn values<L>(mut self, labels: L) -> GraphTraversal<S, GValue>
+    pub fn values<L>(mut self, labels: L) -> GraphTraversal<S, GValue, T>
     where
         L: Into<Labels>,
+        T: Terminator<GValue>,
     {
         self.bytecode.add_step(
             String::from("values"),
             labels.into().0.into_iter().map(GValue::from).collect(),
         );
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn value_map<L>(mut self, labels: L) -> GraphTraversal<S, Map>
+    pub fn value_map<L>(mut self, labels: L) -> GraphTraversal<S, Map, T>
     where
         L: Into<Labels>,
+        T: Terminator<Map>,
     {
         self.bytecode.add_step(
             String::from("valueMap"),
             labels.into().0.into_iter().map(GValue::from).collect(),
         );
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn count(mut self) -> GraphTraversal<S, i64> {
+    pub fn count(mut self) -> GraphTraversal<S, i64, T>
+    where
+        T: Terminator<i64>,
+    {
         self.bytecode.add_step(String::from("count"), vec![]);
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn group_count(mut self) -> GraphTraversal<S, Map> {
+    pub fn group_count(mut self) -> GraphTraversal<S, Map, T>
+    where
+        T: Terminator<Map>,
+    {
         self.bytecode.add_step(String::from("groupCount"), vec![]);
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn group(mut self) -> GraphTraversal<S, Map> {
+    pub fn group(mut self) -> GraphTraversal<S, Map, T>
+    where
+        T: Terminator<Map>,
+    {
         self.bytecode.add_step(String::from("group"), vec![]);
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
     pub fn by<A>(mut self, step: A) -> Self
@@ -265,30 +293,37 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self
     }
 
-    pub fn select<A>(mut self, step: A) -> GraphTraversal<S, GValue>
+    pub fn select<A>(mut self, step: A) -> GraphTraversal<S, GValue, T>
     where
         A: IntoSelectStep,
+        T: Terminator<GValue>,
     {
         self.bytecode
             .add_step(String::from("select"), step.into_step().take_params());
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn fold(mut self) -> GraphTraversal<S, List> {
+    pub fn fold(mut self) -> GraphTraversal<S, List, T>
+    where
+        T: Terminator<List>,
+    {
         self.bytecode.add_step(String::from("fold"), vec![]);
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
-    pub fn unfold(mut self) -> GraphTraversal<S, E> {
+    pub fn unfold(mut self) -> Self {
         self.bytecode.add_step(String::from("unfold"), vec![]);
         self
     }
 
-    pub fn path(mut self) -> GraphTraversal<S, Path> {
+    pub fn path(mut self) -> GraphTraversal<S, Path, T>
+    where
+        T: Terminator<Path>,
+    {
         self.bytecode.add_step(String::from("path"), vec![]);
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn limit<A>(mut self, limit: A) -> GraphTraversal<S, E>
+    pub fn limit<A>(mut self, limit: A) -> Self
     where
         A: Into<LimitStep>,
     {
@@ -298,7 +333,7 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self
     }
 
-    pub fn dedup<A>(mut self, limit: A) -> GraphTraversal<S, E>
+    pub fn dedup<A>(mut self, limit: A) -> Self
     where
         A: Into<DedupStep>,
     {
@@ -308,47 +343,51 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self
     }
 
-    pub fn sum<A>(mut self, scope: A) -> GraphTraversal<S, GValue>
+    pub fn sum<A>(mut self, scope: A) -> GraphTraversal<S, GValue, T>
     where
         A: Into<Scope>,
+        T: Terminator<GValue>,
     {
         self.bytecode
             .add_step(String::from("sum"), vec![scope.into().into()]);
 
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn max<A>(mut self, scope: A) -> GraphTraversal<S, GValue>
+    pub fn max<A>(mut self, scope: A) -> GraphTraversal<S, GValue, T>
     where
         A: Into<Scope>,
+        T: Terminator<GValue>,
     {
         self.bytecode
             .add_step(String::from("max"), vec![scope.into().into()]);
 
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn mean<A>(mut self, scope: A) -> GraphTraversal<S, GValue>
+    pub fn mean<A>(mut self, scope: A) -> GraphTraversal<S, GValue, T>
     where
         A: Into<Scope>,
+        T: Terminator<GValue>,
     {
         self.bytecode
             .add_step(String::from("mean"), vec![scope.into().into()]);
 
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn min<A>(mut self, scope: A) -> GraphTraversal<S, GValue>
+    pub fn min<A>(mut self, scope: A) -> GraphTraversal<S, GValue, T>
     where
         A: Into<Scope>,
+        T: Terminator<GValue>,
     {
         self.bytecode
             .add_step(String::from("min"), vec![scope.into().into()]);
 
-        GraphTraversal::new(self.strategies, self.bytecode)
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 
-    pub fn is<A>(mut self, val: A) -> GraphTraversal<S, E>
+    pub fn is<A>(mut self, val: A) -> Self
     where
         A: IntoPredicate,
     {
@@ -358,7 +397,7 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self
     }
 
-    pub fn where_<A>(mut self, step: A) -> GraphTraversal<S, E>
+    pub fn where_<A>(mut self, step: A) -> Self
     where
         A: IntoWhereStep,
     {
@@ -367,7 +406,7 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self
     }
 
-    pub fn not<A>(mut self, step: A) -> GraphTraversal<S, E>
+    pub fn not<A>(mut self, step: A) -> Self
     where
         A: IntoNotStep,
     {
@@ -376,7 +415,7 @@ impl<S, E: FromGValue> GraphTraversal<S, E> {
         self
     }
 
-    pub fn order<A>(mut self, scope: A) -> GraphTraversal<S, E>
+    pub fn order<A>(mut self, scope: A) -> Self
     where
         A: Into<Scope>,
     {

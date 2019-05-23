@@ -2,45 +2,44 @@ use crate::conversion::ToGValue;
 use crate::process::traversal::strategies::{
     RemoteStrategy, TraversalStrategies, TraversalStrategy,
 };
+
+use crate::process::traversal::remote::{MockTerminator, SyncTerminator, Terminator};
 use crate::process::traversal::Bytecode;
 use crate::process::traversal::GraphTraversal;
 use crate::structure::GIDs;
 use crate::structure::Labels;
 use crate::structure::{Edge, GValue, Vertex};
 use crate::GremlinClient;
-use std::sync::Arc;
 
 #[derive(Clone)]
-pub struct GraphTraversalSource {
-    inner: Arc<InnerGraphTraversalSource>,
+pub struct GraphTraversalSource<A: Terminator<GValue>> {
+    term: A,
 }
 
-impl GraphTraversalSource {
-    pub fn new(strategies: TraversalStrategies) -> GraphTraversalSource {
-        GraphTraversalSource {
-            inner: Arc::new(InnerGraphTraversalSource { strategies }),
-        }
+impl<A: Terminator<GValue>> GraphTraversalSource<A> {
+    pub fn new(terminator: A) -> GraphTraversalSource<A> {
+        GraphTraversalSource { term: terminator }
     }
 
-    pub fn empty() -> GraphTraversalSource {
-        GraphTraversalSource::new(TraversalStrategies::new(vec![]))
+    pub fn empty() -> GraphTraversalSource<MockTerminator> {
+        GraphTraversalSource::new(MockTerminator {})
     }
 
-    pub fn with_remote(&self, client: GremlinClient) -> GraphTraversalSource {
-        let mut strategies = self.inner.strategies.clone();
+    pub fn with_remote(&self, client: GremlinClient) -> GraphTraversalSource<SyncTerminator> {
+        let mut strategies = TraversalStrategies::new(vec![]);
 
         strategies.add_strategy(TraversalStrategy::Remote(RemoteStrategy::new(client)));
 
         GraphTraversalSource {
-            inner: Arc::new(InnerGraphTraversalSource { strategies }),
+            term: SyncTerminator::new(strategies),
         }
     }
 
-    pub fn v<T>(&self, ids: T) -> GraphTraversal<Vertex, Vertex>
+    pub fn v<T>(&self, ids: T) -> GraphTraversal<Vertex, Vertex, A>
     where
         T: Into<GIDs>,
+        A: Terminator<Vertex>,
     {
-        let strategies = self.inner.strategies.clone();
         let mut code = Bytecode::new();
 
         code.add_step(
@@ -48,14 +47,14 @@ impl GraphTraversalSource {
             ids.into().0.iter().map(|id| id.to_gvalue()).collect(),
         );
 
-        GraphTraversal::new(strategies, code)
+        GraphTraversal::new(self.term.clone(), code)
     }
 
-    pub fn add_v<T>(&self, label: T) -> GraphTraversal<Vertex, Vertex>
+    pub fn add_v<T>(&self, label: T) -> GraphTraversal<Vertex, Vertex, A>
     where
         T: Into<Labels>,
+        A: Terminator<Vertex>,
     {
-        let strategies = self.inner.strategies.clone();
         let mut code = Bytecode::new();
 
         code.add_step(
@@ -63,26 +62,26 @@ impl GraphTraversalSource {
             label.into().0.into_iter().map(GValue::from).collect(),
         );
 
-        GraphTraversal::new(strategies, code)
+        GraphTraversal::new(self.term.clone(), code)
     }
 
-    pub fn add_e<T>(&self, label: T) -> GraphTraversal<Edge, Edge>
+    pub fn add_e<T>(&self, label: T) -> GraphTraversal<Edge, Edge, A>
     where
         T: Into<String>,
+        A: Terminator<Edge>,
     {
-        let strategies = self.inner.strategies.clone();
         let mut code = Bytecode::new();
 
         code.add_step(String::from("addE"), vec![label.into().into()]);
 
-        GraphTraversal::new(strategies, code)
+        GraphTraversal::new(self.term.clone(), code)
     }
 
-    pub fn e<T>(&self, ids: T) -> GraphTraversal<Edge, Edge>
+    pub fn e<T>(&self, ids: T) -> GraphTraversal<Edge, Edge, A>
     where
         T: Into<GIDs>,
+        A: Terminator<Edge>,
     {
-        let strategies = self.inner.strategies.clone();
         let mut code = Bytecode::new();
 
         code.add_step(
@@ -90,25 +89,27 @@ impl GraphTraversalSource {
             ids.into().0.iter().map(|id| id.to_gvalue()).collect(),
         );
 
-        GraphTraversal::new(strategies, code)
+        GraphTraversal::new(self.term.clone(), code)
     }
-}
-pub struct InnerGraphTraversalSource {
-    strategies: TraversalStrategies,
 }
 
 // TESTS
 #[cfg(test)]
 mod tests {
 
+    use crate::process::traversal::remote::MockTerminator;
+
     use super::GraphTraversalSource;
-    use crate::process::traversal::strategies::TraversalStrategies;
     use crate::process::traversal::{Bytecode, Order, Scope, __};
     use crate::structure::{GValue, P, T};
 
+    fn empty() -> GraphTraversalSource<MockTerminator> {
+        GraphTraversalSource::new(MockTerminator {})
+    }
+    
     #[test]
     fn v_traversal() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -119,7 +120,7 @@ mod tests {
 
     #[test]
     fn e_traversal() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -129,7 +130,7 @@ mod tests {
     }
     #[test]
     fn v_has_label_traversal() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -144,7 +145,7 @@ mod tests {
 
     #[test]
     fn v_has_traversal() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -203,7 +204,7 @@ mod tests {
 
     #[test]
     fn v_has_traversal_with_p() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         // EQ
         let mut code = Bytecode::new();
@@ -295,7 +296,7 @@ mod tests {
     }
     #[test]
     fn add_v_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -312,7 +313,7 @@ mod tests {
 
     #[test]
     fn add_v_with_property_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -330,7 +331,7 @@ mod tests {
 
     #[test]
     fn add_e_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -349,7 +350,7 @@ mod tests {
 
     #[test]
     fn as_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -361,7 +362,7 @@ mod tests {
 
     #[test]
     fn label_step_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -373,7 +374,7 @@ mod tests {
 
     #[test]
     fn properties_step_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -408,7 +409,7 @@ mod tests {
 
     #[test]
     fn property_map_step_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -443,7 +444,7 @@ mod tests {
 
     #[test]
     fn values_step_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -462,7 +463,7 @@ mod tests {
 
     #[test]
     fn value_map_step_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -481,7 +482,7 @@ mod tests {
 
     #[test]
     fn count_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -493,7 +494,7 @@ mod tests {
 
     #[test]
     fn group_count_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -505,7 +506,7 @@ mod tests {
 
     #[test]
     fn group_count_by_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -534,7 +535,7 @@ mod tests {
 
     #[test]
     fn group_by_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -578,7 +579,7 @@ mod tests {
 
     #[test]
     fn select_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -600,7 +601,7 @@ mod tests {
 
     #[test]
     fn fold_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -613,7 +614,7 @@ mod tests {
 
     #[test]
     fn unfold_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -626,7 +627,7 @@ mod tests {
 
     #[test]
     fn path_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -638,7 +639,7 @@ mod tests {
 
     #[test]
     fn limit_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -650,7 +651,7 @@ mod tests {
 
     #[test]
     fn dedup_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
@@ -663,7 +664,7 @@ mod tests {
 
     #[test]
     fn numerical_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         // sum
         let mut code = Bytecode::new();
@@ -706,7 +707,7 @@ mod tests {
 
     #[test]
     fn where_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         // sum
         let mut code = Bytecode::new();
@@ -720,7 +721,7 @@ mod tests {
 
     #[test]
     fn not_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         // sum
         let mut code = Bytecode::new();
@@ -736,7 +737,7 @@ mod tests {
 
     #[test]
     fn order_test() {
-        let g = GraphTraversalSource::new(TraversalStrategies::new(vec![]));
+        let g = empty();
 
         let mut code = Bytecode::new();
 
