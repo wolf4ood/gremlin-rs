@@ -1,4 +1,4 @@
-use gremlin_client::process::traversal::GraphTraversalSource;
+use gremlin_client::process::traversal::{GraphTraversalSource, SyncTerminator};
 
 mod ch310;
 mod ch311;
@@ -9,13 +9,13 @@ mod ch33;
 mod ch34;
 
 fn example<T>(
-    source: &GraphTraversalSource,
+    source: &GraphTraversalSource<SyncTerminator>,
     chapter: &str,
     description: &str,
     fun: T,
 ) -> Result<(), Box<std::error::Error>>
 where
-    T: Fn(&GraphTraversalSource) -> Result<String, Box<std::error::Error>>,
+    T: Fn(&GraphTraversalSource<SyncTerminator>) -> Result<String, Box<std::error::Error>>,
 {
     println!("Chapter {} - {}", chapter, description);
 
@@ -26,7 +26,8 @@ where
     Ok(())
 }
 
-pub fn all() -> Vec<Box<Fn(&GraphTraversalSource) -> Result<(), Box<std::error::Error>>>> {
+pub fn all(
+) -> Vec<Box<Fn(&GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>>>> {
     let mut chapters = vec![];
 
     chapters.append(&mut ch32::all());

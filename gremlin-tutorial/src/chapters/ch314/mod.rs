@@ -1,8 +1,8 @@
 use crate::chapters::example;
-use gremlin_client::process::traversal::{GraphTraversalSource, __};
+use gremlin_client::process::traversal::{GraphTraversalSource, SyncTerminator, __};
 use gremlin_client::structure::P;
 
-fn chapter_314(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
+fn chapter_314(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>> {
     let chapter = "3.14";
 
     example(
@@ -37,6 +37,7 @@ fn chapter_314(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
     Ok(())
 }
 
-pub fn all() -> Vec<Box<Fn(&GraphTraversalSource) -> Result<(), Box<std::error::Error>>>> {
+pub fn all(
+) -> Vec<Box<Fn(&GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>>>> {
     vec![Box::new(chapter_314)]
 }

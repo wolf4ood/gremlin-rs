@@ -3,11 +3,11 @@ mod ch322;
 mod ch323;
 mod ch324;
 
-use gremlin_client::process::traversal::GraphTraversalSource;
+use gremlin_client::process::traversal::{GraphTraversalSource, SyncTerminator};
 
 use crate::chapters::example;
 
-fn chapter_32(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
+fn chapter_32(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>> {
     let chapter = "3.2";
 
     example(&g, chapter, "Find vertices that are airports", |g| {
@@ -32,7 +32,8 @@ fn chapter_32(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
     Ok(())
 }
 
-pub fn all() -> Vec<Box<Fn(&GraphTraversalSource) -> Result<(), Box<std::error::Error>>>> {
+pub fn all(
+) -> Vec<Box<Fn(&GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>>>> {
     vec![
         Box::new(chapter_32),
         Box::new(ch321::chapter_321),

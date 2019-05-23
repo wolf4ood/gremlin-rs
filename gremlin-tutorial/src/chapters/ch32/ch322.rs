@@ -1,8 +1,8 @@
 use crate::chapters::example;
-use gremlin_client::process::traversal::GraphTraversalSource;
+use gremlin_client::process::traversal::{GraphTraversalSource,SyncTerminator};
 use gremlin_client::process::traversal::__;
 
-pub fn chapter_322(g: &GraphTraversalSource) -> Result<(), Box<std::error::Error>> {
+pub fn chapter_322(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>> {
     let chapter = "3.2.2";
 
     example(
