@@ -11,10 +11,10 @@ fn chapter_310(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
         "Sum of values - total runways of all airports",
         |g| {
             let results = g
-                .v(())
+                .v({})
                 .has_label("airport")
                 .values("runways")
-                .sum(())
+                .sum({})
                 .to_list()?;
             Ok(format!(
                 "Total runways {:?} ",
@@ -29,10 +29,10 @@ fn chapter_310(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
         "Statistical mean (average) value - average number of runways per airport",
         |g| {
             let results = g
-                .v(())
+                .v({})
                 .has_label("airport")
                 .values("runways")
-                .mean(())
+                .mean({})
                 .to_list()?;
             Ok(format!(
                 "Average runways {:?} ",
@@ -43,10 +43,10 @@ fn chapter_310(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
 
     example(&g, chapter, "Maximum value - longest runway", |g| {
         let results = g
-            .v(())
+            .v({})
             .has_label("airport")
             .values("longest")
-            .max(())
+            .max({})
             .to_list()?;
         Ok(format!(
             "Max longest runway {:?} ",
@@ -56,10 +56,10 @@ fn chapter_310(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
 
     example(&g, chapter, "Minimum value - shortest runway", |g| {
         let results = g
-            .v(())
+            .v({})
             .has_label("airport")
             .values("longest")
-            .min(())
+            .min({})
             .to_list()?;
         Ok(format!(
             "Shortest runway {:?} ",

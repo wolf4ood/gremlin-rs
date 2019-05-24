@@ -6,9 +6,9 @@ pub fn chapter_331(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
 
     example(&g, chapter, "Where can I fly to from Austin?", |g| {
         let results = g
-            .v(())
+            .v({})
             .has(("airport", "code", "AUS"))
-            .out(())
+            .out({})
             .values("code")
             .fold()
             .to_list()?;
@@ -17,7 +17,7 @@ pub fn chapter_331(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
 
     example(&g, chapter, "Where can I fly to from Austin?", |g| {
         let results = g
-            .v(())
+            .v({})
             .has(("airport", "code", "AUS"))
             .out("route")
             .values("code")
@@ -32,7 +32,7 @@ pub fn chapter_331(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
         "Where can I fly to from Austin, with one stop on the way?",
         |g| {
             let results = g
-                .v(())
+                .v({})
                 .has(("airport", "code", "AUS"))
                 .out("route")
                 .out("route")
@@ -44,7 +44,7 @@ pub fn chapter_331(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
 
     example(&g, chapter, "What routes come in to LCY?", |g| {
         let results = g
-            .v(())
+            .v({})
             .has(("airport", "code", "LCY"))
             .in_("route")
             .values("code")
@@ -58,7 +58,7 @@ pub fn chapter_331(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
         "Flights from London Heathrow (LHR) to airports in the USA",
         |g| {
             let results = g
-                .v(())
+                .v({})
                 .has(("code", "LHR"))
                 .out("route")
                 .has(("country", "US"))

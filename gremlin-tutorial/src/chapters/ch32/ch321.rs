@@ -10,9 +10,9 @@ pub fn chapter_321(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
         "What property values are stored in the DFW vertex?",
         |g| {
             let results = g
-                .v(())
+                .v({})
                 .has(("airport", "code", "DFW"))
-                .values(())
+                .values({})
                 .to_list()?;
             Ok(format!(
                 "Found values [{}] ",
@@ -27,7 +27,7 @@ pub fn chapter_321(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
 
     example(&g, chapter, "Return just the city name property", |g| {
         let results = g
-            .v(())
+            .v({})
             .has(("airport", "code", "DFW"))
             .values("city")
             .to_list()?;
@@ -47,7 +47,7 @@ pub fn chapter_321(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
         "Return the 'runways' and 'icao' property values.",
         |g| {
             let results = g
-                .v(())
+                .v({})
                 .has(("airport", "code", "DFW"))
                 .values(vec!["runways", "icao"])
                 .to_list()?;
