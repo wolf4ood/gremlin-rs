@@ -5,6 +5,8 @@ mod ch324;
 
 use gremlin_client::process::traversal::{GraphTraversalSource, SyncTerminator};
 
+use crate::chapters::TraversalExamples;
+
 use crate::chapters::example;
 
 fn chapter_32(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>> {
@@ -32,8 +34,7 @@ fn chapter_32(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::e
     Ok(())
 }
 
-pub fn all(
-) -> Vec<Box<Fn(&GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>>>> {
+pub fn all() -> TraversalExamples {
     vec![
         Box::new(chapter_32),
         Box::new(ch321::chapter_321),

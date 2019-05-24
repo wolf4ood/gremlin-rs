@@ -1,8 +1,7 @@
 mod ch342;
 
-use gremlin_client::process::traversal::{GraphTraversalSource, SyncTerminator};
+use crate::chapters::TraversalExamples;
 
-pub fn all(
-) -> Vec<Box<Fn(&GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>>>> {
+pub fn all() -> TraversalExamples {
     vec![Box::new(ch342::chapter_342)]
 }

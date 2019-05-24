@@ -1,5 +1,8 @@
 use gremlin_client::process::traversal::{GraphTraversalSource, SyncTerminator};
 
+pub type TraversalExamples =
+    Vec<Box<Fn(&GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>>>>;
+
 mod ch310;
 mod ch311;
 mod ch312;
@@ -21,13 +24,12 @@ where
 
     println!("===> {}", fun(source)?);
 
-    println!("");
+    println!();
 
     Ok(())
 }
 
-pub fn all(
-) -> Vec<Box<Fn(&GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>>>> {
+pub fn all() -> TraversalExamples {
     let mut chapters = vec![];
 
     chapters.append(&mut ch32::all());
