@@ -19,6 +19,12 @@ pub fn traversal() -> RemoteTraversalSource {
 #[derive(Clone)]
 pub struct MockTerminator {}
 
+impl Default for MockTerminator {
+    fn default() -> Self {
+        MockTerminator {}
+    }
+}
+
 impl MockTerminator {
     pub fn new() -> Self {
         MockTerminator {}
@@ -49,9 +55,7 @@ pub struct SyncTerminator {
 
 impl SyncTerminator {
     pub fn new(strategies: TraversalStrategies) -> SyncTerminator {
-        SyncTerminator {
-            strategies: strategies,
-        }
+        SyncTerminator { strategies }
     }
 }
 
