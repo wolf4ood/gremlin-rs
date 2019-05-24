@@ -1,7 +1,7 @@
-use crate::process::traversal::step::has::IntoHasStep;
-use crate::process::traversal::Bytecode;
-
 use crate::process::traversal::remote::MockTerminator;
+use crate::process::traversal::step::has::IntoHasStep;
+use crate::process::traversal::step::not::IntoNotStep;
+use crate::process::traversal::Bytecode;
 use crate::process::traversal::GraphTraversal;
 
 use crate::structure::{GValue, Labels, Vertex};
@@ -52,6 +52,13 @@ impl AnonymousTraversalSource {
         A: IntoHasStep,
     {
         self.traversal.clone().has(step)
+    }
+
+    pub fn not<A>(&self, step: A) -> GraphTraversal<GValue, GValue, MockTerminator>
+    where
+        A: IntoNotStep,
+    {
+        self.traversal.clone().not(step)
     }
 }
 
