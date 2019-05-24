@@ -32,7 +32,7 @@ where
     }
 }
 
-impl<S, E: FromGValue, A> IntoMatchStep for Vec<Box<GraphTraversal<S, E, A>>>
+impl<S, E: FromGValue, A> IntoMatchStep for Vec<GraphTraversal<S, E, A>>
 where
     A: Terminator<E>,
 {
