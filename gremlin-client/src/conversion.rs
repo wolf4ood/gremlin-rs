@@ -127,6 +127,22 @@ impl FromGValue for GValue {
 }
 // Borrow from GValue
 
+impl<T: FromGValue> FromGValue for Vec<T> {
+    fn from_gvalue(v: GValue) -> GremlinResult<Vec<T>> {
+        match v {
+            GValue::List(l) => {
+                let results: GremlinResult<Vec<T>> =
+                    l.take().into_iter().map(T::from_gvalue).collect();
+                Ok(results?)
+            }
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot convert {:?} to List of T",
+                v
+            ))),
+        }
+    }
+}
+
 #[doc(hidden)]
 pub trait BorrowFromGValue: Sized {
     fn from_gvalue<'a>(v: &'a GValue) -> GremlinResult<&'a Self>;
