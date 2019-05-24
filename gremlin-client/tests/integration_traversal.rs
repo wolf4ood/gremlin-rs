@@ -11,7 +11,7 @@ use common::{
 fn test_simple_vertex_traversal() {
     let g = traversal().with_remote(graph());
 
-    let results = g.v(()).to_list().unwrap();
+    let results = g.v({}).to_list().unwrap();
 
     assert!(results.len() > 0);
 }
@@ -46,7 +46,7 @@ fn test_simple_vertex_traversal_with_label() {
     let g = traversal().with_remote(client);
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_simple_vertex_traversal_with_label")
         .to_list()
         .unwrap();
@@ -71,7 +71,7 @@ fn test_simple_vertex_traversal_with_label_and_has() {
     let g = traversal().with_remote(client);
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_simple_vertex_traversal_with_label_and_has")
         .has(("name", "Traversal"))
         .to_list()
@@ -84,7 +84,7 @@ fn test_simple_vertex_traversal_with_label_and_has() {
     // with 3 params
 
     let results = g
-        .v(())
+        .v({})
         .has((
             "test_simple_vertex_traversal_with_label_and_has",
             "name",
@@ -100,7 +100,7 @@ fn test_simple_vertex_traversal_with_label_and_has() {
     // with 1 param
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_simple_vertex_traversal_with_label_and_has")
         .has("name")
         .to_list()
@@ -113,7 +113,7 @@ fn test_simple_vertex_traversal_with_label_and_has() {
     // hasNot
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_simple_vertex_traversal_with_label_and_has")
         .has_not("surname")
         .to_list()
@@ -128,7 +128,7 @@ fn test_simple_vertex_traversal_with_label_and_has() {
 fn test_simple_edge_traversal() {
     let g = traversal().with_remote(graph());
 
-    let results = g.e(()).to_list().unwrap();
+    let results = g.e({}).to_list().unwrap();
 
     assert!(results.len() > 0);
 }
@@ -165,7 +165,7 @@ fn test_simple_edge_traversal_with_label() {
     let g = traversal().with_remote(client);
 
     let results = g
-        .e(())
+        .e({})
         .has_label("test_simple_edge_traversal_with_label")
         .to_list()
         .unwrap();
@@ -291,7 +291,7 @@ fn test_add_v() {
 
     assert_eq!("person", results[0].label());
 
-    let results = g.add_v("person").add_v(()).to_list().unwrap();
+    let results = g.add_v("person").add_v({}).to_list().unwrap();
 
     assert!(results.len() > 0);
 
@@ -384,7 +384,7 @@ fn test_add_e() {
     assert_eq!("livesNear", edges[0].label());
 
     let edges = g
-        .v(())
+        .v({})
         .as_("a")
         .out("created")
         .add_e("createdBy")
@@ -419,7 +419,7 @@ fn test_properties_step() {
 
     let g = traversal().with_remote(client);
 
-    let results = g.v(vertex.id()).properties(()).to_list().unwrap();
+    let results = g.v(vertex.id()).properties({}).to_list().unwrap();
 
     assert_eq!(1, results.len());
 
@@ -444,7 +444,7 @@ fn test_property_map() {
 
     let g = traversal().with_remote(client);
 
-    let results = g.v(vertex.id()).property_map(()).to_list().unwrap();
+    let results = g.v(vertex.id()).property_map({}).to_list().unwrap();
 
     assert_eq!(1, results.len());
 
@@ -491,7 +491,7 @@ fn test_values() {
 
     let g = traversal().with_remote(client);
 
-    let results = g.v(vertex.id()).values(()).to_list().unwrap();
+    let results = g.v(vertex.id()).values({}).to_list().unwrap();
 
     assert_eq!(1, results.len());
 
@@ -526,7 +526,7 @@ fn test_value_map() {
 
     let vertex = &vertices[0];
 
-    let results = g.v(vertex.id()).value_map(()).to_list().unwrap();
+    let results = g.v(vertex.id()).value_map({}).to_list().unwrap();
 
     assert_eq!(1, results.len());
 
@@ -585,7 +585,7 @@ fn test_group_count_step() {
     let g = traversal().with_remote(client);
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_group_count")
         .group_count()
         .to_list()
@@ -598,7 +598,7 @@ fn test_group_count_step() {
     assert_eq!(&1, value[&vertex].get::<i64>().unwrap());
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_group_count")
         .group_count()
         .by("name")
@@ -612,7 +612,7 @@ fn test_group_count_step() {
     assert_eq!(&1, value["Count"].get::<i64>().unwrap());
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_group_count")
         .group_count()
         .by(T::Label)
@@ -637,7 +637,7 @@ fn test_group_by_step() {
     let g = traversal().with_remote(client);
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_group_by_step")
         .group()
         .by("name")
@@ -651,7 +651,7 @@ fn test_group_by_step() {
     assert_eq!(1, value["Count"].get::<List>().unwrap().len());
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_group_by_step")
         .group()
         .by(T::Label)
@@ -667,7 +667,7 @@ fn test_group_by_step() {
     //
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_group_by_step")
         .group()
         .by(T::Label)
@@ -693,7 +693,7 @@ fn test_select_step() {
     let g = traversal().with_remote(client);
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_select_step")
         .group_count()
         .by("name")
@@ -719,7 +719,7 @@ fn test_fold_step() {
     let g = traversal().with_remote(client);
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_fold_step")
         .values("name")
         .fold()
@@ -745,7 +745,7 @@ fn test_unfold_step() {
 
     let results = g
         .v(vertex.id())
-        .property_map(())
+        .property_map({})
         .unfold()
         .to_list()
         .unwrap();
@@ -775,7 +775,7 @@ fn test_path_step() {
     let g = traversal().with_remote(client);
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_path_step")
         .path()
         .to_list()
@@ -800,7 +800,7 @@ fn test_limit_step() {
     let g = traversal().with_remote(client);
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_limit_step")
         .limit(1)
         .to_list()
@@ -821,9 +821,9 @@ fn test_dedup_step() {
     let g = traversal().with_remote(client);
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_limit_step")
-        .dedup(())
+        .dedup({})
         .by(T::Label)
         .to_list()
         .unwrap();
@@ -850,10 +850,10 @@ fn test_numerical_steps() {
 
     // sum
     let results = g
-        .v(())
+        .v({})
         .has_label("test_numerical_steps")
         .values("age")
-        .sum(())
+        .sum({})
         .to_list()
         .unwrap();
 
@@ -863,10 +863,10 @@ fn test_numerical_steps() {
 
     // max
     let results = g
-        .v(())
+        .v({})
         .has_label("test_numerical_steps")
         .values("age")
-        .max(())
+        .max({})
         .to_list()
         .unwrap();
 
@@ -877,10 +877,10 @@ fn test_numerical_steps() {
     // mean
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_numerical_steps")
         .values("age")
-        .mean(())
+        .mean({})
         .to_list()
         .unwrap();
 
@@ -891,10 +891,10 @@ fn test_numerical_steps() {
     // min
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_numerical_steps")
         .values("age")
-        .min(())
+        .min({})
         .to_list()
         .unwrap();
 
@@ -922,7 +922,7 @@ fn test_has_with_p_steps() {
         .unwrap();
 
     let results = g
-        .v(())
+        .v({})
         .has(("test_has_with_p_steps", "age", P::within(vec![19, 20])))
         .to_list()
         .unwrap();
@@ -932,7 +932,7 @@ fn test_has_with_p_steps() {
     assert_eq!(vertices[0].id(), results[0].id());
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_has_with_p_steps")
         .values("age")
         .is(20)
@@ -944,7 +944,7 @@ fn test_has_with_p_steps() {
     assert_eq!(&20, results[0].get::<i32>().unwrap());
 
     let results = g
-        .v(())
+        .v({})
         .has_label("test_has_with_p_steps")
         .values("age")
         .is(P::within(vec![19, 20]))
@@ -971,7 +971,7 @@ fn where_step_test() {
         .unwrap();
 
     let results = g
-        .v(())
+        .v({})
         .has_label("where_step_test")
         .where_(__.values("age").is(26))
         .to_list()
@@ -996,7 +996,7 @@ fn not_step_test() {
         .unwrap();
 
     let results = g
-        .v(())
+        .v({})
         .has_label("not_step_test")
         .not(__.values("age").is(26))
         .to_list()
@@ -1024,10 +1024,10 @@ fn order_step_test() {
         .unwrap();
 
     let results = g
-        .v(())
+        .v({})
         .has_label("order_step_test")
         .values("name")
-        .order(())
+        .order({})
         .to_list()
         .unwrap();
 
@@ -1036,10 +1036,10 @@ fn order_step_test() {
     assert_eq!("a", results[0].get::<String>().unwrap());
 
     let results = g
-        .v(())
+        .v({})
         .has_label("order_step_test")
         .values("name")
-        .order(())
+        .order({})
         .by(Order::Desc)
         .to_list()
         .unwrap();
