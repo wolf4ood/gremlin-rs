@@ -760,4 +760,32 @@ mod tests {
         );
     }
 
+    #[test]
+    fn match_test() {
+        let g = empty();
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(
+            String::from("match"),
+            vec![
+                __.as_("a").out({}).as_("b").bytecode().clone().into(),
+                __.as_("b").out({}).as_("c").bytecode().clone().into(),
+            ],
+        );
+        code.add_step(String::from("select"), vec!["a".into(), "c".into()]);
+
+        assert_eq!(
+            &code,
+            g.v({})
+                .match_(vec![
+                    __.as_("a").out({}).as_("b"),
+                    __.as_("b").out({}).as_("c")
+                ])
+                .select(vec!["a", "c"])
+                .bytecode()
+        );
+    }
+
 }

@@ -1048,3 +1048,65 @@ fn order_step_test() {
 
     assert_eq!("b", results[0].get::<String>().unwrap());
 }
+
+#[test]
+fn match_step_test() {
+    let client = graph();
+
+    drop_vertices(&client, "match_step_test").unwrap();
+
+    drop_edges(&client, "match_step_test_edge").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    let v1 = g
+        .add_v("match_step_test")
+        .property("name", "a")
+        .to_list()
+        .unwrap();
+
+    let v2 = g
+        .add_v("match_step_test")
+        .property("name", "b")
+        .to_list()
+        .unwrap();
+
+    let v3 = g
+        .add_v("match_step_test")
+        .property("name", "c")
+        .to_list()
+        .unwrap();
+
+    g.add_e("match_step_test_edge")
+        .from(&v1[0])
+        .to(&v2[0])
+        .to_list()
+        .unwrap();
+
+    g.add_e("match_step_test_edge")
+        .from(&v2[0])
+        .to(&v3[0])
+        .to_list()
+        .unwrap();
+
+    let results = g
+        .v({})
+        .has_label("match_step_test")
+        .match_(vec![
+            __.as_("a")
+                .has(("name", "a"))
+                .out("match_step_test_edge")
+                .as_("b"),
+            __.as_("b").out("match_step_test_edge").as_("c"),
+        ])
+        .select(vec!["a", "c"])
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    let first = &results[0].get::<Map>().unwrap();
+
+    assert_eq!(&v1[0], first["a"].get::<Vertex>().unwrap());
+    assert_eq!(&v3[0], first["c"].get::<Vertex>().unwrap());
+}

@@ -52,7 +52,6 @@ fn chapter_311(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
     Ok(())
 }
 
-pub fn all(
-) -> TraversalExamples {
+pub fn all() -> TraversalExamples {
     vec![Box::new(chapter_311)]
 }

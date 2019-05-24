@@ -3,6 +3,7 @@ use crate::process::traversal::step::by::IntoByStep;
 use crate::process::traversal::step::dedup::DedupStep;
 use crate::process::traversal::step::has::IntoHasStep;
 use crate::process::traversal::step::limit::LimitStep;
+use crate::process::traversal::step::match_step::IntoMatchStep;
 use crate::process::traversal::step::not::IntoNotStep;
 use crate::process::traversal::step::select::IntoSelectStep;
 use crate::process::traversal::step::where_step::IntoWhereStep;
@@ -423,5 +424,15 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
             .add_step(String::from("order"), vec![scope.into().into()]);
 
         self
+    }
+
+    pub fn match_<A>(mut self, step: A) -> GraphTraversal<S, Map, T>
+    where
+        A: IntoMatchStep,
+        T: Terminator<Map>,
+    {
+        self.bytecode
+            .add_step(String::from("match"), step.into_step().take_params());
+        GraphTraversal::new(self.terminator, self.bytecode)
     }
 }

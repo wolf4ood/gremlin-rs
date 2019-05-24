@@ -41,6 +41,12 @@ impl AnonymousTraversalSource {
         self.traversal.clone().has_label(labels)
     }
 
+    pub fn as_<A>(&self, alias: A) -> GraphTraversal<GValue, GValue, MockTerminator>
+    where
+        A: Into<String>,
+    {
+        self.traversal.clone().as_(alias)
+    }
     pub fn has<A>(&self, step: A) -> GraphTraversal<GValue, GValue, MockTerminator>
     where
         A: IntoHasStep,
