@@ -1,8 +1,8 @@
 use crate::conversion::FromGValue;
+use crate::process::traversal::remote::Terminator;
 use crate::process::traversal::GraphTraversal;
 use crate::structure::GValue;
 use crate::structure::IntoPredicate;
-use crate::process::traversal::remote::Terminator;
 
 pub struct WhereStep {
     params: Vec<GValue>,

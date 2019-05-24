@@ -106,7 +106,7 @@ mod tests {
     fn empty() -> GraphTraversalSource<MockTerminator> {
         GraphTraversalSource::new(MockTerminator {})
     }
-    
+
     #[test]
     fn v_traversal() {
         let g = empty();
