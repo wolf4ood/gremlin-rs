@@ -1096,8 +1096,9 @@ fn match_step_test() {
             __.as_("a")
                 .has(("name", "a"))
                 .out("match_step_test_edge")
-                .as_("b"),
-            __.as_("b").out("match_step_test_edge").as_("c"),
+                .as_("b")
+                .boxed(),
+            __.as_("b").out("match_step_test_edge").as_("c").boxed(),
         ])
         .select(vec!["a", "c"])
         .to_list()

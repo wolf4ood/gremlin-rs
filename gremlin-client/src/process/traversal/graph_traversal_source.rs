@@ -780,8 +780,8 @@ mod tests {
             &code,
             g.v({})
                 .match_(vec![
-                    __.as_("a").out({}).as_("b"),
-                    __.as_("b").out({}).as_("c")
+                    __.as_("a").out({}).as_("b").boxed(),
+                    __.as_("b").out({}).as_("c").boxed()
                 ])
                 .select(vec!["a", "c"])
                 .bytecode()

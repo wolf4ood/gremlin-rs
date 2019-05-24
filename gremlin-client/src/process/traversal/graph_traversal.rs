@@ -435,4 +435,8 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
             .add_step(String::from("match"), step.into_step().take_params());
         GraphTraversal::new(self.terminator, self.bytecode)
     }
+
+    pub fn boxed(self) -> Box<Self> {
+        Box::new(self)
+    }
 }
