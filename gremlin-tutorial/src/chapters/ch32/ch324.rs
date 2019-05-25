@@ -130,7 +130,7 @@ pub fn chapter_324(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
                 .has_label("airport")
                 .group_count()
                 .by("country")
-                .select(vec!["FR", "GR", "BE"])
+                .select(["FR", "GR", "BE"])
                 .to_list()?;
             Ok(format!("Found [{:?}] ", results[0]))
         },

@@ -49,7 +49,7 @@ pub fn chapter_321(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
             let results = g
                 .v({})
                 .has(("airport", "code", "DFW"))
-                .values(vec!["runways", "icao"])
+                .values(["runways", "icao"])
                 .to_list()?;
             Ok(format!(
                 "Found values [{}] ",

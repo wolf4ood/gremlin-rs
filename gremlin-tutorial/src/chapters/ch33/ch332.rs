@@ -106,7 +106,7 @@ pub fn chapter_332(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
                 .out({})
                 .limit(5)
                 .path()
-                .by(__.values(vec!["code","city"]).fold())
+                .by(__.values(["code","city"]).fold())
                 .to_list()?;
 
             Ok(format!("Found [{:?}] path", results[0]))

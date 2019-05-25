@@ -53,7 +53,7 @@ fn chapter_312(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
                 .out({})
                 .order({})
                 .by("code")
-                .values(vec!["code", "icao"])
+                .values(["code", "icao"])
                 .fold()
                 .to_list()?;
 
@@ -110,7 +110,7 @@ fn chapter_312(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
                 .order({})
                 .by(("longest", Order::Shuffle))
                 .value_map({})
-                .select(vec!["code", "longest"])
+                .select(["code", "longest"])
                 .limit(10)
                 .to_list()?;
 
