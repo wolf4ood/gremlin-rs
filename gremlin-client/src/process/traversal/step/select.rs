@@ -38,3 +38,27 @@ impl IntoSelectStep for TraversalBuilder {
         SelectStep::new(vec![self.bytecode.into()])
     }
 }
+
+macro_rules! impl_into_select {
+    ($n:expr) => {
+        impl<T: Clone> IntoSelectStep for [T; $n]
+        where
+            T: Into<String>,
+        {
+            fn into_step(self) -> SelectStep {
+                SelectStep::new(self.iter().map(|e| e.clone().into().into()).collect())
+            }
+        }
+    };
+}
+
+impl_into_select!(1);
+impl_into_select!(2);
+impl_into_select!(3);
+impl_into_select!(4);
+impl_into_select!(5);
+impl_into_select!(6);
+impl_into_select!(7);
+impl_into_select!(8);
+impl_into_select!(9);
+impl_into_select!(10);
