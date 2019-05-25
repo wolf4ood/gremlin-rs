@@ -401,10 +401,14 @@ mod tests {
             vec![String::from("name").into(), String::from("surname").into()],
         );
 
+        // with vec
         assert_eq!(
             &code,
             g.v({}).properties(vec!["name", "surname"]).bytecode()
         );
+
+        // without vec
+        assert_eq!(&code, g.v({}).properties(["name", "surname"]).bytecode());
     }
 
     #[test]
@@ -436,10 +440,14 @@ mod tests {
             vec![String::from("name").into(), String::from("surname").into()],
         );
 
+        // with vec
         assert_eq!(
             &code,
             g.v({}).property_map(vec!["name", "surname"]).bytecode()
         );
+
+        // without vec
+        assert_eq!(&code, g.v({}).property_map(["name", "surname"]).bytecode());
     }
 
     #[test]
@@ -459,6 +467,20 @@ mod tests {
         code.add_step(String::from("values"), vec![String::from("name").into()]);
 
         assert_eq!(&code, g.v({}).values("name").bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(
+            String::from("values"),
+            vec![String::from("name").into(), String::from("surname").into()],
+        );
+
+        // with vec
+        assert_eq!(&code, g.v({}).values(vec!["name", "surname"]).bytecode());
+
+        // without vec
+        assert_eq!(&code, g.v({}).values(["name", "surname"]).bytecode());
     }
 
     #[test]
@@ -478,6 +500,18 @@ mod tests {
         code.add_step(String::from("valueMap"), vec![String::from("name").into()]);
 
         assert_eq!(&code, g.v({}).value_map("name").bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(
+            String::from("valueMap"),
+            vec![String::from("name").into(), String::from("surname").into()],
+        );
+
+        assert_eq!(&code, g.v({}).value_map(vec!["name", "surname"]).bytecode());
+
+        assert_eq!(&code, g.v({}).value_map(["name", "surname"]).bytecode());
     }
 
     #[test]
@@ -597,6 +631,8 @@ mod tests {
         );
 
         assert_eq!(&code, g.v({}).select(vec!["name", "surname"]).bytecode());
+
+        assert_eq!(&code, g.v({}).select(["name", "surname"]).bytecode());
     }
 
     #[test]
@@ -776,6 +812,7 @@ mod tests {
         );
         code.add_step(String::from("select"), vec!["a".into(), "c".into()]);
 
+        // with vec
         assert_eq!(
             &code,
             g.v({})
@@ -784,6 +821,15 @@ mod tests {
                     __.as_("b").out({}).as_("c")
                 ])
                 .select(vec!["a", "c"])
+                .bytecode()
+        );
+
+        // without vec
+        assert_eq!(
+            &code,
+            g.v({})
+                .match_([__.as_("a").out({}).as_("b"), __.as_("b").out({}).as_("c")])
+                .select(["a", "c"])
                 .bytecode()
         );
     }

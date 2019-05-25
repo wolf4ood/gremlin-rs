@@ -9,6 +9,7 @@ mod builder;
 mod bytecode;
 mod graph_traversal;
 mod graph_traversal_source;
+mod macros;
 mod order;
 mod remote;
 mod scope;
