@@ -1,6 +1,4 @@
-use crate::conversion::FromGValue;
-use crate::process::traversal::remote::Terminator;
-use crate::process::traversal::GraphTraversal;
+use crate::process::traversal::TraversalBuilder;
 use crate::structure::GValue;
 
 pub struct NotStep {
@@ -23,10 +21,7 @@ pub trait IntoNotStep {
     fn into_step(self) -> NotStep;
 }
 
-impl<S, E: FromGValue, A> IntoNotStep for GraphTraversal<S, E, A>
-where
-    A: Terminator<E>,
-{
+impl IntoNotStep for TraversalBuilder {
     fn into_step(self) -> NotStep {
         NotStep::new(vec![self.bytecode.into()])
     }

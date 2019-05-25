@@ -1,6 +1,4 @@
-use crate::conversion::FromGValue;
-use crate::process::traversal::remote::Terminator;
-use crate::process::traversal::GraphTraversal;
+use crate::process::traversal::TraversalBuilder;
 use crate::structure::GValue;
 
 pub struct SelectStep {
@@ -35,10 +33,7 @@ impl IntoSelectStep for Vec<&str> {
     }
 }
 
-impl<S, E: FromGValue, A> IntoSelectStep for GraphTraversal<S, E, A>
-where
-    A: Terminator<E>,
-{
+impl IntoSelectStep for TraversalBuilder {
     fn into_step(self) -> SelectStep {
         SelectStep::new(vec![self.bytecode.into()])
     }

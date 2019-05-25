@@ -1,6 +1,4 @@
-use crate::conversion::FromGValue;
-use crate::process::traversal::remote::Terminator;
-use crate::process::traversal::{GraphTraversal, Order};
+use crate::process::traversal::{Order, TraversalBuilder};
 use crate::structure::{GValue, T};
 
 pub struct ByStep {
@@ -59,18 +57,12 @@ impl IntoByStep for (String, Order) {
     }
 }
 
-impl<S, E: FromGValue, A> IntoByStep for (GraphTraversal<S, E, A>, Order)
-where
-    A: Terminator<E>,
-{
+impl IntoByStep for (TraversalBuilder, Order) {
     fn into_step(self) -> ByStep {
         ByStep::new(vec![self.0.bytecode.into(), self.1.into()])
     }
 }
-impl<S, E: FromGValue, A> IntoByStep for GraphTraversal<S, E, A>
-where
-    A: Terminator<E>,
-{
+impl IntoByStep for TraversalBuilder {
     fn into_step(self) -> ByStep {
         ByStep::new(vec![self.bytecode.into()])
     }

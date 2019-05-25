@@ -1,6 +1,4 @@
-use crate::conversion::FromGValue;
-use crate::process::traversal::remote::Terminator;
-use crate::process::traversal::GraphTraversal;
+use crate::process::traversal::TraversalBuilder;
 use crate::structure::GValue;
 use crate::structure::IntoPredicate;
 
@@ -24,10 +22,7 @@ pub trait IntoWhereStep {
     fn into_step(self) -> WhereStep;
 }
 
-impl<S, E: FromGValue, A> IntoWhereStep for GraphTraversal<S, E, A>
-where
-    A: Terminator<E>,
-{
+impl IntoWhereStep for TraversalBuilder {
     fn into_step(self) -> WhereStep {
         WhereStep::new(vec![self.bytecode.into()])
     }
