@@ -7,6 +7,7 @@ mod ch310;
 mod ch311;
 mod ch312;
 mod ch314;
+mod ch317;
 mod ch32;
 mod ch33;
 mod ch34;
@@ -39,5 +40,6 @@ pub fn all() -> TraversalExamples {
     chapters.append(&mut ch311::all());
     chapters.append(&mut ch312::all());
     chapters.append(&mut ch314::all());
+    chapters.append(&mut ch317::all());
     chapters
 }
