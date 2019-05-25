@@ -11,7 +11,7 @@ pub fn chapter_322(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
         "Find all edges that have a 'dist' property",
         |g| {
             let property = "dist";
-            let results = g.e({}).has(property).to_list()?;
+            let results = g.e(()).has(property).to_list()?;
             Ok(format!(
                 "Found [{}] edges with property {}",
                 results.len(),
@@ -26,7 +26,7 @@ pub fn chapter_322(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
         "Find all vertices that have a 'region' property",
         |g| {
             let property = "region";
-            let results = g.v({}).has(property).to_list()?;
+            let results = g.v(()).has(property).to_list()?;
             Ok(format!(
                 "Found [{}] vertices with property {}",
                 results.len(),
@@ -41,7 +41,7 @@ pub fn chapter_322(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
         "Find all the vertices that do not have a 'region' property",
         |g| {
             let property = "region";
-            let results = g.v({}).has_not(property).to_list()?;
+            let results = g.v(()).has_not(property).to_list()?;
             Ok(format!(
                 "Found [{}] vertices without property {}",
                 results.len(),
@@ -52,7 +52,7 @@ pub fn chapter_322(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
 
     example(&g, chapter, "The above is shorthand for", |g| {
         let property = "region";
-        let results = g.v({}).not(__.has("region")).to_list()?;
+        let results = g.v(()).not(__.has("region")).to_list()?;
         Ok(format!(
             "Found [{}] vertices without property {}",
             results.len(),

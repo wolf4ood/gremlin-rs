@@ -6,10 +6,10 @@ pub fn chapter_342(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
 
     example(&g, chapter, "Removing duplcated with dedup", |g| {
         let results = g
-            .v({})
+            .v(())
             .has(("region", "GB-ENG"))
             .values("runways")
-            .dedup({})
+            .dedup(())
             .fold()
             .to_list()?;
 

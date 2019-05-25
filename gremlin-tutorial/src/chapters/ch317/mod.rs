@@ -12,9 +12,9 @@ fn chapter_317(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
         "Find any cases of where you can fly from JFK non stop to a place you cannot get back from non stop",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has(("code","JFK"))
-                .match_([__.as_("s").out({}).as_("d"),__.not(__.as_("d").out({}).as_("s"))])
+                .match_([__.as_("s").out(()).as_("d"),__.not(__.as_("d").out(()).as_("s"))])
                 .select(["s","d"])
                 .by("code")
                 .to_list()?;
@@ -28,11 +28,11 @@ fn chapter_317(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
         "How many occurrences of the pattern in the graph are there?",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has_label("airport")
                 .match_([
-                    __.as_("s").out({}).as_("d"),
-                    __.not(__.as_("d").out({}).as_("s")),
+                    __.as_("s").out(()).as_("d"),
+                    __.not(__.as_("d").out(()).as_("s")),
                 ])
                 .count()
                 .to_list()?;
@@ -46,12 +46,12 @@ fn chapter_317(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
         "All routes between two airports with one intermediate stop where there is no direct flight",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has_label("airport")
                 .match_([
-                    __.as_("a").out({}).as_("b"),
-                    __.as_("b").out({}).where_(P::neq("a")).as_("c"),
-                    __.not(__.as_("a").out({}).as_("c")),
+                    __.as_("a").out(()).as_("b"),
+                    __.as_("b").out(()).where_(P::neq("a")).as_("c"),
+                    __.not(__.as_("a").out(()).as_("c")),
                 ])
                 .select(["a","b","c"])
                 .by("code")

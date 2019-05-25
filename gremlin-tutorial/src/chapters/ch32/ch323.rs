@@ -9,14 +9,14 @@ pub fn chapter_323(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
         chapter,
         "How many airports are there in the graph?",
         |g| {
-            let results = g.v({}).has_label("airport").count().to_list()?;
+            let results = g.v(()).has_label("airport").count().to_list()?;
             Ok(format!("Found [{}] airports", results[0]))
         },
     )?;
 
     example(&g, chapter, "How many routes are there?", |g| {
         let results = g
-            .v({})
+            .v(())
             .has_label("airport")
             .out_e("route")
             .count()
@@ -25,12 +25,12 @@ pub fn chapter_323(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
     })?;
 
     example(&g, chapter, "How many routes are there?", |g| {
-        let results = g.v({}).out_e("route").count().to_list()?;
+        let results = g.v(()).out_e("route").count().to_list()?;
         Ok(format!("Found [{}] routes", results[0]))
     })?;
 
     example(&g, chapter, "How many routes are there?", |g| {
-        let results = g.e({}).has_label("route").count().to_list()?;
+        let results = g.e(()).has_label("route").count().to_list()?;
         Ok(format!("Found [{}] routes", results[0]))
     })?;
 

@@ -13,18 +13,18 @@ fn chapter_32(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::e
     let chapter = "3.2";
 
     example(&g, chapter, "Find vertices that are airports", |g| {
-        let results = g.v({}).has_label("airport").to_list()?;
+        let results = g.v(()).has_label("airport").to_list()?;
         Ok(format!("Found {} airports", results.len()))
     })?;
 
     example(&g, chapter, "Find the DFW vertex", |g| {
-        let results = g.v({}).has(("code", "DFW")).to_list()?;
+        let results = g.v(()).has(("code", "DFW")).to_list()?;
         Ok(format!("Found DPW airport with id {:?}", results[0].id()))
     })?;
 
     example(&g, chapter, "Combining those two previous queries", |g| {
         let results = g
-            .v({})
+            .v(())
             .has_label("airport")
             .has(("code", "DFW"))
             .to_list()?;

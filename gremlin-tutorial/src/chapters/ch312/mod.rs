@@ -12,11 +12,11 @@ fn chapter_312(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
         "Sort the first 20 airports returned in ascending order",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has_label("airport")
                 .limit(20)
                 .values("code")
-                .order({})
+                .order(())
                 .fold()
                 .to_list()?;
             Ok(format!("Found {:?} ", results[0]))
@@ -29,9 +29,9 @@ fn chapter_312(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
         "Sort all of the airports in the graph by their code and then return the first 20",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has_label("airport")
-                .order({})
+                .order(())
                 .by("code")
                 .limit(20)
                 .values("code")
@@ -48,10 +48,10 @@ fn chapter_312(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
         "Sort all of the places you can fly to from Austin (AUS)",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has(("code", "AUS"))
-                .out({})
-                .order({})
+                .out(())
+                .order(())
                 .by("code")
                 .values(["code", "icao"])
                 .fold()
@@ -67,11 +67,11 @@ fn chapter_312(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
         "Sort the first 20 airports returned in descending order",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has_label("airport")
                 .limit(20)
                 .values("code")
-                .order({})
+                .order(())
                 .by(Order::Desc)
                 .fold()
                 .to_list()?;
@@ -86,11 +86,11 @@ fn chapter_312(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
         "Sort the first 20 airports returned in shuffle order",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has_label("airport")
                 .limit(20)
                 .values("code")
-                .order({})
+                .order(())
                 .by(Order::Shuffle)
                 .fold()
                 .to_list()?;
@@ -105,11 +105,11 @@ fn chapter_312(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
         "List the 10 airports with the longest runways in decreasing order.",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has_label("airport")
-                .order({})
+                .order(())
                 .by(("longest", Order::Shuffle))
-                .value_map({})
+                .value_map(())
                 .select(["code", "longest"])
                 .limit(10)
                 .to_list()?;
@@ -124,12 +124,12 @@ fn chapter_312(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
         "sorts all the airports by longest runway in descending order and returns the valueMap for the first of those",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has_label("airport")
-                .order({})
+                .order(())
                 .by((__.values("longest"), Order::Shuffle))
                 .limit(1)
-                .value_map({})
+                .value_map(())
                 .to_list()?;
 
             Ok(format!("Found {:?} ", results[0]))

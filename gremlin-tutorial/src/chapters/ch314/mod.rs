@@ -12,7 +12,7 @@ fn chapter_314(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
         "Find airports with more than five runways",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .where_(__.values("runways").is(P::gt(5)))
                 .to_list()?;
             Ok(format!("Found {:?} airports", results.len()))
@@ -25,7 +25,7 @@ fn chapter_314(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::
         "Airports with more than 60 unique routes from them",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has_label("airport")
                 .where_(__.out("route").count().is(P::gt(60)))
                 .count()

@@ -10,9 +10,9 @@ pub fn chapter_332(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
         "This time, for each route, return both vertices and the edge that connects them",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has(("airport", "code", "LCY"))
-                .out_e({})
+                .out_e(())
                 .in_v()
                 .path()
                 .to_list()?;
@@ -23,9 +23,9 @@ pub fn chapter_332(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
 
     example(&g, chapter, "Same as above with by modulator", |g| {
         let results = g
-            .v({})
+            .v(())
             .has(("airport", "code", "LCY"))
-            .out_e({})
+            .out_e(())
             .in_v()
             .path()
             .by("code")
@@ -41,9 +41,9 @@ pub fn chapter_332(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
         "Same as above with by modulator with longer form",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has(("airport", "code", "LCY"))
-                .out_e({})
+                .out_e(())
                 .in_v()
                 .path()
                 .by("code")
@@ -61,9 +61,9 @@ pub fn chapter_332(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
         "Same as above with by modulator with city",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has(("airport", "code", "LCY"))
-                .out_e({})
+                .out_e(())
                 .in_v()
                 .path()
                 .by("code")
@@ -81,15 +81,15 @@ pub fn chapter_332(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
         "Codes for the airports we visited along with a number of runways the second airport has.",
         |g| {
             let results = g
-                .v({})
+                .v(())
                 .has(("airport", "code", "LCY"))
-                .out({})
+                .out(())
                 .limit(5)
                 .values("runways")
                 .path()
                 .by("code")
                 .by("code")
-                .by({})
+                .by(())
                 .to_list()?;
 
             Ok(format!("Found [{:?}] path", results[0]))
@@ -103,7 +103,7 @@ pub fn chapter_332(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
         |g| {
             let results = g
                 .v(3)
-                .out({})
+                .out(())
                 .limit(5)
                 .path()
                 .by(__.values(["code","city"]).fold())
@@ -120,10 +120,10 @@ pub fn chapter_332(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<s
         |g| {
             let results = g
                 .v(3)
-                .out({})
+                .out(())
                 .limit(5)
                 .path()
-                .by(__.out({}).count().fold())
+                .by(__.out(()).count().fold())
                 .to_list()?;
 
             Ok(format!("Found [{:?}] path", results[0]))
