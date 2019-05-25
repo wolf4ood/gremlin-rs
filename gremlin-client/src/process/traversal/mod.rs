@@ -5,6 +5,7 @@ use crate::GremlinResult;
 use std::marker::PhantomData;
 
 mod anonymous_traversal_source;
+mod builder;
 mod bytecode;
 mod graph_traversal;
 mod graph_traversal_source;
@@ -16,6 +17,7 @@ mod strategies;
 pub use order::Order;
 pub use remote::{traversal, SyncTerminator, Terminator};
 
+pub use builder::TraversalBuilder;
 pub use bytecode::Bytecode;
 pub use graph_traversal::GraphTraversal;
 pub use graph_traversal_source::GraphTraversalSource;

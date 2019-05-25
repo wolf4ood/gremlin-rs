@@ -5,7 +5,7 @@ use crate::process::traversal::strategies::{
 
 use crate::process::traversal::remote::{MockTerminator, SyncTerminator, Terminator};
 use crate::process::traversal::Bytecode;
-use crate::process::traversal::GraphTraversal;
+use crate::process::traversal::{GraphTraversal, TraversalBuilder};
 use crate::structure::GIDs;
 use crate::structure::Labels;
 use crate::structure::{Edge, GValue, Vertex};
@@ -47,7 +47,7 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
             ids.into().0.iter().map(|id| id.to_gvalue()).collect(),
         );
 
-        GraphTraversal::new(self.term.clone(), code)
+        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
     }
 
     pub fn add_v<T>(&self, label: T) -> GraphTraversal<Vertex, Vertex, A>
@@ -62,7 +62,7 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
             label.into().0.into_iter().map(GValue::from).collect(),
         );
 
-        GraphTraversal::new(self.term.clone(), code)
+        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
     }
 
     pub fn add_e<T>(&self, label: T) -> GraphTraversal<Edge, Edge, A>
@@ -74,7 +74,7 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
 
         code.add_step(String::from("addE"), vec![label.into().into()]);
 
-        GraphTraversal::new(self.term.clone(), code)
+        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
     }
 
     pub fn e<T>(&self, ids: T) -> GraphTraversal<Edge, Edge, A>
@@ -89,7 +89,7 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
             ids.into().0.iter().map(|id| id.to_gvalue()).collect(),
         );
 
-        GraphTraversal::new(self.term.clone(), code)
+        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
     }
 }
 
