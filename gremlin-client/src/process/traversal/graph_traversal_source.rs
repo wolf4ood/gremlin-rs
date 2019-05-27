@@ -834,4 +834,15 @@ mod tests {
         );
     }
 
+    #[test]
+    fn drop_test() {
+        let g = empty();
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("drop"), vec![]);
+
+        assert_eq!(&code, g.v({}).drop().bytecode());
+    }
 }

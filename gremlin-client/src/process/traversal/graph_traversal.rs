@@ -384,4 +384,9 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self.builder = self.builder.match_(step);
         GraphTraversal::new(self.terminator, self.builder)
     }
+
+    pub fn drop(mut self) -> Self {
+        self.builder = self.builder.drop();
+        self
+    }
 }

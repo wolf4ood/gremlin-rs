@@ -386,4 +386,9 @@ impl TraversalBuilder {
             .add_step(String::from("match"), step.into_step().take_params());
         self
     }
+
+    pub fn drop(mut self) -> Self {
+        self.bytecode.add_step(String::from("drop"), vec![]);
+        self
+    }
 }

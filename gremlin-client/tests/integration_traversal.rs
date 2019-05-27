@@ -1110,3 +1110,46 @@ fn match_step_test() {
     assert_eq!(&v1[0], first["a"].get::<Vertex>().unwrap());
     assert_eq!(&v3[0], first["c"].get::<Vertex>().unwrap());
 }
+
+#[test]
+fn drop_step_test() {
+    let client = graph();
+
+    drop_vertices(&client, "drop_step_test").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    g.add_v("drop_step_test")
+        .property("name", "a")
+        .to_list()
+        .unwrap();
+
+    g.add_v("drop_step_test")
+        .property("name", "b")
+        .to_list()
+        .unwrap();
+
+    let results = g
+        .v(())
+        .has_label("drop_step_test")
+        .count()
+        .to_list()
+        .unwrap();
+
+    assert_eq!(2, results[0]);
+
+    g.v(())
+        .has_label("drop_step_test")
+        .drop()
+        .to_list()
+        .unwrap();
+
+    let results = g
+        .v(())
+        .has_label("drop_step_test")
+        .count()
+        .to_list()
+        .unwrap();
+
+    assert_eq!(0, results[0]);
+}
