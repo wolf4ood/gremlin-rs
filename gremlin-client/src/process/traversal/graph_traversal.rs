@@ -169,6 +169,13 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self.terminator.to_list(self)
     }
 
+    pub fn next(&self) -> T::Next {
+        self.terminator.next(self)
+    }
+    pub fn has_next(&self) -> T::HasNext {
+        self.terminator.has_next(self)
+    }
+
     pub fn from<A>(mut self, target: A) -> Self
     where
         A: Into<Either2<String, Vertex>>,

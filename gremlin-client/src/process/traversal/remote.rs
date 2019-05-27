@@ -32,8 +32,24 @@ impl MockTerminator {
 }
 impl<T: FromGValue> Terminator<T> for MockTerminator {
     type List = ();
+    type Next = ();
+    type HasNext = ();
 
     fn to_list<S, E>(&self, _traversal: &GraphTraversal<S, T, E>) -> Self::List
+    where
+        E: Terminator<T>,
+    {
+        unimplemented!()
+    }
+
+    fn next<S, E>(&self, _traversal: &GraphTraversal<S, T, E>) -> Self::Next
+    where
+        E: Terminator<T>,
+    {
+        unimplemented!()
+    }
+
+    fn has_next<S, E>(&self, _traversal: &GraphTraversal<S, T, E>) -> Self::HasNext
     where
         E: Terminator<T>,
     {
@@ -42,8 +58,18 @@ impl<T: FromGValue> Terminator<T> for MockTerminator {
 }
 pub trait Terminator<T: FromGValue>: Clone {
     type List;
+    type Next;
+    type HasNext;
 
     fn to_list<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::List
+    where
+        E: Terminator<T>;
+
+    fn next<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::Next
+    where
+        E: Terminator<T>;
+
+    fn has_next<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::HasNext
     where
         E: Terminator<T>;
 }
@@ -61,11 +87,31 @@ impl SyncTerminator {
 
 impl<T: FromGValue> Terminator<T> for SyncTerminator {
     type List = GremlinResult<Vec<T>>;
+    type Next = GremlinResult<Option<T>>;
+    type HasNext = GremlinResult<bool>;
 
     fn to_list<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::List
     where
         E: Terminator<T>,
     {
         self.strategies.apply(traversal)?.collect()
+    }
+
+    fn next<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::Next
+    where
+        E: Terminator<T>,
+    {
+        let results: GremlinResult<Vec<T>> = self.strategies.apply(traversal)?.collect();
+
+        Ok(results?.into_iter().next())
+    }
+
+    fn has_next<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::HasNext
+    where
+        E: Terminator<T>,
+    {
+        let results: GremlinResult<Vec<T>> = self.strategies.apply(traversal)?.collect();
+
+        Ok(results?.iter().next().is_some())
     }
 }

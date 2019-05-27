@@ -1121,22 +1121,17 @@ fn drop_step_test() {
 
     g.add_v("drop_step_test")
         .property("name", "a")
-        .to_list()
+        .next()
         .unwrap();
 
     g.add_v("drop_step_test")
         .property("name", "b")
-        .to_list()
+        .next()
         .unwrap();
 
-    let results = g
-        .v(())
-        .has_label("drop_step_test")
-        .count()
-        .to_list()
-        .unwrap();
+    let results = g.v(()).has_label("drop_step_test").count().next().unwrap();
 
-    assert_eq!(2, results[0]);
+    assert_eq!(Some(2), results);
 
     g.v(())
         .has_label("drop_step_test")
@@ -1144,12 +1139,7 @@ fn drop_step_test() {
         .to_list()
         .unwrap();
 
-    let results = g
-        .v(())
-        .has_label("drop_step_test")
-        .count()
-        .to_list()
-        .unwrap();
+    let results = g.v(()).has_label("drop_step_test").has_next().unwrap();
 
-    assert_eq!(0, results[0]);
+    assert_eq!(false, results);
 }
