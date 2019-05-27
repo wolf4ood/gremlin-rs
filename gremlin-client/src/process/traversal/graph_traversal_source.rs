@@ -834,7 +834,7 @@ mod tests {
         );
     }
 
-    #[test] 
+    #[test]
     fn drop_test() {
         let g = empty();
 
