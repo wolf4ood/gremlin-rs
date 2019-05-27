@@ -32,6 +32,25 @@
 //!
 //! ```
 //!
+//! Here it is an example with traversal:
+//!
+//! ```rust,no_run
+//!     
+//! use gremlin_client::{GremlinClient, Vertex, process::traversal::traversal};
+//!
+//! fn main() -> Result<(), Box<std::error::Error>> {
+//!    let client = GremlinClient::connect("localhost")?;
+//!
+//!    let g = traversal().with_remote(client);
+//!
+//!    let results = g.v(()).has_label("person").has(("name","Jon")).to_list()?;   
+//!    
+//!    println!("{:?}", results);
+//!    Ok(())
+//!}
+//!
+//!
+//! ```
 
 mod client;
 mod connection;
