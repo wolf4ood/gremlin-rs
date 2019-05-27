@@ -181,7 +181,7 @@ mod tests {
             ],
         );
 
-        assert_eq!(&code, g.v({}).has(("person", "name", "marko")).bytecode());
+        assert_eq!(&code, g.v(()).has(("person", "name", "marko")).bytecode());
 
         // has with 1 param
 
@@ -190,7 +190,7 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("has"), vec![String::from("name").into()]);
 
-        assert_eq!(&code, g.v({}).has("name").bytecode());
+        assert_eq!(&code, g.v(()).has("name").bytecode());
 
         // hasNot
 
@@ -199,7 +199,7 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("hasNot"), vec![String::from("name").into()]);
 
-        assert_eq!(&code, g.v({}).has_not("name").bytecode());
+        assert_eq!(&code, g.v(()).has_not("name").bytecode());
     }
 
     #[test]
@@ -308,7 +308,7 @@ mod tests {
 
         code.add_step(String::from("addV"), vec![]);
 
-        assert_eq!(&code, g.add_v({}).bytecode());
+        assert_eq!(&code, g.add_v(()).bytecode());
     }
 
     #[test]
@@ -357,7 +357,7 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("as"), vec![String::from("a").into()]);
 
-        assert_eq!(&code, g.v({}).as_("a").bytecode());
+        assert_eq!(&code, g.v(()).as_("a").bytecode());
     }
 
     #[test]
@@ -369,7 +369,7 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("label"), vec![]);
 
-        assert_eq!(&code, g.v({}).label().bytecode());
+        assert_eq!(&code, g.v(()).label().bytecode());
     }
 
     #[test]
@@ -381,7 +381,7 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("properties"), vec![]);
 
-        assert_eq!(&code, g.v({}).properties({}).bytecode());
+        assert_eq!(&code, g.v(()).properties(()).bytecode());
 
         let mut code = Bytecode::new();
 
@@ -391,7 +391,7 @@ mod tests {
             vec![String::from("name").into()],
         );
 
-        assert_eq!(&code, g.v({}).properties("name").bytecode());
+        assert_eq!(&code, g.v(()).properties("name").bytecode());
 
         let mut code = Bytecode::new();
 
@@ -404,11 +404,11 @@ mod tests {
         // with vec
         assert_eq!(
             &code,
-            g.v({}).properties(vec!["name", "surname"]).bytecode()
+            g.v(()).properties(vec!["name", "surname"]).bytecode()
         );
 
         // without vec
-        assert_eq!(&code, g.v({}).properties(["name", "surname"]).bytecode());
+        assert_eq!(&code, g.v(()).properties(["name", "surname"]).bytecode());
     }
 
     #[test]
@@ -420,7 +420,7 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("propertyMap"), vec![]);
 
-        assert_eq!(&code, g.v({}).property_map({}).bytecode());
+        assert_eq!(&code, g.v(()).property_map(()).bytecode());
 
         let mut code = Bytecode::new();
 
@@ -430,7 +430,7 @@ mod tests {
             vec![String::from("name").into()],
         );
 
-        assert_eq!(&code, g.v({}).property_map("name").bytecode());
+        assert_eq!(&code, g.v(()).property_map("name").bytecode());
 
         let mut code = Bytecode::new();
 
@@ -443,11 +443,11 @@ mod tests {
         // with vec
         assert_eq!(
             &code,
-            g.v({}).property_map(vec!["name", "surname"]).bytecode()
+            g.v(()).property_map(vec!["name", "surname"]).bytecode()
         );
 
         // without vec
-        assert_eq!(&code, g.v({}).property_map(["name", "surname"]).bytecode());
+        assert_eq!(&code, g.v(()).property_map(["name", "surname"]).bytecode());
     }
 
     #[test]
@@ -459,14 +459,14 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("values"), vec![]);
 
-        assert_eq!(&code, g.v({}).values({}).bytecode());
+        assert_eq!(&code, g.v(()).values(()).bytecode());
 
         let mut code = Bytecode::new();
 
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("values"), vec![String::from("name").into()]);
 
-        assert_eq!(&code, g.v({}).values("name").bytecode());
+        assert_eq!(&code, g.v(()).values("name").bytecode());
 
         let mut code = Bytecode::new();
 
@@ -477,10 +477,10 @@ mod tests {
         );
 
         // with vec
-        assert_eq!(&code, g.v({}).values(vec!["name", "surname"]).bytecode());
+        assert_eq!(&code, g.v(()).values(vec!["name", "surname"]).bytecode());
 
         // without vec
-        assert_eq!(&code, g.v({}).values(["name", "surname"]).bytecode());
+        assert_eq!(&code, g.v(()).values(["name", "surname"]).bytecode());
     }
 
     #[test]
@@ -492,14 +492,14 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("valueMap"), vec![]);
 
-        assert_eq!(&code, g.v({}).value_map({}).bytecode());
+        assert_eq!(&code, g.v(()).value_map(()).bytecode());
 
         let mut code = Bytecode::new();
 
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("valueMap"), vec![String::from("name").into()]);
 
-        assert_eq!(&code, g.v({}).value_map("name").bytecode());
+        assert_eq!(&code, g.v(()).value_map("name").bytecode());
 
         let mut code = Bytecode::new();
 
@@ -509,9 +509,9 @@ mod tests {
             vec![String::from("name").into(), String::from("surname").into()],
         );
 
-        assert_eq!(&code, g.v({}).value_map(vec!["name", "surname"]).bytecode());
+        assert_eq!(&code, g.v(()).value_map(vec!["name", "surname"]).bytecode());
 
-        assert_eq!(&code, g.v({}).value_map(["name", "surname"]).bytecode());
+        assert_eq!(&code, g.v(()).value_map(["name", "surname"]).bytecode());
     }
 
     #[test]
@@ -523,7 +523,7 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("count"), vec![]);
 
-        assert_eq!(&code, g.v({}).count().bytecode());
+        assert_eq!(&code, g.v(()).count().bytecode());
     }
 
     #[test]
@@ -535,7 +535,7 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("groupCount"), vec![]);
 
-        assert_eq!(&code, g.v({}).group_count().bytecode());
+        assert_eq!(&code, g.v(()).group_count().bytecode());
     }
 
     #[test]
@@ -548,7 +548,7 @@ mod tests {
         code.add_step(String::from("groupCount"), vec![]);
         code.add_step(String::from("by"), vec![]);
 
-        assert_eq!(&code, g.v({}).group_count().by({}).bytecode());
+        assert_eq!(&code, g.v(()).group_count().by(()).bytecode());
 
         let mut code = Bytecode::new();
 
@@ -556,7 +556,7 @@ mod tests {
         code.add_step(String::from("groupCount"), vec![]);
         code.add_step(String::from("by"), vec!["name".into()]);
 
-        assert_eq!(&code, g.v({}).group_count().by("name").bytecode());
+        assert_eq!(&code, g.v(()).group_count().by("name").bytecode());
 
         let mut code = Bytecode::new();
 
@@ -564,7 +564,7 @@ mod tests {
         code.add_step(String::from("groupCount"), vec![]);
         code.add_step(String::from("by"), vec![T::Label.into()]);
 
-        assert_eq!(&code, g.v({}).group_count().by(T::Label).bytecode());
+        assert_eq!(&code, g.v(()).group_count().by(T::Label).bytecode());
     }
 
     #[test]
@@ -577,7 +577,7 @@ mod tests {
         code.add_step(String::from("group"), vec![]);
         code.add_step(String::from("by"), vec![]);
 
-        assert_eq!(&code, g.v({}).group().by({}).bytecode());
+        assert_eq!(&code, g.v(()).group().by(()).bytecode());
 
         let mut code = Bytecode::new();
 
@@ -585,7 +585,7 @@ mod tests {
         code.add_step(String::from("group"), vec![]);
         code.add_step(String::from("by"), vec!["name".into()]);
 
-        assert_eq!(&code, g.v({}).group().by("name").bytecode());
+        assert_eq!(&code, g.v(()).group().by("name").bytecode());
 
         let mut code = Bytecode::new();
 
@@ -593,7 +593,7 @@ mod tests {
         code.add_step(String::from("group"), vec![]);
         code.add_step(String::from("by"), vec![T::Label.into()]);
 
-        assert_eq!(&code, g.v({}).group().by(T::Label).bytecode());
+        assert_eq!(&code, g.v(()).group().by(T::Label).bytecode());
 
         let mut code = Bytecode::new();
 
@@ -607,7 +607,7 @@ mod tests {
 
         assert_eq!(
             &code,
-            g.v({}).group().by(T::Label).by(__.count()).bytecode()
+            g.v(()).group().by(T::Label).by(__.count()).bytecode()
         );
     }
 
@@ -620,7 +620,7 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("select"), vec!["name".into()]);
 
-        assert_eq!(&code, g.v({}).select("name").bytecode());
+        assert_eq!(&code, g.v(()).select("name").bytecode());
 
         let mut code = Bytecode::new();
 
@@ -630,9 +630,9 @@ mod tests {
             vec!["name".into(), "surname".into()],
         );
 
-        assert_eq!(&code, g.v({}).select(vec!["name", "surname"]).bytecode());
+        assert_eq!(&code, g.v(()).select(vec!["name", "surname"]).bytecode());
 
-        assert_eq!(&code, g.v({}).select(["name", "surname"]).bytecode());
+        assert_eq!(&code, g.v(()).select(["name", "surname"]).bytecode());
     }
 
     #[test]
@@ -645,7 +645,7 @@ mod tests {
         code.add_step(String::from("values"), vec!["name".into()]);
         code.add_step(String::from("fold"), vec![]);
 
-        assert_eq!(&code, g.v({}).values("name").fold().bytecode());
+        assert_eq!(&code, g.v(()).values("name").fold().bytecode());
     }
 
     #[test]
@@ -658,7 +658,7 @@ mod tests {
         code.add_step(String::from("propertyMap"), vec![]);
         code.add_step(String::from("unfold"), vec![]);
 
-        assert_eq!(&code, g.v({}).property_map({}).unfold().bytecode());
+        assert_eq!(&code, g.v(()).property_map(()).unfold().bytecode());
     }
 
     #[test]
@@ -670,7 +670,7 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("path"), vec![]);
 
-        assert_eq!(&code, g.v({}).path().bytecode());
+        assert_eq!(&code, g.v(()).path().bytecode());
     }
 
     #[test]
@@ -682,7 +682,7 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("limit"), vec![GValue::Int64(1)]);
 
-        assert_eq!(&code, g.v({}).limit(1).bytecode());
+        assert_eq!(&code, g.v(()).limit(1).bytecode());
     }
 
     #[test]
@@ -695,7 +695,7 @@ mod tests {
         code.add_step(String::from("values"), vec![]);
         code.add_step(String::from("dedup"), vec![]);
 
-        assert_eq!(&code, g.v({}).values({}).dedup({}).bytecode());
+        assert_eq!(&code, g.v(()).values(()).dedup(()).bytecode());
     }
 
     #[test]
@@ -709,7 +709,7 @@ mod tests {
         code.add_step(String::from("values"), vec!["test".into()]);
         code.add_step(String::from("sum"), vec![Scope::Global.into()]);
 
-        assert_eq!(&code, g.v({}).values("test").sum({}).bytecode());
+        assert_eq!(&code, g.v(()).values("test").sum(()).bytecode());
 
         // max
         let mut code = Bytecode::new();
@@ -718,7 +718,7 @@ mod tests {
         code.add_step(String::from("values"), vec!["test".into()]);
         code.add_step(String::from("max"), vec![Scope::Global.into()]);
 
-        assert_eq!(&code, g.v({}).values("test").max({}).bytecode());
+        assert_eq!(&code, g.v(()).values("test").max(()).bytecode());
 
         // mean
 
@@ -728,7 +728,7 @@ mod tests {
         code.add_step(String::from("values"), vec!["test".into()]);
         code.add_step(String::from("mean"), vec![Scope::Global.into()]);
 
-        assert_eq!(&code, g.v({}).values("test").mean({}).bytecode());
+        assert_eq!(&code, g.v(()).values("test").mean(()).bytecode());
 
         // min
 
@@ -738,7 +738,7 @@ mod tests {
         code.add_step(String::from("values"), vec!["test".into()]);
         code.add_step(String::from("min"), vec![Scope::Global.into()]);
 
-        assert_eq!(&code, g.v({}).values("test").min({}).bytecode());
+        assert_eq!(&code, g.v(()).values("test").min(()).bytecode());
     }
 
     #[test]
@@ -752,7 +752,7 @@ mod tests {
         code.add_step(String::from("values"), vec!["age".into()]);
         code.add_step(String::from("where"), vec![P::eq(23).into()]);
 
-        assert_eq!(&code, g.v({}).values("age").where_(P::eq(23)).bytecode());
+        assert_eq!(&code, g.v(()).values("age").where_(P::eq(23)).bytecode());
     }
 
     #[test]
@@ -768,7 +768,7 @@ mod tests {
             vec![__.has_label("person").bytecode().clone().into()],
         );
 
-        assert_eq!(&code, g.v({}).not(__.has_label("person")).bytecode());
+        assert_eq!(&code, g.v(()).not(__.has_label("person")).bytecode());
     }
 
     #[test]
@@ -781,7 +781,7 @@ mod tests {
         code.add_step(String::from("values"), vec!["name".into()]);
         code.add_step(String::from("order"), vec![Scope::Global.into()]);
 
-        assert_eq!(&code, g.v({}).values("name").order({}).bytecode());
+        assert_eq!(&code, g.v(()).values("name").order(()).bytecode());
 
         let mut code = Bytecode::new();
 
@@ -792,7 +792,7 @@ mod tests {
 
         assert_eq!(
             &code,
-            g.v({}).values("name").order({}).by(Order::Desc).bytecode()
+            g.v(()).values("name").order(()).by(Order::Desc).bytecode()
         );
     }
 
@@ -806,8 +806,8 @@ mod tests {
         code.add_step(
             String::from("match"),
             vec![
-                __.as_("a").out({}).as_("b").bytecode().clone().into(),
-                __.as_("b").out({}).as_("c").bytecode().clone().into(),
+                __.as_("a").out(()).as_("b").bytecode().clone().into(),
+                __.as_("b").out(()).as_("c").bytecode().clone().into(),
             ],
         );
         code.add_step(String::from("select"), vec!["a".into(), "c".into()]);
@@ -815,10 +815,10 @@ mod tests {
         // with vec
         assert_eq!(
             &code,
-            g.v({})
+            g.v(())
                 .match_(vec![
-                    __.as_("a").out({}).as_("b"),
-                    __.as_("b").out({}).as_("c")
+                    __.as_("a").out(()).as_("b"),
+                    __.as_("b").out(()).as_("c")
                 ])
                 .select(vec!["a", "c"])
                 .bytecode()
@@ -827,14 +827,14 @@ mod tests {
         // without vec
         assert_eq!(
             &code,
-            g.v({})
-                .match_([__.as_("a").out({}).as_("b"), __.as_("b").out({}).as_("c")])
+            g.v(())
+                .match_([__.as_("a").out(()).as_("b"), __.as_("b").out(()).as_("c")])
                 .select(["a", "c"])
                 .bytecode()
         );
     }
 
-    #[test]
+    #[test] 
     fn drop_test() {
         let g = empty();
 
@@ -843,6 +843,6 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("drop"), vec![]);
 
-        assert_eq!(&code, g.v({}).drop().bytecode());
+        assert_eq!(&code, g.v(()).drop().bytecode());
     }
 }
