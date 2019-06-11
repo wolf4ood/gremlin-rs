@@ -259,8 +259,17 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
     where
         T: Terminator<Map>,
     {
-        self.builder = self.builder.group();
+        self.builder = self.builder.group(None);
         GraphTraversal::new(self.terminator, self.builder)
+    }
+
+    pub fn group_as<A>(mut self, key: A) -> GraphTraversal<S, E, T>
+    where
+        T: Terminator<Map>,
+        A: Into<String>,
+    {
+        self.builder = self.builder.group(Some(key.into()));
+        self
     }
 
     pub fn by<A>(mut self, step: A) -> Self

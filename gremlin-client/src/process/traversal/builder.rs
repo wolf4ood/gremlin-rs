@@ -248,8 +248,13 @@ impl TraversalBuilder {
         self
     }
 
-    pub fn group(mut self) -> Self {
-        self.bytecode.add_step(String::from("group"), vec![]);
+    pub fn group(mut self, key: Option<String>) -> Self {
+        let mut params = vec![];
+
+        if let Some(k) = key {
+            params.push(k.into());
+        }
+        self.bytecode.add_step(String::from("group"), params);
         self
     }
 

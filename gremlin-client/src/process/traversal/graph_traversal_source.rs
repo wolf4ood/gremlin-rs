@@ -616,6 +616,14 @@ mod tests {
             &code,
             g.v(()).group().by(T::Label).by(__.count()).bytecode()
         );
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("group"), vec!["m".into()]);
+        code.add_step(String::from("by"), vec![T::Label.into()]);
+
+        assert_eq!(&code, g.v(()).group_as("m").by(T::Label).bytecode());
     }
 
     #[test]
