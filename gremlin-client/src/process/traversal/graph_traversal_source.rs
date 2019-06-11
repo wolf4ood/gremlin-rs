@@ -536,6 +536,13 @@ mod tests {
         code.add_step(String::from("groupCount"), vec![]);
 
         assert_eq!(&code, g.v(()).group_count().bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("groupCount"), vec!["m".into()]);
+
+        assert_eq!(&code, g.v(()).group_count_as("m").bytecode());
     }
 
     #[test]

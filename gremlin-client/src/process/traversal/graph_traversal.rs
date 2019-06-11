@@ -242,8 +242,17 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
     where
         T: Terminator<Map>,
     {
-        self.builder = self.builder.group_count();
+        self.builder = self.builder.group_count(None);
         GraphTraversal::new(self.terminator, self.builder)
+    }
+
+    pub fn group_count_as<A>(mut self, key: A) -> GraphTraversal<S, E, T>
+    where
+        T: Terminator<Map>,
+        A: Into<String>,
+    {
+        self.builder = self.builder.group_count(Some(key.into()));
+        self
     }
 
     pub fn group(mut self) -> GraphTraversal<S, Map, T>
