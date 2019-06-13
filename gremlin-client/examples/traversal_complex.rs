@@ -43,9 +43,7 @@ fn main() -> Result<(), Box<std::error::Error>> {
         .has(("number", P::within((3, 6))))
         .to_list()?;
 
-
     println!("Found {} vertices with number 3 or 6", results.len());
-
 
     let results = g
         .v(())
