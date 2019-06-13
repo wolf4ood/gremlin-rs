@@ -1,6 +1,7 @@
 use crate::client::GremlinClient;
 use crate::conversion::FromGValue;
 use crate::process::traversal::strategies::TraversalStrategies;
+use crate::process::traversal::RemoteTraversalIterator;
 use crate::process::traversal::{GraphTraversal, GraphTraversalSource};
 use crate::GremlinResult;
 
@@ -34,6 +35,7 @@ impl<T: FromGValue> Terminator<T> for MockTerminator {
     type List = ();
     type Next = ();
     type HasNext = ();
+    type Iter = ();
 
     fn to_list<S, E>(&self, _traversal: &GraphTraversal<S, T, E>) -> Self::List
     where
@@ -55,11 +57,19 @@ impl<T: FromGValue> Terminator<T> for MockTerminator {
     {
         unimplemented!()
     }
+
+    fn iter<S, E>(&self, _traversal: &GraphTraversal<S, T, E>) -> Self::Iter
+    where
+        E: Terminator<T>,
+    {
+        unimplemented!()
+    }
 }
 pub trait Terminator<T: FromGValue>: Clone {
     type List;
     type Next;
     type HasNext;
+    type Iter;
 
     fn to_list<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::List
     where
@@ -70,6 +80,10 @@ pub trait Terminator<T: FromGValue>: Clone {
         E: Terminator<T>;
 
     fn has_next<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::HasNext
+    where
+        E: Terminator<T>;
+
+    fn iter<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::Iter
     where
         E: Terminator<T>;
 }
@@ -89,6 +103,7 @@ impl<T: FromGValue> Terminator<T> for SyncTerminator {
     type List = GremlinResult<Vec<T>>;
     type Next = GremlinResult<Option<T>>;
     type HasNext = GremlinResult<bool>;
+    type Iter = GremlinResult<RemoteTraversalIterator<T>>;
 
     fn to_list<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::List
     where
@@ -113,5 +128,12 @@ impl<T: FromGValue> Terminator<T> for SyncTerminator {
         let results: GremlinResult<Vec<T>> = self.strategies.apply(traversal)?.collect();
 
         Ok(results?.iter().next().is_some())
+    }
+
+    fn iter<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::Iter
+    where
+        E: Terminator<T>,
+    {
+        self.strategies.apply(traversal)
     }
 }

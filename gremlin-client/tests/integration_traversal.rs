@@ -1143,3 +1143,32 @@ fn drop_step_test() {
 
     assert_eq!(false, results);
 }
+
+#[test]
+fn iter_terminator_test() {
+    let client = graph();
+
+    drop_vertices(&client, "iter_terminator_test").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    g.add_v("iter_terminator_test")
+        .property("name", "a")
+        .next()
+        .unwrap();
+
+    g.add_v("iter_terminator_test")
+        .property("name", "b")
+        .next()
+        .unwrap();
+
+    let results: Vec<Vertex> = g
+        .v(())
+        .has_label("iter_terminator_test")
+        .iter()
+        .unwrap()
+        .filter_map(Result::ok)
+        .collect();
+
+    assert_eq!(2, results.len())
+}

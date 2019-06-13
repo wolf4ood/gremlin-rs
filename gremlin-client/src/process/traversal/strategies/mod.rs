@@ -1,10 +1,10 @@
 mod remote;
+use crate::conversion::FromGValue;
 use crate::process::traversal::remote::Terminator;
 use crate::process::traversal::GraphTraversal;
+use crate::process::traversal::RemoteTraversalIterator;
 use crate::{GremlinError, GremlinResult};
 pub use remote::RemoteStrategy;
-
-use crate::conversion::FromGValue;
 
 #[derive(Clone)]
 pub enum TraversalStrategy {
@@ -15,7 +15,7 @@ impl TraversalStrategy {
     pub(crate) fn apply<S, E: FromGValue, A>(
         &self,
         traversal: &GraphTraversal<S, E, A>,
-    ) -> GremlinResult<impl Iterator<Item = GremlinResult<E>>>
+    ) -> GremlinResult<RemoteTraversalIterator<E>>
     where
         A: Terminator<E>,
     {
@@ -41,7 +41,7 @@ impl TraversalStrategies {
     pub(crate) fn apply<S, E: FromGValue, A>(
         &self,
         traversal: &GraphTraversal<S, E, A>,
-    ) -> GremlinResult<impl Iterator<Item = GremlinResult<E>>>
+    ) -> GremlinResult<RemoteTraversalIterator<E>>
     where
         A: Terminator<E>,
     {

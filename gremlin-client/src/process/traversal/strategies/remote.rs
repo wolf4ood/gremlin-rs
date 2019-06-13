@@ -19,7 +19,7 @@ impl RemoteStrategy {
     pub(crate) fn apply<S, E: FromGValue, A>(
         &self,
         traversal: &GraphTraversal<S, E, A>,
-    ) -> GremlinResult<impl Iterator<Item = GremlinResult<E>>>
+    ) -> GremlinResult<RemoteTraversalIterator<E>>
     where
         A: Terminator<E>,
     {
