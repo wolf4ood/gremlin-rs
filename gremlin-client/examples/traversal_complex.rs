@@ -1,5 +1,5 @@
 use gremlin_client::{
-    process::traversal::{traversal, GraphTraversalSource, SyncTerminator},
+    process::traversal::{traversal, GraphTraversalSource, SyncTerminator, __},
     structure::{List, Vertex, P},
     GremlinClient,
 };
@@ -43,7 +43,20 @@ fn main() -> Result<(), Box<std::error::Error>> {
         .has(("number", P::within((3, 6))))
         .to_list()?;
 
+
     println!("Found {} vertices with number 3 or 6", results.len());
+
+
+    let results = g
+        .v(())
+        .has_label("complex_vertex")
+        .where_(__.out("complex_label").count().is(P::gte(1)))
+        .to_list()?;
+
+    println!(
+        "Found {} vertices with 1 or more connected edges with label complex_label",
+        results.len()
+    );
 
     Ok(())
 }
