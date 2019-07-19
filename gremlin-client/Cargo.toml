@@ -30,7 +30,7 @@ lazy_static = "1.3.0"
 
 
 [dependencies.websocket]
-version="0.22"
+version="0.23"
 default-features = false 
 features = ["sync","sync-ssl"]
 
