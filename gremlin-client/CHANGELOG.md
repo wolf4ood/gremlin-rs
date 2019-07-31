@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [#1](https://github.com/wolf4ood/gremlin-rs/issues/1) Implemented SASL Authentication
 
 ### Fixed
 
