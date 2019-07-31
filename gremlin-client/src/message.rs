@@ -31,8 +31,17 @@ pub struct ReponseStatus {
 }
 
 pub fn message_with_args<T>(op: String, processor: String, args: T) -> Message<T> {
+    message_with_args_and_uuid(op, processor, Uuid::new_v4(), args)
+}
+
+pub fn message_with_args_and_uuid<T>(
+    op: String,
+    processor: String,
+    id: Uuid,
+    args: T,
+) -> Message<T> {
     Message {
-        request_id: Uuid::new_v4(),
+        request_id: id,
         op,
         processor,
         args,

@@ -95,6 +95,14 @@ impl ConnectionOptionsBuilder {
     pub fn build(self) -> ConnectionOptions {
         self.0
     }
+
+    pub fn credentials(mut self, username: &str, password: &str) -> Self {
+        self.0.credentials = Some(Credentials {
+            username: String::from(username),
+            password: String::from(password),
+        });
+        self
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -102,6 +110,13 @@ pub struct ConnectionOptions {
     pub(crate) host: String,
     pub(crate) port: u16,
     pub(crate) pool_size: u32,
+    pub(crate) credentials: Option<Credentials>,
+}
+
+#[derive(Clone, Debug)]
+pub(crate) struct Credentials {
+    pub(crate) username: String,
+    pub(crate) password: String,
 }
 
 impl Default for ConnectionOptions {
@@ -110,6 +125,7 @@ impl Default for ConnectionOptions {
             host: String::from("localhost"),
             port: 8182,
             pool_size: 10,
+            credentials: None,
         }
     }
 }

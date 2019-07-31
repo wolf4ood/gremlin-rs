@@ -6,6 +6,7 @@ fn main() -> Result<(), Box<std::error::Error>> {
             .host("localhost")
             .port(8182)
             .pool_size(1)
+            .credentials("stephen", "password")
             .build(),
     )?;
 

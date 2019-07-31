@@ -1,7 +1,8 @@
-use gremlin_client::{Edge, GValue, Map, Vertex};
 use gremlin_client::{
-    GremlinError, List, ToGValue, TraversalExplanation, TraversalMetrics, VertexProperty,
+    ConnectionOptions, GremlinClient, GremlinError, List, ToGValue, TraversalExplanation,
+    TraversalMetrics, VertexProperty,
 };
+use gremlin_client::{Edge, GValue, Map, Vertex};
 
 mod common;
 
@@ -21,6 +22,36 @@ fn test_empty_query() {
             .expect("It should execute a traversal")
             .count()
     )
+}
+
+#[test]
+fn test_ok_credentials() {
+    let client = GremlinClient::connect(
+        ConnectionOptions::builder()
+            .host("localhost")
+            .port(8183)
+            .credentials("stephen", "password")
+            .build(),
+    )
+    .expect("Cannot connect");
+
+    let result = client.execute("g.V().limit(1)", &[]);
+    assert!(result.is_ok(), format!("{:?}", result));
+}
+
+#[test]
+fn test_ko_credentials() {
+    let client = GremlinClient::connect(
+        ConnectionOptions::builder()
+            .host("localhost")
+            .port(8183)
+            .credentials("stephen", "pwd")
+            .build(),
+    )
+    .expect("Cannot connect");
+
+    let result = client.execute("g.V().limit(1)", &[]);
+    assert!(result.is_err(), format!("{:?}", result));
 }
 
 #[test]
