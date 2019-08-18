@@ -21,9 +21,15 @@ addons:
       - libiberty-dev
 
 
+
 env:
   - GREMLIN_SERVER=3.4.2
   - GREMLIN_SERVER=3.4.3
+
+
+matrix:
+  allow_failures:
+    - rust: nightly
 
 before_install:
   - rustup component add rustfmt
