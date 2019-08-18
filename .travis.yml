@@ -22,8 +22,8 @@ addons:
 
 
 env:
-  - GREMLIN_SERVER=3.4.0
-  - GREMLIN_SERVER=3.4.1
+  - GREMLIN_SERVER=3.4.2
+  - GREMLIN_SERVER=3.4.3
 
 before_install:
   - rustup component add rustfmt
