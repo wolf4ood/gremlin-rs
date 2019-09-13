@@ -31,6 +31,7 @@ fn test_ok_credentials() {
             .host("localhost")
             .port(8183)
             .credentials("stephen", "password")
+            .ssl(true)
             .build(),
     )
     .expect("Cannot connect");
@@ -46,6 +47,7 @@ fn test_ko_credentials() {
             .host("localhost")
             .port(8183)
             .credentials("stephen", "pwd")
+            .ssl(true)
             .build(),
     )
     .expect("Cannot connect");
