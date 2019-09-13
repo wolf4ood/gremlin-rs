@@ -1,6 +1,6 @@
 use gremlin_client::{process::traversal::traversal, GremlinClient};
 
-fn main() -> Result<(), Box<std::error::Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = GremlinClient::connect("localhost")?;
 
     let g = traversal().with_remote(client);

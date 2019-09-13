@@ -4,7 +4,7 @@ use gremlin_client::{
     GremlinClient,
 };
 
-fn main() -> Result<(), Box<std::error::Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = GremlinClient::connect("localhost")?;
 
     let g = traversal().with_remote(client);
@@ -59,7 +59,7 @@ fn main() -> Result<(), Box<std::error::Error>> {
     Ok(())
 }
 
-fn create_graph(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>> {
+fn create_graph(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<dyn std::error::Error>> {
     g.v(()).has_label("complex_vertex").drop().next()?;
     g.e(()).has_label("complex_label").drop().next()?;
 

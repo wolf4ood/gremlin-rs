@@ -1,6 +1,6 @@
 use gremlin_client::{Edge, GremlinClient};
 
-fn main() -> Result<(), Box<std::error::Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = GremlinClient::connect("localhost")?;
 
     // Find outgoing edges for V[1]

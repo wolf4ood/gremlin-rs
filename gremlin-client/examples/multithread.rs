@@ -1,7 +1,7 @@
 use gremlin_client::{GremlinClient, Vertex};
 use std::thread;
 
-fn main() -> Result<(), Box<std::error::Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = GremlinClient::connect("localhost")?;
 
     let c = client.clone();

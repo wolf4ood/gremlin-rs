@@ -1,6 +1,6 @@
 use gremlin_client::{ConnectionOptions, GremlinClient, Vertex};
 
-fn main() -> Result<(), Box<std::error::Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = GremlinClient::connect(
         ConnectionOptions::builder()
             .host("localhost")

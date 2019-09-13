@@ -1,6 +1,6 @@
 use gremlin_client::{GremlinClient, Map, Property};
 
-fn main() -> Result<(), Box<std::error::Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = GremlinClient::connect("localhost")?;
 
     let results = client
