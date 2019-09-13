@@ -1,7 +1,9 @@
 use crate::chapters::example;
 use gremlin_client::process::traversal::{GraphTraversalSource, SyncTerminator};
 
-pub fn chapter_331(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<dyn std::error::Error>> {
+pub fn chapter_331(
+    g: &GraphTraversalSource<SyncTerminator>,
+) -> Result<(), Box<dyn std::error::Error>> {
     let chapter = "3.3.1";
 
     example(&g, chapter, "Where can I fly to from Austin?", |g| {

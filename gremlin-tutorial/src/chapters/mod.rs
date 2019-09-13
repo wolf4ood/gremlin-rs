@@ -1,7 +1,8 @@
 use gremlin_client::process::traversal::{GraphTraversalSource, SyncTerminator};
 
-pub type TraversalExamples =
-    Vec<Box<dyn Fn(&GraphTraversalSource<SyncTerminator>) -> Result<(), Box<dyn std::error::Error>>>>;
+pub type TraversalExamples = Vec<
+    Box<dyn Fn(&GraphTraversalSource<SyncTerminator>) -> Result<(), Box<dyn std::error::Error>>>,
+>;
 
 mod ch310;
 mod ch311;

@@ -59,7 +59,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn create_graph(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<dyn std::error::Error>> {
+fn create_graph(
+    g: &GraphTraversalSource<SyncTerminator>,
+) -> Result<(), Box<dyn std::error::Error>> {
     g.v(()).has_label("complex_vertex").drop().next()?;
     g.e(()).has_label("complex_label").drop().next()?;
 
