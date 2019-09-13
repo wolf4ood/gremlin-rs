@@ -2,17 +2,13 @@ version: "3"
 services:
   gremlin-server:
     image: tinkerpop/gremlin-server:${GREMLIN_SERVER}
-    command : ["conf/gremlin-server-modern.yaml"]  
+    command : ["conf/gremlin-server-modern.yaml"]
     ports:
       - "8182:8182"
   gremlin-server-secure:
-    build:
-      context: "./credentials"
-      dockerfile: Dockerfile
-      args:
-        - GREMLIN_SERVER=${GREMLIN_SERVER}
-    command : ["conf/gremlin-server-credentials.yaml"]
+    image: tinkerpop/gremlin-server:${GREMLIN_SERVER}
+    volumes:
+      - ./credentials:/conf/
+    command : ["/conf/gremlin-server-credentials.yaml"]
     ports:
       - "8183:8182"
-
-        
