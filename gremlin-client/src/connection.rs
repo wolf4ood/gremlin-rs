@@ -12,9 +12,18 @@ impl std::fmt::Debug for ConnectionStream {
 
 impl ConnectionStream {
     fn connect(options: ConnectionOptions) -> GremlinResult<Self> {
+        let connector = match options.tls_options.as_ref() {
+            Some(option) => Some(
+                option
+                    .tls_connector()
+                    .map_err(|e| GremlinError::Generic(e.to_string()))?,
+            ),
+            _ => None,
+        };
+
         let client = ClientBuilder::new(&options.websocket_url())
             .map_err(|e| GremlinError::Generic(e.to_string()))?
-            .connect(None)?;
+            .connect(connector)?;
 
         Ok(ConnectionStream(client))
     }
@@ -94,6 +103,11 @@ impl ConnectionOptionsBuilder {
         self.0.ssl = ssl;
         self
     }
+
+    pub fn tls_options(mut self, options: TlsOptions) -> Self {
+        self.0.tls_options = Some(options);
+        self
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -103,12 +117,18 @@ pub struct ConnectionOptions {
     pub(crate) pool_size: u32,
     pub(crate) credentials: Option<Credentials>,
     pub(crate) ssl: bool,
+    pub(crate) tls_options: Option<TlsOptions>,
 }
 
 #[derive(Clone, Debug)]
 pub(crate) struct Credentials {
     pub(crate) username: String,
     pub(crate) password: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct TlsOptions {
+    pub accept_invalid_certs: bool,
 }
 
 impl Default for ConnectionOptions {
@@ -119,6 +139,7 @@ impl Default for ConnectionOptions {
             pool_size: 10,
             credentials: None,
             ssl: false,
+            tls_options: None,
         }
     }
 }
@@ -153,6 +174,14 @@ impl Connection {
     }
 }
 
+impl TlsOptions {
+    fn tls_connector(&self) -> native_tls::Result<TlsConnector> {
+        TlsConnector::builder()
+            .danger_accept_invalid_certs(self.accept_invalid_certs)
+            .build()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -167,9 +196,8 @@ mod tests {
         let options = ConnectionOptions {
             host: "localhost".into(),
             port: 8182,
-            pool_size: 10,
-            credentials: None,
             ssl: false,
+            ..Default::default()
         };
 
         assert_eq!(options.websocket_url(), "ws://localhost:8182/gremlin");
@@ -177,9 +205,8 @@ mod tests {
         let options = ConnectionOptions {
             host: "localhost".into(),
             port: 8182,
-            pool_size: 10,
-            credentials: None,
             ssl: true,
+            ..Default::default()
         };
 
         assert_eq!(options.websocket_url(), "wss://localhost:8182/gremlin");

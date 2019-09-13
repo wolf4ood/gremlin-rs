@@ -1,6 +1,6 @@
 use gremlin_client::{
-    ConnectionOptions, GremlinClient, GremlinError, List, ToGValue, TraversalExplanation,
-    TraversalMetrics, VertexProperty,
+    ConnectionOptions, GremlinClient, GremlinError, List, TlsOptions, ToGValue,
+    TraversalExplanation, TraversalMetrics, VertexProperty,
 };
 use gremlin_client::{Edge, GValue, Map, Vertex};
 
@@ -32,6 +32,9 @@ fn test_ok_credentials() {
             .port(8183)
             .credentials("stephen", "password")
             .ssl(true)
+            .tls_options(TlsOptions {
+                accept_invalid_certs: true,
+            })
             .build(),
     )
     .expect("Cannot connect");
@@ -48,6 +51,9 @@ fn test_ko_credentials() {
             .port(8183)
             .credentials("stephen", "pwd")
             .ssl(true)
+            .tls_options(TlsOptions {
+                accept_invalid_certs: true,
+            })
             .build(),
     )
     .expect("Cannot connect");

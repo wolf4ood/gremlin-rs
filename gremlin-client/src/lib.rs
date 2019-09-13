@@ -61,7 +61,7 @@ mod message;
 mod pool;
 
 pub use client::GremlinClient;
-pub use connection::ConnectionOptions;
+pub use connection::{ConnectionOptions, TlsOptions};
 pub use conversion::ToGValue;
 pub use error::GremlinError;
 
