@@ -2,7 +2,7 @@ use crate::chapters::example;
 use crate::chapters::TraversalExamples;
 use gremlin_client::process::traversal::{GraphTraversalSource, SyncTerminator};
 
-fn chapter_310(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>> {
+fn chapter_310(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<dyn std::error::Error>> {
     let chapter = "3.10";
 
     example(

@@ -9,7 +9,7 @@ use crate::chapters::TraversalExamples;
 
 use crate::chapters::example;
 
-fn chapter_32(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>> {
+fn chapter_32(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<dyn std::error::Error>> {
     let chapter = "3.2";
 
     example(&g, chapter, "Find vertices that are airports", |g| {

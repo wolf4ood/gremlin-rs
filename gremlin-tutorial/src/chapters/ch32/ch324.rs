@@ -3,7 +3,7 @@ use gremlin_client::process::traversal::__;
 use gremlin_client::process::traversal::{GraphTraversalSource, SyncTerminator};
 use gremlin_client::structure::T;
 
-pub fn chapter_324(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>> {
+pub fn chapter_324(g: &GraphTraversalSource<SyncTerminator>) -> Result<(), Box<dyn std::error::Error>> {
     let chapter = "3.2.4";
 
     example(

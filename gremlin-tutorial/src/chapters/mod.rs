@@ -1,7 +1,7 @@
 use gremlin_client::process::traversal::{GraphTraversalSource, SyncTerminator};
 
 pub type TraversalExamples =
-    Vec<Box<Fn(&GraphTraversalSource<SyncTerminator>) -> Result<(), Box<std::error::Error>>>>;
+    Vec<Box<dyn Fn(&GraphTraversalSource<SyncTerminator>) -> Result<(), Box<dyn std::error::Error>>>>;
 
 mod ch310;
 mod ch311;
@@ -17,9 +17,9 @@ fn example<T>(
     chapter: &str,
     description: &str,
     fun: T,
-) -> Result<(), Box<std::error::Error>>
+) -> Result<(), Box<dyn std::error::Error>>
 where
-    T: Fn(&GraphTraversalSource<SyncTerminator>) -> Result<String, Box<std::error::Error>>,
+    T: Fn(&GraphTraversalSource<SyncTerminator>) -> Result<String, Box<dyn std::error::Error>>,
 {
     println!("Chapter {} - {}", chapter, description);
 
