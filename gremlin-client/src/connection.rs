@@ -1,12 +1,8 @@
 use crate::{GremlinError, GremlinResult};
-use std::net::TcpStream;
-use websocket::{sync::Client, ClientBuilder, OwnedMessage};
+use native_tls::TlsConnector;
+use websocket::{stream::sync::NetworkStream, sync::Client, ClientBuilder, OwnedMessage};
 
-enum ConnectionStream {
-    TCP(Client<TcpStream>),
-    #[allow(dead_code)]
-    SSL,
-}
+struct ConnectionStream(Client<Box<dyn NetworkStream + Send>>);
 
 impl std::fmt::Debug for ConnectionStream {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -16,31 +12,21 @@ impl std::fmt::Debug for ConnectionStream {
 
 impl ConnectionStream {
     fn connect(options: ConnectionOptions) -> GremlinResult<Self> {
-        let address = format!("ws://{}:{}/gremlin", options.host, options.port);
-
-        let client = ClientBuilder::new(&address)
+        let client = ClientBuilder::new(&options.websocket_url())
             .map_err(|e| GremlinError::Generic(e.to_string()))?
-            .connect_insecure()?;
+            .connect(None)?;
 
-        Ok(ConnectionStream::TCP(client))
+        Ok(ConnectionStream(client))
     }
 
     fn send(&mut self, payload: Vec<u8>) -> GremlinResult<()> {
-        match self {
-            ConnectionStream::TCP(s) => s
-                .send_message(&OwnedMessage::Binary(payload))
-                .map_err(GremlinError::from),
-            ConnectionStream::SSL => unimplemented!(),
-        }
+        self.0
+            .send_message(&OwnedMessage::Binary(payload))
+            .map_err(GremlinError::from)
     }
 
     fn recv(&mut self) -> GremlinResult<Vec<u8>> {
-        let message = match self {
-            ConnectionStream::TCP(s) => s.recv_message()?,
-            ConnectionStream::SSL => unimplemented!(),
-        };
-
-        match message {
+        match self.0.recv_message()? {
             OwnedMessage::Binary(binary) => Ok(binary),
             _ => unimplemented!(),
         }
@@ -103,6 +89,11 @@ impl ConnectionOptionsBuilder {
         });
         self
     }
+
+    pub fn ssl(mut self, ssl: bool) -> Self {
+        self.0.ssl = ssl;
+        self
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -111,6 +102,7 @@ pub struct ConnectionOptions {
     pub(crate) port: u16,
     pub(crate) pool_size: u32,
     pub(crate) credentials: Option<Credentials>,
+    pub(crate) ssl: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -126,6 +118,7 @@ impl Default for ConnectionOptions {
             port: 8182,
             pool_size: 10,
             credentials: None,
+            ssl: false,
         }
     }
 }
@@ -133,6 +126,11 @@ impl Default for ConnectionOptions {
 impl ConnectionOptions {
     pub fn builder() -> ConnectionOptionsBuilder {
         ConnectionOptionsBuilder(ConnectionOptions::default())
+    }
+
+    pub fn websocket_url(&self) -> String {
+        let protocol = if self.ssl { "wss" } else { "ws" };
+        format!("{}://{}:{}/gremlin", protocol, self.host, self.port)
     }
 }
 
@@ -157,11 +155,33 @@ impl Connection {
 
 #[cfg(test)]
 mod tests {
-
-    use super::Connection;
+    use super::*;
 
     #[test]
     fn it_should_connect() {
         Connection::connect(("localhost", 8182)).unwrap();
+    }
+
+    #[test]
+    fn connection_option_build_url() {
+        let options = ConnectionOptions {
+            host: "localhost".into(),
+            port: 8182,
+            pool_size: 10,
+            credentials: None,
+            ssl: false,
+        };
+
+        assert_eq!(options.websocket_url(), "ws://localhost:8182/gremlin");
+
+        let options = ConnectionOptions {
+            host: "localhost".into(),
+            port: 8182,
+            pool_size: 10,
+            credentials: None,
+            ssl: true,
+        };
+
+        assert_eq!(options.websocket_url(), "wss://localhost:8182/gremlin");
     }
 }
