@@ -860,4 +860,16 @@ mod tests {
 
         assert_eq!(&code, g.v(()).drop().bytecode());
     }
+
+    #[test]
+    fn or_test() {
+        let g = empty();
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("or"), vec![]);
+
+        assert_eq!(&code, g.v(()).or().bytecode());
+    }
 }

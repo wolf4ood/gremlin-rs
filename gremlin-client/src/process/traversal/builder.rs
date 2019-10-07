@@ -401,4 +401,9 @@ impl TraversalBuilder {
         self.bytecode.add_step(String::from("drop"), vec![]);
         self
     }
+
+    pub fn or(mut self) -> Self {
+        self.bytecode.add_step(String::from("or"), vec![]);
+        self
+    }
 }

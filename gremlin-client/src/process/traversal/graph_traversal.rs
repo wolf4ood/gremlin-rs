@@ -418,4 +418,9 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self.builder = self.builder.drop();
         self
     }
+
+    pub fn or(mut self) -> Self {
+        self.builder = self.builder.or();
+        self
+    }
 }
