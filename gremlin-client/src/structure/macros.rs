@@ -74,5 +74,4 @@ mod test {
 
         assert_eq!(v1, Vertex::new(1.into(), "Person", properties));
     }
-
 }
