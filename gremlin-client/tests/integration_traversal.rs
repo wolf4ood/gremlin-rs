@@ -1164,10 +1164,24 @@ fn or_step_test() {
         .next()
         .unwrap();
 
-    let result = g.v(()).has_label("or_step_test").has(("foo", "bar")).or().has(("bar", "foo")).to_list().unwrap();
+    let result = g
+        .v(())
+        .has_label("or_step_test")
+        .has(("foo", "bar"))
+        .or()
+        .has(("bar", "foo"))
+        .to_list()
+        .unwrap();
     assert_eq!(result.len(), 1);
 
-    let result = g.v(()).has_label("or_step_test").has(("foo", "bar")).or().has(("bar", "nofoo")).to_list().unwrap();
+    let result = g
+        .v(())
+        .has_label("or_step_test")
+        .has(("foo", "bar"))
+        .or()
+        .has(("bar", "nofoo"))
+        .to_list()
+        .unwrap();
     assert_eq!(result.len(), 2);
 }
 
