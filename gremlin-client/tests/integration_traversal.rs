@@ -555,6 +555,12 @@ fn test_value_map() {
     let results = g.v(vertex.id()).value_map("fake").to_list().unwrap();
 
     assert_eq!(0, results[0].len());
+
+    let results = g.v(vertex.id()).value_map(true).to_list().unwrap();
+
+    assert_eq!(true, results[0].get("id").is_some());
+    assert_eq!(true, results[0].get("label").is_some());
+    assert_eq!(true, results[0].get("name").is_some());
 }
 
 #[test]
