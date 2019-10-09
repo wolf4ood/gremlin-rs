@@ -1,6 +1,6 @@
 pub enum LabelType {
     String_(String),
-    Bool(bool)
+    Bool(bool),
 }
 
 pub struct Labels(pub(crate) Vec<LabelType>);
@@ -19,13 +19,21 @@ impl Into<Labels> for () {
 
 impl Into<Labels> for Vec<&str> {
     fn into(self) -> Labels {
-        Labels(self.into_iter().map(|val| LabelType::String_(String::from(val))).collect())
+        Labels(
+            self.into_iter()
+                .map(|val| LabelType::String_(String::from(val)))
+                .collect(),
+        )
     }
 }
 
 impl Into<Labels> for Vec<String> {
     fn into(self) -> Labels {
-        Labels(self.into_iter().map(|val| LabelType::String_(val)).collect())
+        Labels(
+            self.into_iter()
+                .map(|val| LabelType::String_(val))
+                .collect(),
+        )
     }
 }
 
@@ -39,7 +47,11 @@ macro_rules! impl_into_labels_str {
     ($n:expr) => {
         impl Into<Labels> for [&str; $n] {
             fn into(self) -> Labels {
-                Labels(self.iter().map(|s| LabelType::String_(String::from(*s))).collect())
+                Labels(
+                    self.iter()
+                        .map(|s| LabelType::String_(String::from(*s)))
+                        .collect(),
+                )
             }
         }
     };
@@ -60,7 +72,11 @@ macro_rules! impl_into_labels_string {
     ($n:expr) => {
         impl Into<Labels> for [String; $n] {
             fn into(self) -> Labels {
-                Labels(self.iter().map(|val| LabelType::String_(val.clone())).collect())
+                Labels(
+                    self.iter()
+                        .map(|val| LabelType::String_(val.clone()))
+                        .collect(),
+                )
             }
         }
     };

@@ -2,8 +2,8 @@ use crate::conversion::{BorrowFromGValue, FromGValue};
 use crate::process::traversal::{Bytecode, Order, Scope};
 use crate::structure::traverser::Traverser;
 use crate::structure::{
-    Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property, Set, Token,
-    TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, label::LabelType,
+    label::LabelType, Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property, Set, Token,
+    TraversalExplanation, TraversalMetrics, Vertex, VertexProperty,
 };
 use crate::structure::{P, T};
 use crate::GremlinResult;
@@ -41,7 +41,7 @@ pub enum GValue {
     Traverser(Traverser),
     Scope(Scope),
     Order(Order),
-    Bool(bool)
+    Bool(bool),
 }
 
 impl GValue {
@@ -255,7 +255,7 @@ impl From<LabelType> for GValue {
     fn from(val: LabelType) -> GValue {
         match val {
             LabelType::String_(val) => val.into(),
-            LabelType::Bool(val) => val.into()
+            LabelType::Bool(val) => val.into(),
         }
     }
 }

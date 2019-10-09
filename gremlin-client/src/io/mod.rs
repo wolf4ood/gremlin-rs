@@ -155,7 +155,7 @@ impl GraphSON {
             GValue::Bool(b) => {
                 let json_string = match b {
                     true => "true",
-                    false => "false"
+                    false => "false",
                 };
                 Ok(serde_json::from_str(json_string).unwrap())
             }
