@@ -1145,6 +1145,47 @@ fn drop_step_test() {
 }
 
 #[test]
+fn or_step_test() {
+    let client = graph();
+
+    drop_vertices(&client, "or_step_test").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    g.add_v("or_step_test")
+        .property("foo", "bar")
+        .property("bar", "foo")
+        .next()
+        .unwrap();
+
+    g.add_v("or_step_test")
+        .property("foo", "nobar")
+        .property("bar", "nofoo")
+        .next()
+        .unwrap();
+
+    let result = g
+        .v(())
+        .has_label("or_step_test")
+        .has(("foo", "bar"))
+        .or()
+        .has(("bar", "foo"))
+        .to_list()
+        .unwrap();
+    assert_eq!(result.len(), 1);
+
+    let result = g
+        .v(())
+        .has_label("or_step_test")
+        .has(("foo", "bar"))
+        .or()
+        .has(("bar", "nofoo"))
+        .to_list()
+        .unwrap();
+    assert_eq!(result.len(), 2);
+}
+
+#[test]
 fn iter_terminator_test() {
     let client = graph();
 
