@@ -152,6 +152,14 @@ impl GraphSON {
                 }))
             }
 
+            GValue::Bool(b) => {
+                let json_string = match b {
+                    true => "true",
+                    false => "false"
+                };
+                Ok(serde_json::from_str(json_string).unwrap())
+            }
+
             _ => panic!("Type {:?} not supported.", value),
         }
     }
