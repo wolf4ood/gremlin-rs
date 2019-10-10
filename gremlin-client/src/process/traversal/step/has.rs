@@ -1,10 +1,10 @@
 use crate::structure::GValue;
-use crate::structure::{IntoPredicate, P as Predicate};
 use crate::structure::T;
+use crate::structure::{IntoPredicate, P as Predicate};
 
 pub enum HasStepKey {
     STRING(String),
-    T(T)
+    T(T),
 }
 
 impl Into<HasStepKey> for T {
@@ -41,7 +41,7 @@ impl HasStep {
 
         match self.key {
             HasStepKey::STRING(key) => params.push(Into::into(key)),
-            HasStepKey::T(key) => params.push(Into::into(key))
+            HasStepKey::T(key) => params.push(Into::into(key)),
         };
 
         if let Some(p) = self.predicate {
