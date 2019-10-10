@@ -580,7 +580,7 @@ fn test_uwnrap_map() {
 
     let results = g.v(vertex.id()).value_map(true).next().unwrap().unwrap();
     let v_id = vertex.id().get::<i64>().unwrap();
-    
+
     let id = utils::unwrap_map::<i64>(&results, "id", 0);
     let property = utils::unwrap_map::<String>(&results, "name", 0);
     let label = utils::unwrap_map::<String>(&results, "label", 0);
