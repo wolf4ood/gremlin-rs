@@ -1,4 +1,5 @@
 use crate::{GremlinError, GremlinResult};
+use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 pub struct GIDs(pub(crate) Vec<GID>);
@@ -51,6 +52,12 @@ impl From<i64> for GID {
 impl From<&GID> for GID {
     fn from(val: &GID) -> Self {
         val.clone()
+    }
+}
+
+impl From<Uuid> for GID {
+    fn from(val: Uuid) -> Self {
+        GID::String(val.to_string())
     }
 }
 
