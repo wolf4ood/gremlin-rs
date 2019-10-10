@@ -1,9 +1,33 @@
 use crate::structure::GValue;
 use crate::structure::{IntoPredicate, P as Predicate};
+use crate::structure::T;
+
+pub enum HasStepKey {
+    STRING(String),
+    T(T)
+}
+
+impl Into<HasStepKey> for T {
+    fn into(self) -> HasStepKey {
+        HasStepKey::T(self)
+    }
+}
+
+impl Into<HasStepKey> for String {
+    fn into(self) -> HasStepKey {
+        HasStepKey::STRING(self)
+    }
+}
+
+impl Into<HasStepKey> for &str {
+    fn into(self) -> HasStepKey {
+        HasStepKey::STRING(String::from(self))
+    }
+}
 
 pub struct HasStep {
     label: Option<String>,
-    key: String,
+    key: HasStepKey,
     predicate: Option<Predicate>,
 }
 
@@ -15,7 +39,10 @@ impl HasStep {
             params.push(Into::into(s));
         }
 
-        params.push(Into::into(self.key));
+        match self.key {
+            HasStepKey::STRING(key) => params.push(Into::into(key)),
+            HasStepKey::T(key) => params.push(Into::into(key))
+        };
 
         if let Some(p) = self.predicate {
             params.push(Into::into(p));
@@ -31,7 +58,7 @@ pub trait IntoHasStep {
 
 impl<A, B> IntoHasStep for (A, B)
 where
-    A: Into<String>,
+    A: Into<HasStepKey>,
     B: IntoPredicate,
 {
     fn into_step(self) -> HasStep {
@@ -46,7 +73,7 @@ where
 impl<A, B, C> IntoHasStep for (A, B, C)
 where
     A: Into<String>,
-    B: Into<String>,
+    B: Into<HasStepKey>,
     C: IntoPredicate,
 {
     fn into_step(self) -> HasStep {
@@ -62,7 +89,7 @@ impl IntoHasStep for (String) {
     fn into_step(self) -> HasStep {
         HasStep {
             label: None,
-            key: self,
+            key: HasStepKey::STRING(self),
             predicate: None,
         }
     }
@@ -72,7 +99,7 @@ impl IntoHasStep for (&str) {
     fn into_step(self) -> HasStep {
         HasStep {
             label: None,
-            key: String::from(self),
+            key: HasStepKey::STRING(String::from(self)),
             predicate: None,
         }
     }
