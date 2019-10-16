@@ -406,4 +406,13 @@ impl TraversalBuilder {
         self.bytecode.add_step(String::from("or"), vec![]);
         self
     }
+
+    pub fn map<A>(mut self, step: A) -> Self
+    where
+        A: IntoByStep,
+    {
+        self.bytecode
+            .add_step(String::from("map"), step.into_step().take_params());
+        self
+    }
 }
