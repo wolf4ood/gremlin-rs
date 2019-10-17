@@ -47,6 +47,7 @@ impl_to_gvalue!(i32, GValue::Int32);
 impl_to_gvalue!(i64, GValue::Int64);
 impl_to_gvalue!(chrono::DateTime<chrono::Utc>, GValue::Date);
 impl_to_gvalue!(uuid::Uuid, GValue::Uuid);
+impl_to_gvalue!(bool, GValue::Bool);
 
 impl ToGValue for &str {
     fn to_gvalue(&self) -> GValue {
@@ -180,3 +181,4 @@ impl_borrow_from_gvalue!(i32, GValue::Int32);
 impl_borrow_from_gvalue!(i64, GValue::Int64);
 impl_borrow_from_gvalue!(uuid::Uuid, GValue::Uuid);
 impl_borrow_from_gvalue!(chrono::DateTime<chrono::Utc>, GValue::Date);
+impl_borrow_from_gvalue!(bool, GValue::Bool);

@@ -1,5 +1,6 @@
 use gremlin_client::process::traversal::{traversal, Order, __};
 use gremlin_client::structure::{List, Map, Vertex, VertexProperty, P, T};
+use gremlin_client::utils;
 
 mod common;
 
@@ -555,6 +556,42 @@ fn test_value_map() {
     let results = g.v(vertex.id()).value_map("fake").to_list().unwrap();
 
     assert_eq!(0, results[0].len());
+
+    let results = g.v(vertex.id()).value_map(true).to_list().unwrap();
+
+    assert_eq!(true, results[0].get("id").is_some());
+    assert_eq!(true, results[0].get("label").is_some());
+    assert_eq!(true, results[0].get("name").is_some());
+}
+
+#[test]
+fn test_uwnrap_map() {
+    let client = graph();
+
+    let g = traversal().with_remote(client);
+
+    let vertices = g
+        .add_v("test_value_map")
+        .property("name", "test")
+        .to_list()
+        .unwrap();
+
+    let vertex = &vertices[0];
+
+    let results = g.v(vertex.id()).value_map(true).next().unwrap().unwrap();
+    let v_id = vertex.id().get::<i64>().unwrap();
+
+    let id = utils::unwrap_map::<i64>(&results, "id", 0);
+    let property = utils::unwrap_map::<String>(&results, "name", 0);
+    let label = utils::unwrap_map::<String>(&results, "label", 0);
+
+    assert_eq!(id.is_ok(), true);
+    assert_eq!(property.is_ok(), true);
+    assert_eq!(label.is_ok(), true);
+
+    assert_eq!(id.unwrap(), v_id);
+    assert_eq!(property.unwrap(), "test");
+    assert_eq!(label.unwrap(), "test_value_map");
 }
 
 #[test]

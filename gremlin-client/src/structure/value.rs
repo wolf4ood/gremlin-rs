@@ -2,7 +2,7 @@ use crate::conversion::{BorrowFromGValue, FromGValue};
 use crate::process::traversal::{Bytecode, Order, Scope};
 use crate::structure::traverser::Traverser;
 use crate::structure::{
-    Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property, Set, Token,
+    label::LabelType, Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property, Set, Token,
     TraversalExplanation, TraversalMetrics, Vertex, VertexProperty,
 };
 use crate::structure::{P, T};
@@ -41,6 +41,7 @@ pub enum GValue {
     Traverser(Traverser),
     Scope(Scope),
     Order(Order),
+    Bool(bool),
 }
 
 impl GValue {
@@ -241,5 +242,20 @@ impl From<T> for GValue {
 impl From<Bytecode> for GValue {
     fn from(val: Bytecode) -> GValue {
         GValue::Bytecode(val)
+    }
+}
+
+impl From<bool> for GValue {
+    fn from(val: bool) -> GValue {
+        GValue::Bool(val)
+    }
+}
+
+impl From<LabelType> for GValue {
+    fn from(val: LabelType) -> GValue {
+        match val {
+            LabelType::String_(val) => val.into(),
+            LabelType::Bool(val) => val.into(),
+        }
     }
 }
