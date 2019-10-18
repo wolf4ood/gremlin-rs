@@ -1,6 +1,5 @@
 use crate::structure::{GValue, Vertex};
 
-
 pub enum Either3<A: Into<GValue>, B: Into<GValue>, C: Into<GValue>> {
     A(A),
     B(B),

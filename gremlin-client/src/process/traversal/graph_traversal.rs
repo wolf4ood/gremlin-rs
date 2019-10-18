@@ -197,7 +197,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
         self
     }
-    
+
     pub fn properties<L>(mut self, labels: L) -> GraphTraversal<S, GProperty, T>
     where
         L: Into<Labels>,
