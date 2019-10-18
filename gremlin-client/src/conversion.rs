@@ -105,6 +105,7 @@ impl_from_gvalue!(TraversalExplanation, GValue::TraversalExplanation);
 impl_from_gvalue!(IntermediateRepr, GValue::IntermediateRepr);
 impl_from_gvalue!(chrono::DateTime<chrono::Utc>, GValue::Date);
 impl_from_gvalue!(Traverser, GValue::Traverser);
+impl_from_gvalue!(bool, GValue::Bool);
 
 impl FromGValue for GKey {
     fn from_gvalue(v: GValue) -> GremlinResult<GKey> {
