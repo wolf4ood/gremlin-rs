@@ -411,4 +411,13 @@ impl TraversalBuilder {
             .add_step(String::from("or"), step.into_step().take_params());
         self
     }
+
+    pub fn project<A>(mut self, step: A) -> Self
+    where
+        A: IntoSelectStep,
+    {
+        self.bytecode
+            .add_step(String::from("project"), step.into_step().take_params());
+        self
+    }
 }
