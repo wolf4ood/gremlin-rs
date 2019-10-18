@@ -417,5 +417,6 @@ impl TraversalBuilder {
     {
         self.bytecode
             .add_step(String::from("project"), step.into_step().take_params());
+        self
     }
 }
