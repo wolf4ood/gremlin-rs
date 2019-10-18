@@ -9,7 +9,7 @@ use crate::process::traversal::step::select::IntoSelectStep;
 use crate::process::traversal::step::where_step::IntoWhereStep;
 
 use crate::process::traversal::{Bytecode, Scope};
-use crate::structure::Either2;
+use crate::structure::Either3;
 use crate::structure::Labels;
 use crate::{structure::IntoPredicate, GValue, Vertex};
 
@@ -101,7 +101,6 @@ impl TraversalBuilder {
     {
         self.bytecode
             .add_step(String::from("addE"), vec![label.into().into()]);
-
         self
     }
 
@@ -172,7 +171,7 @@ impl TraversalBuilder {
 
     pub fn from<A>(mut self, target: A) -> Self
     where
-        A: Into<Either2<String, Vertex>>,
+        A: Into<Either3<String, Vertex, GValue>>,
     {
         self.bytecode
             .add_step(String::from("from"), vec![target.into().into()]);
@@ -182,7 +181,7 @@ impl TraversalBuilder {
 
     pub fn to<A>(mut self, target: A) -> Self
     where
-        A: Into<Either2<String, Vertex>>,
+        A: Into<Either3<String, Vertex, GValue>>,
     {
         self.bytecode
             .add_step(String::from("to"), vec![target.into().into()]);
@@ -418,6 +417,5 @@ impl TraversalBuilder {
     {
         self.bytecode
             .add_step(String::from("project"), step.into_step().take_params());
-        self
     }
 }
