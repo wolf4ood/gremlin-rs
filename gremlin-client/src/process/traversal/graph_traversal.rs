@@ -11,7 +11,7 @@ use crate::process::traversal::step::where_step::IntoWhereStep;
 
 use crate::process::traversal::remote::Terminator;
 use crate::process::traversal::{Bytecode, Scope, TraversalBuilder};
-use crate::structure::Either2;
+use crate::structure::Either3;
 use crate::structure::Labels;
 use crate::{
     structure::GProperty, structure::IntoPredicate, Edge, GValue, List, Map, Path, Vertex,
@@ -183,22 +183,21 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn from<A>(mut self, target: A) -> Self
     where
-        A: Into<Either2<String, Vertex>>,
+        A: Into<Either3<String, Vertex, GValue>>,
     {
         self.builder = self.builder.from(target);
-
         self
     }
 
     pub fn to<A>(mut self, target: A) -> Self
     where
-        A: Into<Either2<String, Vertex>>,
+        A: Into<Either3<String, Vertex, GValue>>,
     {
         self.builder = self.builder.to(target);
 
         self
     }
-
+    
     pub fn properties<L>(mut self, labels: L) -> GraphTraversal<S, GProperty, T>
     where
         L: Into<Labels>,

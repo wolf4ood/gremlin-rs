@@ -28,6 +28,12 @@ impl Bytecode {
             .push(Instruction::new(step_name, args));
     }
 
+    pub fn add_step_and_consume(mut self, step_name: String, args: Vec<GValue>) -> Self {
+        self.step_instructions
+            .push(Instruction::new(step_name.clone(), args));
+        self
+    }
+
     pub fn steps(&self) -> &Vec<Instruction> {
         &self.step_instructions
     }
