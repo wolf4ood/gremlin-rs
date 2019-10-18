@@ -254,7 +254,7 @@ impl From<bool> for GValue {
 impl From<LabelType> for GValue {
     fn from(val: LabelType) -> GValue {
         match val {
-            LabelType::String_(val) => val.into(),
+            LabelType::Str(val) => val.into(),
             LabelType::Bool(val) => val.into(),
         }
     }

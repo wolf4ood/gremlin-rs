@@ -3,7 +3,7 @@ use crate::structure::T;
 use crate::structure::{IntoPredicate, P as Predicate};
 
 pub enum HasStepKey {
-    STRING(String),
+    Str(String),
     T(T),
 }
 
@@ -15,13 +15,13 @@ impl Into<HasStepKey> for T {
 
 impl Into<HasStepKey> for String {
     fn into(self) -> HasStepKey {
-        HasStepKey::STRING(self)
+        HasStepKey::Str(self)
     }
 }
 
 impl Into<HasStepKey> for &str {
     fn into(self) -> HasStepKey {
-        HasStepKey::STRING(String::from(self))
+        HasStepKey::Str(String::from(self))
     }
 }
 
@@ -40,7 +40,7 @@ impl HasStep {
         }
 
         match self.key {
-            HasStepKey::STRING(key) => params.push(Into::into(key)),
+            HasStepKey::Str(key) => params.push(Into::into(key)),
             HasStepKey::T(key) => params.push(Into::into(key)),
         };
 
@@ -89,7 +89,7 @@ impl IntoHasStep for (String) {
     fn into_step(self) -> HasStep {
         HasStep {
             label: None,
-            key: HasStepKey::STRING(self),
+            key: HasStepKey::Str(self),
             predicate: None,
         }
     }
@@ -99,7 +99,7 @@ impl IntoHasStep for (&str) {
     fn into_step(self) -> HasStep {
         HasStep {
             label: None,
-            key: HasStepKey::STRING(String::from(self)),
+            key: HasStepKey::Str(String::from(self)),
             predicate: None,
         }
     }
