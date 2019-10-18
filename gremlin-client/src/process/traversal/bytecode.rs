@@ -25,7 +25,7 @@ impl Bytecode {
     }
     pub fn add_step(&mut self, step_name: String, args: Vec<GValue>) {
         self.step_instructions
-            .push(Instruction::new(step_name.clone(), args));
+            .push(Instruction::new(step_name, args));
     }
 
     pub fn steps(&self) -> &Vec<Instruction> {
