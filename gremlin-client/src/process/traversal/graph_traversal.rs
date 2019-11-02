@@ -435,7 +435,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self.builder = self.builder.map(step);
         self
     }
-  
+
     pub fn project<A>(mut self, step: A) -> GraphTraversal<S, GValue, T>
     where
         A: IntoSelectStep,
