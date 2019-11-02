@@ -1205,7 +1205,7 @@ fn or_step_test() {
         .v(())
         .has_label("or_step_test")
         .has(("foo", "bar"))
-        .or()
+        .or(())
         .has(("bar", "foo"))
         .to_list()
         .unwrap();
@@ -1215,7 +1215,7 @@ fn or_step_test() {
         .v(())
         .has_label("or_step_test")
         .has(("foo", "bar"))
-        .or()
+        .or(())
         .has(("bar", "nofoo"))
         .to_list()
         .unwrap();

@@ -5,6 +5,7 @@ use crate::process::traversal::step::has::IntoHasStep;
 use crate::process::traversal::step::limit::LimitStep;
 use crate::process::traversal::step::match_step::IntoMatchStep;
 use crate::process::traversal::step::not::IntoNotStep;
+use crate::process::traversal::step::or::IntoOrStep;
 use crate::process::traversal::step::select::IntoSelectStep;
 use crate::process::traversal::step::where_step::IntoWhereStep;
 
@@ -419,8 +420,11 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self
     }
 
-    pub fn or(mut self) -> Self {
-        self.builder = self.builder.or();
+    pub fn or<A>(mut self, step: A) -> Self
+    where
+        A: IntoOrStep,
+    {
+        self.builder = self.builder.or(step);
         self
     }
 
@@ -430,5 +434,14 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
     {
         self.builder = self.builder.map(step);
         self
+    }
+  
+    pub fn project<A>(mut self, step: A) -> GraphTraversal<S, GValue, T>
+    where
+        A: IntoSelectStep,
+        T: Terminator<GValue>,
+    {
+        self.builder = self.builder.project(step);
+        GraphTraversal::new(self.terminator, self.builder)
     }
 }

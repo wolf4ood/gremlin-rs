@@ -870,6 +870,6 @@ mod tests {
         code.add_step(String::from("V"), vec![]);
         code.add_step(String::from("or"), vec![]);
 
-        assert_eq!(&code, g.v(()).or().bytecode());
+        assert_eq!(&code, g.v(()).or(()).bytecode());
     }
 }
