@@ -1,17 +1,18 @@
 use crate::conversion::FromGValue;
 use crate::process::traversal::step::by::IntoByStep;
 use crate::process::traversal::step::dedup::DedupStep;
+use crate::process::traversal::step::from::IntoFromStep;
 use crate::process::traversal::step::has::IntoHasStep;
 use crate::process::traversal::step::limit::LimitStep;
 use crate::process::traversal::step::match_step::IntoMatchStep;
 use crate::process::traversal::step::not::IntoNotStep;
 use crate::process::traversal::step::or::IntoOrStep;
 use crate::process::traversal::step::select::IntoSelectStep;
+use crate::process::traversal::step::to::IntoToStep;
 use crate::process::traversal::step::where_step::IntoWhereStep;
 
 use crate::process::traversal::remote::Terminator;
 use crate::process::traversal::{Bytecode, Scope, TraversalBuilder};
-use crate::structure::Either2;
 use crate::structure::Labels;
 use crate::{
     structure::GProperty, structure::IntoPredicate, Edge, GValue, List, Map, Path, Vertex,
@@ -183,7 +184,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn from<A>(mut self, target: A) -> Self
     where
-        A: Into<Either2<String, Vertex>>,
+        A: IntoFromStep,
     {
         self.builder = self.builder.from(target);
 
@@ -192,7 +193,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn to<A>(mut self, target: A) -> Self
     where
-        A: Into<Either2<String, Vertex>>,
+        A: IntoToStep,
     {
         self.builder = self.builder.to(target);
 

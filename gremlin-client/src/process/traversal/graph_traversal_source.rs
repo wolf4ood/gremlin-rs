@@ -349,6 +349,22 @@ mod tests {
     }
 
     #[test]
+    fn add_e_test_with_traversal() {
+        let g = empty();
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("addE"), vec![String::from("knows").into()]);
+        code.add_step(
+            String::from("from"),
+            vec![__.v(1).bytecode().clone().into()],
+        );
+        code.add_step(String::from("to"), vec![__.v(2).bytecode().clone().into()]);
+
+        assert_eq!(&code, g.add_e("knows").from(__.v(1)).to(__.v(2)).bytecode());
+    }
+
+    #[test]
     fn as_test() {
         let g = empty();
 

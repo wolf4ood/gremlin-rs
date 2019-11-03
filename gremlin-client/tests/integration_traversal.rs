@@ -359,7 +359,7 @@ fn test_add_e() {
 
     let v1 = g
         .add_v("person")
-        .property("name", "marko")
+        .property("name", "jon")
         .property("age", 29)
         .to_list()
         .unwrap();
@@ -395,6 +395,17 @@ fn test_add_e() {
         .unwrap();
 
     assert_eq!("createdBy", edges[0].label());
+
+    let edges = g
+        .add_e("knows")
+        .from(__.v(()).has(("name", "marko")))
+        .to(__.v(()).has(("name", "jon")))
+        .to_list()
+        .unwrap();
+
+    assert!(edges.len() > 0);
+
+    assert_eq!("knows", edges[0].label());
 }
 
 #[test]

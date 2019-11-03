@@ -1,17 +1,19 @@
+use crate::conversion::ToGValue;
 use crate::process::traversal::step::by::IntoByStep;
 use crate::process::traversal::step::dedup::DedupStep;
+use crate::process::traversal::step::from::IntoFromStep;
 use crate::process::traversal::step::has::IntoHasStep;
 use crate::process::traversal::step::limit::LimitStep;
 use crate::process::traversal::step::match_step::IntoMatchStep;
 use crate::process::traversal::step::not::IntoNotStep;
 use crate::process::traversal::step::or::IntoOrStep;
 use crate::process::traversal::step::select::IntoSelectStep;
+use crate::process::traversal::step::to::IntoToStep;
 use crate::process::traversal::step::where_step::IntoWhereStep;
 
 use crate::process::traversal::{Bytecode, Scope};
-use crate::structure::Either2;
 use crate::structure::Labels;
-use crate::{structure::IntoPredicate, GValue, Vertex};
+use crate::{structure::GIDs, structure::IntoPredicate, GValue};
 
 #[derive(Clone)]
 pub struct TraversalBuilder {
@@ -32,6 +34,17 @@ impl TraversalBuilder {
     }
     pub fn bytecode(&self) -> &Bytecode {
         &self.bytecode
+    }
+
+    pub fn v<T>(mut self, ids: T) -> TraversalBuilder
+    where
+        T: Into<GIDs>,
+    {
+        self.bytecode.add_step(
+            String::from("V"),
+            ids.into().0.iter().map(|id| id.to_gvalue()).collect(),
+        );
+        self
     }
 
     pub fn has_label<L>(mut self, labels: L) -> Self
@@ -170,22 +183,22 @@ impl TraversalBuilder {
         self
     }
 
-    pub fn from<A>(mut self, target: A) -> Self
+    pub fn from<A>(mut self, step: A) -> Self
     where
-        A: Into<Either2<String, Vertex>>,
+        A: IntoFromStep,
     {
         self.bytecode
-            .add_step(String::from("from"), vec![target.into().into()]);
+            .add_step(String::from("from"), step.into_step().take_params());
 
         self
     }
 
-    pub fn to<A>(mut self, target: A) -> Self
+    pub fn to<A>(mut self, step: A) -> Self
     where
-        A: Into<Either2<String, Vertex>>,
+        A: IntoToStep,
     {
         self.bytecode
-            .add_step(String::from("to"), vec![target.into().into()]);
+            .add_step(String::from("to"), step.into_step().take_params());
 
         self
     }

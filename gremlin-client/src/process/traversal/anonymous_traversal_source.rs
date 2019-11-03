@@ -1,7 +1,7 @@
 use crate::process::traversal::step::has::IntoHasStep;
 use crate::process::traversal::step::not::IntoNotStep;
 use crate::process::traversal::TraversalBuilder;
-use crate::structure::Labels;
+use crate::structure::{GIDs, Labels};
 
 pub struct AnonymousTraversalSource {
     traversal: TraversalBuilder,
@@ -12,6 +12,13 @@ impl AnonymousTraversalSource {
         AnonymousTraversalSource {
             traversal: TraversalBuilder::default(),
         }
+    }
+
+    pub fn v<T>(&self, ids: T) -> TraversalBuilder
+    where
+        T: Into<GIDs>,
+    {
+        self.traversal.clone().v(ids)
     }
 
     pub fn count(&self) -> TraversalBuilder {
