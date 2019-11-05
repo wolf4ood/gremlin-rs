@@ -1,5 +1,5 @@
 use gremlin_client::process::traversal::{traversal, Order, __};
-use gremlin_client::structure::{List, Map, Vertex, VertexProperty, P, T};
+use gremlin_client::structure::{List, Map, TextP, Vertex, VertexProperty, P, T};
 use gremlin_client::utils;
 
 mod common;
@@ -1002,6 +1002,73 @@ fn test_has_with_p_steps() {
     assert_eq!(1, results.len());
 
     assert_eq!(&20, results[0].get::<i32>().unwrap());
+}
+
+#[test]
+fn test_has_with_text_p_step() {
+    let client = graph();
+
+    drop_vertices(&client, "test_has_with_text_p_step").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    g.add_v("test_has_with_text_p_step")
+        .property("name", "Jon")
+        .to_list()
+        .unwrap();
+
+    let vertices = g
+        .add_v("test_has_with_text_p_step")
+        .property("name", "Alice")
+        .to_list()
+        .unwrap();
+
+    let results = g
+        .v(())
+        .has(("test_has_with_text_p_step", "name", TextP::containing("A")))
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(vertices[0].id(), results[0].id());
+
+    let results = g
+        .v(())
+        .has_label("test_has_with_text_p_step")
+        .values("name")
+        .is("Alice")
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!("Alice", results[0].get::<String>().unwrap());
+
+    let results = g
+        .v(())
+        .has_label("test_has_with_text_p_step")
+        .values("name")
+        .is(TextP::containing("Al"))
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!("Alice", results[0].get::<String>().unwrap());
+
+    g.add_v("test_has_with_text_p_step")
+        .property("name", "Alice2")
+        .to_list()
+        .unwrap();
+
+    let results = g
+        .v(())
+        .has(("test_has_with_text_p_step", "name", TextP::containing("A")))
+        .to_list()
+        .unwrap();
+
+    assert_eq!(2, results.len());
 }
 
 #[test]
