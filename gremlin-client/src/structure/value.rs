@@ -5,7 +5,7 @@ use crate::structure::{
     label::LabelType, Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property, Set, Token,
     TraversalExplanation, TraversalMetrics, Vertex, VertexProperty,
 };
-use crate::structure::{P, T};
+use crate::structure::{TextP, P, T};
 use crate::GremlinResult;
 use chrono;
 use std::collections::{BTreeMap, HashMap, VecDeque};
@@ -42,6 +42,7 @@ pub enum GValue {
     Scope(Scope),
     Order(Order),
     Bool(bool),
+    TextP(TextP),
 }
 
 impl GValue {
@@ -230,6 +231,12 @@ impl From<GKey> for GValue {
 impl From<P> for GValue {
     fn from(val: P) -> GValue {
         GValue::P(val)
+    }
+}
+
+impl From<TextP> for GValue {
+    fn from(val: TextP) -> GValue {
+        GValue::TextP(val)
     }
 }
 

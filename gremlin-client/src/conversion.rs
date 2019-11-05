@@ -1,7 +1,7 @@
 use crate::{
-    structure::P as Predicate, Edge, GKey, GValue, GremlinError, GremlinResult, IntermediateRepr,
-    List, Map, Metric, Path, Property, Token, TraversalExplanation, TraversalMetrics, Vertex,
-    VertexProperty, GID,
+    structure::{TextP, P as Predicate},
+    Edge, GKey, GValue, GremlinError, GremlinResult, IntermediateRepr, List, Map, Metric, Path,
+    Property, Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
 };
 
 use crate::structure::Traverser;
@@ -58,6 +58,12 @@ impl ToGValue for &str {
 impl ToGValue for Predicate {
     fn to_gvalue(&self) -> GValue {
         GValue::P(self.clone())
+    }
+}
+
+impl ToGValue for TextP {
+    fn to_gvalue(&self) -> GValue {
+        GValue::TextP(self.clone())
     }
 }
 

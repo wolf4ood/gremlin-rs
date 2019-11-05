@@ -160,6 +160,14 @@ impl GraphSON {
                 Ok(serde_json::from_str(json_string).unwrap())
             }
 
+            GValue::TextP(text_p) => Ok(json!({
+                "@type" : "g:TextP",
+                "@value" : {
+                    "predicate" : text_p.operator(),
+                    "value" : self.write(text_p.value())?
+                }
+            })),
+
             _ => panic!("Type {:?} not supported.", value),
         }
     }

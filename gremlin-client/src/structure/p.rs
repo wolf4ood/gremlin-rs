@@ -1,3 +1,5 @@
+use crate::structure::either::Either2;
+use crate::structure::text_p::TextP;
 use crate::{GValue, ToGValue};
 
 #[derive(Debug, PartialEq, Clone)]
@@ -75,16 +77,16 @@ impl P {
 }
 
 pub trait IntoPredicate {
-    fn into_predicate(self) -> P;
+    fn into_predicate(self) -> Either2<P, TextP>;
 }
 
 impl<T: ToGValue> IntoPredicate for T {
-    fn into_predicate(self) -> P {
-        let val = (self).to_gvalue();
-        if let GValue::P(ref p) = val {
-            p.clone()
-        } else {
-            P::new("eq", val)
+    fn into_predicate(self) -> Either2<P, TextP> {
+        let val = self.to_gvalue();
+        match val {
+            GValue::P(ref p) => Either2::A(p.clone()),
+            GValue::TextP(ref p) => Either2::B(p.clone()),
+            _ => Either2::A(P::new("eq", val)),
         }
     }
 }
