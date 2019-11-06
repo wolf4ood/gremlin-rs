@@ -37,6 +37,13 @@ impl From<&'static str> for GID {
         GID::String(String::from(val))
     }
 }
+
+impl From<String> for GID {
+    fn from(val: String) -> Self {
+        GID::String(val)
+    }
+}
+
 impl From<i32> for GID {
     fn from(val: i32) -> Self {
         GID::Int32(val)
