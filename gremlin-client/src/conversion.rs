@@ -26,7 +26,7 @@ impl ToGValue for GID {
         match self {
             GID::Int32(n) => GValue::from(*n),
             GID::Int64(n) => GValue::from(*n),
-            GID::String(n) => GValue::from(n.clone()),
+            GID::String(n) => GValue::from(n),
         }
     }
 }

@@ -33,6 +33,24 @@ fn test_simple_vertex_traversal_with_id() {
 }
 
 #[test]
+fn test_simple_vertex_traversal_with_multiple_id() {
+    let client = graph();
+    drop_vertices(&client, "test_simple_vertex_traversal").unwrap();
+
+    let vertex = create_vertex_with_label(&client, "test_simple_vertex_traversal", "Traversal");
+    let vertex2 = create_vertex_with_label(&client, "test_simple_vertex_traversal", "Traversal");
+
+    let g = traversal().with_remote(client);
+
+    let results = g.v(vec![vertex.id(), vertex2.id()]).to_list().unwrap();
+
+    assert_eq!(2, results.len());
+
+    assert_eq!(vertex.id(), results[0].id());
+    assert_eq!(vertex2.id(), results[1].id());
+}
+
+#[test]
 fn test_simple_vertex_traversal_with_label() {
     let client = graph();
 
