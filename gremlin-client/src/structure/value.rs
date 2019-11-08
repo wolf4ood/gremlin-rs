@@ -73,6 +73,12 @@ impl From<String> for GValue {
     }
 }
 
+impl From<&String> for GValue {
+    fn from(val: &String) -> Self {
+        GValue::String(val.clone())
+    }
+}
+
 impl From<i32> for GValue {
     fn from(val: i32) -> Self {
         GValue::Int32(val)

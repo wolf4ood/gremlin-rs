@@ -10,6 +10,12 @@ impl<T: Into<GID>> From<T> for GIDs {
     }
 }
 
+impl<T: Into<GID>> From<Vec<T>> for GIDs {
+    fn from(val: Vec<T>) -> GIDs {
+        GIDs(val.into_iter().map(|gid| gid.into()).collect())
+    }
+}
+
 impl From<()> for GIDs {
     fn from(_val: ()) -> GIDs {
         GIDs(vec![])
