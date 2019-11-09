@@ -364,6 +364,77 @@ fn test_add_v_with_properties() {
 }
 
 #[test]
+fn test_add_v_with_property_many() {
+    let client = graph();
+
+    drop_vertices(&client, "test_add_v_with_property_many").unwrap();
+
+    let g = traversal().with_remote(client.clone());
+    
+
+    let results = g
+        .add_v("test_add_v_with_property_many")
+        .property_many(vec![("name", "marko"), ("age", "29")])
+        .to_list()
+        .unwrap();
+
+    assert!(results.len() > 0);
+
+    assert_eq!("test_add_v_with_property_many", results[0].label());
+
+    let results = client
+        .execute("g.V(_id).propertyMap()", &[("_id", results[0].id())])
+        .expect("it should execute addV")
+        .filter_map(Result::ok)
+        .map(|f| f.take::<Map>())
+        .collect::<Result<Vec<Map>, _>>()
+        .expect("It should be ok");
+
+    let properties = &results[0];
+
+    assert_eq!(
+        &"29".to_string(),
+        properties["age"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<String>()
+            .unwrap()
+    );
+
+    assert_eq!(
+        &"marko",
+        properties["name"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<String>()
+            .unwrap()
+    );
+}
+
+#[test]
+fn test_has_many() {
+    let client = graph();
+
+    drop_vertices(&client, "test_has_many").unwrap();
+
+    let g = traversal().with_remote(client.clone());
+
+    let results = g
+        .add_v("test_has_many")
+        .property_many(vec![("name", "josh"), ("age", "21")])
+        .to_list()
+        .unwrap();
+
+    assert!(results.len() > 0);
+
+    assert_eq!("test_has_many", results[0].label());
+
+    let results = g.v(()).has_many(vec![("name", "josh"), ("age", "21")]).to_list().unwrap();
+
+    assert_eq!(results.len(), 1);
+}
+
+#[test]
 fn test_add_e() {
     let client = graph();
     let g = traversal().with_remote(client.clone());
