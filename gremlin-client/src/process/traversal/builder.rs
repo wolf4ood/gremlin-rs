@@ -94,9 +94,10 @@ impl TraversalBuilder {
     where
         A: IntoHasStep,
     {
-        for step in steps{
-            self.bytecode.add_step(String::from("has"), step.into_step().take_params());
-        };
+        for step in steps {
+            self.bytecode
+                .add_step(String::from("has"), step.into_step().take_params());
+        }
         self
     }
 

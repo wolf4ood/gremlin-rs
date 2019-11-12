@@ -370,7 +370,6 @@ fn test_add_v_with_property_many() {
     drop_vertices(&client, "test_add_v_with_property_many").unwrap();
 
     let g = traversal().with_remote(client.clone());
-    
 
     let results = g
         .add_v("test_add_v_with_property_many")
@@ -429,7 +428,11 @@ fn test_has_many() {
 
     assert_eq!("test_has_many", results[0].label());
 
-    let results = g.v(()).has_many(vec![("name", "josh"), ("age", "21")]).to_list().unwrap();
+    let results = g
+        .v(())
+        .has_many(vec![("name", "josh"), ("age", "21")])
+        .to_list()
+        .unwrap();
 
     assert_eq!(results.len(), 1);
 }

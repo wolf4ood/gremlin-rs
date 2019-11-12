@@ -62,7 +62,7 @@ mod pool;
 
 pub use client::GremlinClient;
 pub use connection::{ConnectionOptions, TlsOptions};
-pub use conversion::{ToGValue, BorrowFromGValue};
+pub use conversion::{BorrowFromGValue, ToGValue};
 pub use error::GremlinError;
 
 pub type GremlinResult<T> = Result<T, error::GremlinError>;
