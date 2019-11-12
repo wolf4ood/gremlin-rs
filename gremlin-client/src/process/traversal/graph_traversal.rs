@@ -66,12 +66,12 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self
     }
 
-    pub fn property_many<A>(mut self, values: Vec<(&str, A)>) -> Self
+    pub fn property_many<A>(mut self, values: Vec<(String, A)>) -> Self
     where
         A: Into<GValue>,
     {
         for property in values {
-            self.builder = self.builder.property(property.0, property.1)
+            self.builder = self.builder.property(property.0.as_ref(), property.1)
         }
 
         self
@@ -90,9 +90,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
     where
         A: IntoHasStep,
     {
-        for step in steps {
-            self.builder = self.builder.has(step);
-        }
+        self.builder = self.builder.has_many(steps);
 
         self
     }

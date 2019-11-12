@@ -67,6 +67,11 @@ impl ToGValue for TextP {
     }
 }
 
+impl ToGValue for String {
+    fn to_gvalue(&self) -> GValue {
+        GValue::String(self.clone())
+    }
+}
 // Take from GValue
 
 #[doc(hidden)]

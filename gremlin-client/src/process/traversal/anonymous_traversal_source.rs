@@ -51,11 +51,19 @@ impl AnonymousTraversalSource {
     {
         self.traversal.clone().as_(alias)
     }
+
     pub fn has<A>(&self, step: A) -> TraversalBuilder
     where
         A: IntoHasStep,
     {
         self.traversal.clone().has(step)
+    }
+
+    pub fn has_many<A>(&self, steps: Vec<A>) -> TraversalBuilder
+    where
+        A: IntoHasStep,
+    {
+        self.traversal.clone().has_many(steps)
     }
 
     pub fn not<A>(&self, step: A) -> TraversalBuilder
