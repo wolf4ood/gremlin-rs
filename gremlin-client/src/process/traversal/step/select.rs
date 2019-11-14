@@ -45,8 +45,10 @@ impl IntoSelectStep for TraversalBuilder {
     }
 }
 
-impl<B> IntoSelectStep for (Pop, B) 
-    where B: Into<GValue> {
+impl<B> IntoSelectStep for (Pop, B)
+where
+    B: Into<GValue>,
+{
     fn into_step(self) -> SelectStep {
         SelectStep::new(vec![GValue::Pop(self.0), self.1.into()])
     }

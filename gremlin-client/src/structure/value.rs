@@ -5,7 +5,7 @@ use crate::structure::{
     label::LabelType, Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property, Set, Token,
     TraversalExplanation, TraversalMetrics, Vertex, VertexProperty,
 };
-use crate::structure::{TextP, P, T, Pop};
+use crate::structure::{Pop, TextP, P, T};
 use crate::GremlinResult;
 use chrono;
 use std::collections::{BTreeMap, HashMap, VecDeque};
