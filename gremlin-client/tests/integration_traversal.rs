@@ -1,5 +1,5 @@
 use gremlin_client::process::traversal::{traversal, Order, __};
-use gremlin_client::structure::{List, Map, TextP, Vertex, VertexProperty, P, T, Pop};
+use gremlin_client::structure::{List, Map, Pop, TextP, Vertex, VertexProperty, P, T};
 use gremlin_client::utils;
 
 mod common;
@@ -1356,39 +1356,36 @@ fn test_select_pop() {
 
     let g = traversal().with_remote(client);
 
-    let v1 = g.add_v("test_select_pop")
+    let v1 = g
+        .add_v("test_select_pop")
         .property("name", "a")
         .to_list()
         .unwrap();
 
-    let v2 = g.add_v("test_select_pop")
+    let v2 = g
+        .add_v("test_select_pop")
         .property("name", "b")
         .to_list()
         .unwrap();
 
-    let e1 = g.add_v("test_select_pop_child")
+    let e1 = g
+        .add_v("test_select_pop_child")
         .property("name", "a")
         .to_list()
         .unwrap();
 
-    let e2 = g.add_v("test_select_pop_child")
+    let e2 = g
+        .add_v("test_select_pop_child")
         .property("name", "b")
         .to_list()
         .unwrap();
 
-    g.add_e("child")
-        .from(&v1[0])
-        .to(&e1[0])
-        .to_list()
-        .unwrap();
+    g.add_e("child").from(&v1[0]).to(&e1[0]).to_list().unwrap();
 
-    g.add_e("child")
-        .from(&v2[0])
-        .to(&e2[0])
-        .to_list()
-        .unwrap();
+    g.add_e("child").from(&v2[0]).to(&e2[0]).to_list().unwrap();
 
-    let results = g.v(())
+    let results = g
+        .v(())
         .has_label("test_select_pop")
         .has(("name", "a"))
         .out("child")
@@ -1404,7 +1401,8 @@ fn test_select_pop() {
         .unwrap();
     assert_eq!(results.len(), 2);
 
-    let results = g.v(())
+    let results = g
+        .v(())
         .has_label("test_select_pop")
         .has(("name", "a"))
         .out("child")
@@ -1420,7 +1418,8 @@ fn test_select_pop() {
         .unwrap();
     assert_eq!(results.len(), 1);
 
-    let results = g.v(())
+    let results = g
+        .v(())
         .has_label("test_select_pop")
         .has(("name", "a"))
         .out("child")

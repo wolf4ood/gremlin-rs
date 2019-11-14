@@ -171,7 +171,7 @@ impl GraphSON {
 
             GValue::Pop(pop) => Ok(json!({
                 "@type": "g:Pop",
-                "@value": *pop.to_string(), 
+                "@value": *pop.to_string(),
             })),
 
             _ => panic!("Type {:?} not supported.", value),
