@@ -373,7 +373,10 @@ fn test_add_v_with_property_many() {
 
     let results = g
         .add_v("test_add_v_with_property_many")
-        .property_many(vec![(String::from("name"), "marko"), (String::from("age"), "29")])
+        .property_many(vec![
+            (String::from("name"), "marko"),
+            (String::from("age"), "29"),
+        ])
         .to_list()
         .unwrap();
 
@@ -420,7 +423,10 @@ fn test_has_many() {
 
     let results = g
         .add_v("test_has_many")
-        .property_many(vec![(String::from("name"), "josh"), (String::from("age"), "21")])
+        .property_many(vec![
+            (String::from("name"), "josh"),
+            (String::from("age"), "21"),
+        ])
         .to_list()
         .unwrap();
 
@@ -430,7 +436,10 @@ fn test_has_many() {
 
     let results = g
         .v(())
-        .has_many(vec![(String::from("name"), "josh"), (String::from("age"), "21")])
+        .has_many(vec![
+            (String::from("name"), "josh"),
+            (String::from("age"), "21"),
+        ])
         .to_list()
         .unwrap();
 
