@@ -90,6 +90,17 @@ impl TraversalBuilder {
         self
     }
 
+    pub fn has_many<A>(mut self, steps: Vec<A>) -> Self
+    where
+        A: IntoHasStep,
+    {
+        for step in steps {
+            self.bytecode
+                .add_step(String::from("has"), step.into_step().take_params());
+        }
+        self
+    }
+
     pub fn has_not<A>(mut self, key: A) -> Self
     where
         A: Into<String>,
