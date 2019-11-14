@@ -18,6 +18,7 @@ mod traverser;
 mod value;
 mod vertex;
 mod vertex_property;
+mod pop;
 
 pub use self::edge::Edge;
 pub use self::gid::{GIDs, GID};
@@ -38,3 +39,4 @@ pub use p::{IntoPredicate, P};
 pub use t::T;
 pub use text_p::TextP;
 pub use traverser::Traverser;
+pub use pop::Pop;

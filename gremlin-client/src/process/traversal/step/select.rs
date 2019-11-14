@@ -1,5 +1,5 @@
 use crate::process::traversal::TraversalBuilder;
-use crate::structure::GValue;
+use crate::structure::{GValue, Pop};
 
 pub struct SelectStep {
     params: Vec<GValue>,
@@ -27,6 +27,12 @@ impl IntoSelectStep for &str {
     }
 }
 
+impl IntoSelectStep for Pop {
+    fn into_step(self) -> SelectStep {
+        SelectStep::new(vec![GValue::Pop(self)])
+    }
+}
+
 impl IntoSelectStep for Vec<&str> {
     fn into_step(self) -> SelectStep {
         SelectStep::new(self.into_iter().map(GValue::from).collect())
@@ -36,6 +42,13 @@ impl IntoSelectStep for Vec<&str> {
 impl IntoSelectStep for TraversalBuilder {
     fn into_step(self) -> SelectStep {
         SelectStep::new(vec![self.bytecode.into()])
+    }
+}
+
+impl<B> IntoSelectStep for (Pop, B) 
+    where B: Into<GValue> {
+    fn into_step(self) -> SelectStep {
+        SelectStep::new(vec![GValue::Pop(self.0), self.1.into()])
     }
 }
 
