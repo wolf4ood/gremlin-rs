@@ -11,6 +11,12 @@ impl Into<Labels> for &str {
     }
 }
 
+impl Into<Labels> for String {
+    fn into(self) -> Labels {
+        Labels(vec![LabelType::Str(self)])
+    }
+}
+
 impl Into<Labels> for () {
     fn into(self) -> Labels {
         Labels(vec![])
