@@ -6,6 +6,7 @@ use crate::conversion::ToGValue;
 use crate::process::traversal::{Order, Scope};
 use crate::structure::{GValue, T};
 use serde_json::{json, Value};
+use std::string::ToString;
 
 use crate::GremlinResult;
 
@@ -166,6 +167,11 @@ impl GraphSON {
                     "predicate" : text_p.operator(),
                     "value" : self.write(text_p.value())?
                 }
+            })),
+
+            GValue::Pop(pop) => Ok(json!({
+                "@type": "g:Pop",
+                "@value": *pop.to_string(), 
             })),
 
             _ => panic!("Type {:?} not supported.", value),

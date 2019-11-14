@@ -15,7 +15,7 @@ use crate::process::traversal::remote::Terminator;
 use crate::process::traversal::{Bytecode, Scope, TraversalBuilder};
 use crate::structure::Labels;
 use crate::{
-    structure::GProperty, structure::IntoPredicate, Edge, GValue, List, Map, Path, Vertex,
+    structure::GProperty, structure::IntoPredicate, structure::GIDs, Edge, GValue, List, Map, Path, Vertex,
 };
 use std::marker::PhantomData;
 
@@ -444,5 +444,13 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
     {
         self.builder = self.builder.project(step);
         GraphTraversal::new(self.terminator, self.builder)
+    }
+
+    pub fn v<VT>(mut self, ids: VT) -> Self
+    where
+        VT: Into<GIDs>,
+    {
+        self.builder = self.builder.v(ids);
+        self
     }
 }

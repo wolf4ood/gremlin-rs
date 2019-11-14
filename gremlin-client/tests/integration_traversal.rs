@@ -1,5 +1,5 @@
 use gremlin_client::process::traversal::{traversal, Order, __};
-use gremlin_client::structure::{List, Map, TextP, Vertex, VertexProperty, P, T};
+use gremlin_client::structure::{List, Map, TextP, Vertex, VertexProperty, P, T, Pop};
 use gremlin_client::utils;
 
 mod common;
@@ -1345,4 +1345,94 @@ fn iter_terminator_test() {
         .collect();
 
     assert_eq!(2, results.len())
+}
+
+#[test]
+fn test_select_pop() {
+    let client = graph();
+
+    drop_vertices(&client, "test_select_pop").unwrap();
+    drop_vertices(&client, "test_select_pop_child").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    let v1 = g.add_v("test_select_pop")
+        .property("name", "a")
+        .to_list()
+        .unwrap();
+
+    let v2 = g.add_v("test_select_pop")
+        .property("name", "b")
+        .to_list()
+        .unwrap();
+
+    let e1 = g.add_v("test_select_pop_child")
+        .property("name", "a")
+        .to_list()
+        .unwrap();
+
+    let e2 = g.add_v("test_select_pop_child")
+        .property("name", "b")
+        .to_list()
+        .unwrap();
+
+    g.add_e("child")
+        .from(&v1[0])
+        .to(&e1[0])
+        .to_list()
+        .unwrap();
+
+    g.add_e("child")
+        .from(&v2[0])
+        .to(&e2[0])
+        .to_list()
+        .unwrap();
+
+    let results = g.v(())
+        .has_label("test_select_pop")
+        .has(("name", "a"))
+        .out("child")
+        .as_("v")
+        .v(())
+        .has_label("test_select_pop")
+        .has(("name", "b"))
+        .out("child")
+        .as_("v")
+        .select((Pop::All, "v"))
+        .unfold()
+        .to_list()
+        .unwrap();
+    assert_eq!(results.len(), 2);
+
+    let results = g.v(())
+        .has_label("test_select_pop")
+        .has(("name", "a"))
+        .out("child")
+        .as_("v")
+        .v(())
+        .has_label("test_select_pop")
+        .has(("name", "b"))
+        .out("child")
+        .as_("v")
+        .select((Pop::Last, "v"))
+        .unfold()
+        .to_list()
+        .unwrap();
+    assert_eq!(results.len(), 1);
+
+    let results = g.v(())
+        .has_label("test_select_pop")
+        .has(("name", "a"))
+        .out("child")
+        .as_("v")
+        .v(())
+        .has_label("test_select_pop")
+        .has(("name", "b"))
+        .out("child")
+        .as_("v")
+        .select((Pop::First, "v"))
+        .unfold()
+        .to_list()
+        .unwrap();
+    assert_eq!(results.len(), 1);
 }
