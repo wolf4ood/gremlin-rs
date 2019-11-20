@@ -1,4 +1,4 @@
-use crate::conversion::ToGValue;
+use crate::conversion::{FromGValue, ToGValue};
 use crate::process::traversal::strategies::{
     RemoteStrategy, TraversalStrategies, TraversalStrategy,
 };
@@ -89,6 +89,20 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
             ids.into().0.iter().map(|id| id.to_gvalue()).collect(),
         );
 
+        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
+    }
+
+    pub fn with_side_effect<T>(&self, step: (&'static str, T)) -> GraphTraversal<GValue, GValue, A>
+    where
+        T: Into<GValue> + FromGValue,
+        A: Terminator<T>,
+    {
+        let mut code = Bytecode::new();
+
+        code.add_source(
+            String::from("withSideEffect"),
+            vec![step.0.into(), step.1.into()],
+        );
         GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
     }
 }
