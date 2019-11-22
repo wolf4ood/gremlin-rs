@@ -475,4 +475,11 @@ impl TraversalBuilder {
 
         self
     }
+
+    pub fn simple_path(mut self) -> Self {
+        self.bytecode
+            .add_step(String::from("simplePath"), vec![]);
+    
+        self
+    }
 }
