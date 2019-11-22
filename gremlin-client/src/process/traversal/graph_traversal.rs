@@ -497,4 +497,9 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self.builder = self.builder.simple_path();
         self
     }
+
+    pub fn sample(mut self, step: i64) -> Self {
+        self.builder = self.builder.sample(step);
+        self
+    } 
 }

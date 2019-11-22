@@ -482,4 +482,10 @@ impl TraversalBuilder {
     
         self
     }
+
+    pub fn sample(mut self, step: i64) -> Self {
+        self.bytecode
+            .add_step(String::from("sample"), vec![step.into()]);
+        self
+    }
 }
