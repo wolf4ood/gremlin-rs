@@ -12,6 +12,7 @@ use crate::process::traversal::step::to::IntoToStep;
 use crate::process::traversal::step::where_step::IntoWhereStep;
 use crate::process::traversal::step::repeat::IntoRepeatStep;
 use crate::process::traversal::step::until::IntoUntilStep;
+use crate::process::traversal::step::loops::LoopsStep;
 
 use crate::process::traversal::remote::Terminator;
 use crate::process::traversal::{Bytecode, Scope, TraversalBuilder};
@@ -502,4 +503,12 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self.builder = self.builder.sample(step);
         self
     } 
+
+    pub fn loops<A>(mut self, step: A) -> Self 
+    where
+        A: Into<LoopsStep>,
+    {
+        self.builder = self.builder.loops(step);
+        self
+    }
 }
