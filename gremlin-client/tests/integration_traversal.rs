@@ -1518,3 +1518,180 @@ fn test_select_pop() {
         .unwrap();
     assert_eq!(results.len(), 1);
 }
+
+#[test]
+fn test_repeat_until_loops_loops() {
+    let client = graph();
+
+    drop_vertices(&client, "test_repeat_until_loops").unwrap();
+    drop_vertices(&client, "test_repeat_until_loops_child").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    let v1 = g
+        .add_v("test_repeat_until_loops")
+        .property("name", "a")
+        .to_list()
+        .unwrap();
+
+    let e1 = g
+        .add_v("test_repeat_until_loops_child")
+        .property("name", "b")
+        .to_list()
+        .unwrap();
+
+    let e2 = g
+        .add_v("test_repeat_until_loops_child")
+        .property("name", "c")
+        .to_list()
+        .unwrap();
+
+    g.add_e("child").from(&v1[0]).to(&e1[0]).to_list().unwrap();
+    g.add_e("child").from(&e1[0]).to(&e2[0]).to_list().unwrap();
+
+    let results = g.v(v1[0].id())
+        .repeat(__.out("child"))
+        .until(__.loops(()).is(2))
+        .to_list()
+        .unwrap();
+
+    assert_eq!(results.len(), 1);
+    assert_eq!(results[0], e2[0]);
+}
+
+#[test]
+fn test_simple_path() {
+    let client = graph();
+
+    drop_vertices(&client, "test_simple_path").unwrap();
+    drop_vertices(&client, "test_simple_path_child").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    let v1 = g
+        .add_v("test_simple_path")
+        .property("name", "a")
+        .to_list()
+        .unwrap();
+
+    let e1 = g
+        .add_v("test_simple_path_child")
+        .property("name", "b")
+        .to_list()
+        .unwrap();
+
+    let e2 = g
+        .add_v("test_simple_path_child")
+        .property("name", "c")
+        .to_list()
+        .unwrap();
+
+    g.add_e("child").from(&v1[0]).to(&e1[0]).to_list().unwrap();
+    g.add_e("child").from(&e1[0]).to(&e2[0]).to_list().unwrap();
+    g.add_e("child").from(&e2[0]).to(&v1[0]).to_list().unwrap();
+
+    let results = g.v(v1[0].id())
+        .repeat(__.out("child").simple_path())
+        .until(__.loops(()).is(2))
+        .to_list()
+        .unwrap();
+
+    assert_eq!(results.len(), 1);
+    assert_eq!(results[0], e2[0]);
+}
+
+#[test]
+fn test_sample() {
+    let client = graph();
+
+    drop_vertices(&client, "test_sample").unwrap();
+    drop_vertices(&client, "test_sample_child").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    let v1 = g
+        .add_v("test_sample")
+        .property("name", "a")
+        .to_list()
+        .unwrap();
+
+    let e1 = g
+        .add_v("test_sample_child")
+        .property("name", "b")
+        .to_list()
+        .unwrap();
+
+    let e2 = g
+        .add_v("test_sample_child")
+        .property("name", "b")
+        .to_list()
+        .unwrap();
+
+    g.add_e("child").from(&v1[0]).to(&e1[0]).to_list().unwrap();
+    g.add_e("child").from(&v1[0]).to(&e2[0]).to_list().unwrap();
+    let results = g.v(v1[0].id()).out("child").sample(1).to_list().unwrap();
+    assert_eq!(results.len(), 1);
+}
+
+#[test]
+fn test_local() {
+    let client = graph();
+
+    drop_vertices(&client, "test_local").unwrap();
+    drop_vertices(&client, "test_local_child").unwrap();
+    drop_vertices(&client, "test_local_child_child").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    let v1 = g
+        .add_v("test_local")
+        .property("name", "a")
+        .to_list()
+        .unwrap();
+
+    let e1 = g
+        .add_v("test_local_child")
+        .property("name", "b")
+        .to_list()
+        .unwrap();
+
+    let e2 = g
+        .add_v("test_local_child")
+        .property("name", "b")
+        .to_list()
+        .unwrap();
+
+    let e3 = g
+        .add_v("test_local_child_child")
+        .property("name", "c")
+        .to_list()
+        .unwrap();
+
+    let e4 = g
+        .add_v("test_local_child_child")
+        .property("name", "d")
+        .to_list()
+        .unwrap();
+
+    let e5 = g
+        .add_v("test_local_child_child")
+        .property("name", "e")
+        .to_list()
+        .unwrap();
+
+    g.add_e("child").from(&v1[0]).to(&e1[0]).to_list().unwrap();
+    g.add_e("child").from(&v1[0]).to(&e2[0]).to_list().unwrap();
+
+    g.add_e("child_child").from(&e1[0]).to(&e3[0]).to_list().unwrap();
+    g.add_e("child_child").from(&e1[0]).to(&e4[0]).to_list().unwrap();
+
+    g.add_e("child_child").from(&e2[0]).to(&e5[0]).to_list().unwrap();
+
+    let results = g.v(v1[0].id())
+        .out("child")
+        .local(__.out("child_child").sample(1)) //Local used here to only get one vertices from each child
+        .to_list()
+        .unwrap();
+
+    assert_eq!(results.len(), 2);
+}
