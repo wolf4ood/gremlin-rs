@@ -4,16 +4,16 @@ use crate::process::traversal::step::dedup::DedupStep;
 use crate::process::traversal::step::from::IntoFromStep;
 use crate::process::traversal::step::has::IntoHasStep;
 use crate::process::traversal::step::limit::LimitStep;
+use crate::process::traversal::step::local::IntoLocalStep;
+use crate::process::traversal::step::loops::LoopsStep;
 use crate::process::traversal::step::match_step::IntoMatchStep;
 use crate::process::traversal::step::not::IntoNotStep;
 use crate::process::traversal::step::or::IntoOrStep;
+use crate::process::traversal::step::repeat::IntoRepeatStep;
 use crate::process::traversal::step::select::IntoSelectStep;
 use crate::process::traversal::step::to::IntoToStep;
-use crate::process::traversal::step::where_step::IntoWhereStep;
-use crate::process::traversal::step::repeat::IntoRepeatStep;
 use crate::process::traversal::step::until::IntoUntilStep;
-use crate::process::traversal::step::local::IntoLocalStep;
-use crate::process::traversal::step::loops::LoopsStep;
+use crate::process::traversal::step::where_step::IntoWhereStep;
 
 use crate::process::traversal::remote::Terminator;
 use crate::process::traversal::{Bytecode, Scope, TraversalBuilder};
@@ -479,7 +479,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self
     }
 
-    pub fn repeat<A>(mut self, step: A) -> Self 
+    pub fn repeat<A>(mut self, step: A) -> Self
     where
         A: IntoRepeatStep,
     {
@@ -503,9 +503,9 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
     pub fn sample(mut self, step: i32) -> Self {
         self.builder = self.builder.sample(step);
         self
-    } 
+    }
 
-    pub fn loops<A>(mut self, step: A) -> Self 
+    pub fn loops<A>(mut self, step: A) -> Self
     where
         A: Into<LoopsStep>,
     {
@@ -518,6 +518,6 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         A: IntoLocalStep,
     {
         self.builder = self.builder.local(step);
-        self 
+        self
     }
 }
