@@ -13,6 +13,7 @@ use crate::process::traversal::step::where_step::IntoWhereStep;
 use crate::process::traversal::step::repeat::IntoRepeatStep;
 use crate::process::traversal::step::until::IntoUntilStep;
 use crate::process::traversal::step::loops::LoopsStep;
+use crate::process::traversal::step::local::IntoLocalStep;
 
 use crate::process::traversal::{Bytecode, Scope};
 use crate::structure::Labels;
@@ -496,6 +497,16 @@ impl TraversalBuilder {
     {
         self.bytecode
             .add_step(String::from("loops"), step.into().params());
+        self
+    }
+
+    pub fn local<A>(mut self, step: A) -> Self
+    where
+        A: IntoLocalStep
+    {
+        self.bytecode
+            .add_step(String::from("local"), step.into_step().take_params());
+
         self
     }
 }
