@@ -1549,7 +1549,8 @@ fn test_repeat_until_loops_loops() {
     g.add_e("child").from(&v1[0]).to(&e1[0]).to_list().unwrap();
     g.add_e("child").from(&e1[0]).to(&e2[0]).to_list().unwrap();
 
-    let results = g.v(v1[0].id())
+    let results = g
+        .v(v1[0].id())
         .repeat(__.out("child"))
         .until(__.loops(()).is(2))
         .to_list()
@@ -1590,7 +1591,8 @@ fn test_simple_path() {
     g.add_e("child").from(&e1[0]).to(&e2[0]).to_list().unwrap();
     g.add_e("child").from(&e2[0]).to(&v1[0]).to_list().unwrap();
 
-    let results = g.v(v1[0].id())
+    let results = g
+        .v(v1[0].id())
         .repeat(__.out("child").simple_path())
         .until(__.loops(()).is(2))
         .to_list()
@@ -1682,12 +1684,25 @@ fn test_local() {
     g.add_e("child").from(&v1[0]).to(&e1[0]).to_list().unwrap();
     g.add_e("child").from(&v1[0]).to(&e2[0]).to_list().unwrap();
 
-    g.add_e("child_child").from(&e1[0]).to(&e3[0]).to_list().unwrap();
-    g.add_e("child_child").from(&e1[0]).to(&e4[0]).to_list().unwrap();
+    g.add_e("child_child")
+        .from(&e1[0])
+        .to(&e3[0])
+        .to_list()
+        .unwrap();
+    g.add_e("child_child")
+        .from(&e1[0])
+        .to(&e4[0])
+        .to_list()
+        .unwrap();
 
-    g.add_e("child_child").from(&e2[0]).to(&e5[0]).to_list().unwrap();
+    g.add_e("child_child")
+        .from(&e2[0])
+        .to(&e5[0])
+        .to_list()
+        .unwrap();
 
-    let results = g.v(v1[0].id())
+    let results = g
+        .v(v1[0].id())
         .out("child")
         .local(__.out("child_child").sample(1)) //Local used here to only get one vertices from each child
         .to_list()

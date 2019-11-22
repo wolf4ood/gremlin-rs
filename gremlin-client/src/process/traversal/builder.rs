@@ -4,16 +4,16 @@ use crate::process::traversal::step::dedup::DedupStep;
 use crate::process::traversal::step::from::IntoFromStep;
 use crate::process::traversal::step::has::IntoHasStep;
 use crate::process::traversal::step::limit::LimitStep;
+use crate::process::traversal::step::local::IntoLocalStep;
+use crate::process::traversal::step::loops::LoopsStep;
 use crate::process::traversal::step::match_step::IntoMatchStep;
 use crate::process::traversal::step::not::IntoNotStep;
 use crate::process::traversal::step::or::IntoOrStep;
+use crate::process::traversal::step::repeat::IntoRepeatStep;
 use crate::process::traversal::step::select::IntoSelectStep;
 use crate::process::traversal::step::to::IntoToStep;
-use crate::process::traversal::step::where_step::IntoWhereStep;
-use crate::process::traversal::step::repeat::IntoRepeatStep;
 use crate::process::traversal::step::until::IntoUntilStep;
-use crate::process::traversal::step::loops::LoopsStep;
-use crate::process::traversal::step::local::IntoLocalStep;
+use crate::process::traversal::step::where_step::IntoWhereStep;
 
 use crate::process::traversal::{Bytecode, Scope};
 use crate::structure::Labels;
@@ -460,7 +460,7 @@ impl TraversalBuilder {
 
     pub fn repeat<A>(mut self, step: A) -> Self
     where
-        A: IntoRepeatStep
+        A: IntoRepeatStep,
     {
         self.bytecode
             .add_step(String::from("repeat"), step.into_step().take_params());
@@ -470,7 +470,7 @@ impl TraversalBuilder {
 
     pub fn until<A>(mut self, step: A) -> Self
     where
-        A: IntoUntilStep
+        A: IntoUntilStep,
     {
         self.bytecode
             .add_step(String::from("until"), step.into_step().take_params());
@@ -479,9 +479,8 @@ impl TraversalBuilder {
     }
 
     pub fn simple_path(mut self) -> Self {
-        self.bytecode
-            .add_step(String::from("simplePath"), vec![]);
-    
+        self.bytecode.add_step(String::from("simplePath"), vec![]);
+
         self
     }
 
@@ -491,7 +490,7 @@ impl TraversalBuilder {
         self
     }
 
-    pub fn loops<A>(mut self, step: A) -> Self 
+    pub fn loops<A>(mut self, step: A) -> Self
     where
         A: Into<LoopsStep>,
     {
@@ -502,7 +501,7 @@ impl TraversalBuilder {
 
     pub fn local<A>(mut self, step: A) -> Self
     where
-        A: IntoLocalStep
+        A: IntoLocalStep,
     {
         self.bytecode
             .add_step(String::from("local"), step.into_step().take_params());
