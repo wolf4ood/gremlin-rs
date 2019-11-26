@@ -33,6 +33,13 @@ impl AnonymousTraversalSource {
         self.traversal.clone().out(labels)
     }
 
+    pub fn out_e<L>(&self, labels: L) -> TraversalBuilder
+    where
+        L: Into<Labels>,
+    {
+        self.traversal.clone().out_e(labels)
+    }
+
     pub fn values<L>(&self, labels: L) -> TraversalBuilder
     where
         L: Into<Labels>,
