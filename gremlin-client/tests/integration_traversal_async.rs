@@ -7,9 +7,9 @@ mod aio {
 
     use super::common_async::{connect, create_vertex_with_label, drop_vertices};
 
-    use async_std::task;
     use async_std::prelude::*;
-    use gremlin_client::{Vertex};
+    use async_std::task;
+    use gremlin_client::Vertex;
 
     #[test]
     fn test_simple_vertex_traversal_with_multiple_id() {
