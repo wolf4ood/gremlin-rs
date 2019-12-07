@@ -71,6 +71,10 @@ pub use structure::{
     Edge, GKey, GResultSet, GValue, IntermediateRepr, List, Map, Metric, Path, Property, Token,
     TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
 };
+
+#[cfg(feature = "async_std")]
+pub mod aio;
+
 pub mod process;
 pub mod structure;
 pub mod utils;

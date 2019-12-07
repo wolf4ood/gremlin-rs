@@ -1,10 +1,10 @@
+mod common;
+
 use gremlin_client::{
     ConnectionOptions, GremlinClient, GremlinError, List, TlsOptions, ToGValue,
     TraversalExplanation, TraversalMetrics, VertexProperty,
 };
 use gremlin_client::{Edge, GValue, Map, Vertex};
-
-mod common;
 
 use common::{create_edge, create_vertex, expect_client, graph};
 

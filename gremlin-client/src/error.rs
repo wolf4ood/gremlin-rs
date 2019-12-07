@@ -4,6 +4,11 @@ use std::fmt::Display;
 use uuid::parser::ParseError;
 use websocket::WebSocketError;
 
+#[cfg(feature = "async_std")]
+use async_tungstenite::tungstenite;
+#[cfg(feature = "async_std")]
+use mobc;
+
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug)]
 pub enum GremlinError {
@@ -15,7 +20,19 @@ pub enum GremlinError {
     Json(String),
     Request((i16, String)),
     Serde(serde_json::Error),
+    #[cfg(feature = "async_std")]
+    WebSocketAsync(tungstenite::error::Error),
     Uuid(ParseError),
+}
+
+#[cfg(feature = "async_std")]
+impl From<mobc::Error<GremlinError>> for GremlinError {
+    fn from(e: mobc::Error<GremlinError>) -> GremlinError {
+        match e {
+            mobc::Error::Inner(e) => e,
+            mobc::Error::Timeout => GremlinError::Generic(String::from("Async pool timeout")),
+        }
+    }
 }
 
 impl From<WebSocketError> for GremlinError {
