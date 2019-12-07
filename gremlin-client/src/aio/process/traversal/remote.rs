@@ -2,13 +2,10 @@ use crate::aio::process::traversal::RemoteTraversalStream;
 use crate::aio::GremlinClient;
 use crate::conversion::FromGValue;
 use crate::process::traversal::remote::Terminator;
-use crate::process::traversal::{GraphTraversal, GraphTraversalSource};
-use crate::structure::Traverser;
+use crate::process::traversal::GraphTraversal;
 use crate::GremlinResult;
 use async_std::prelude::*;
-use async_std::stream::Stream;
 use futures::future::{BoxFuture, FutureExt};
-use std::future::Future;
 
 #[derive(Clone)]
 pub struct AsyncTerminator {

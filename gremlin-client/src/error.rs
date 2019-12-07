@@ -6,7 +6,7 @@ use websocket::WebSocketError;
 
 #[cfg(feature = "async_std")]
 use async_tungstenite::tungstenite;
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async_gremlin")]
 use mobc;
 
 #[allow(clippy::large_enum_variant)]
@@ -20,12 +20,12 @@ pub enum GremlinError {
     Json(String),
     Request((i16, String)),
     Serde(serde_json::Error),
-    #[cfg(feature = "async_std")]
+    #[cfg(feature = "async_gremlin")]
     WebSocketAsync(tungstenite::error::Error),
     Uuid(ParseError),
 }
 
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async_gremlin")]
 impl From<mobc::Error<GremlinError>> for GremlinError {
     fn from(e: mobc::Error<GremlinError>) -> GremlinError {
         match e {

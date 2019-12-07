@@ -72,7 +72,7 @@ pub use structure::{
     TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
 };
 
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async_gremlin")]
 pub mod aio;
 
 pub mod process;

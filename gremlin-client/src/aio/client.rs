@@ -1,4 +1,4 @@
-use crate::aio::pool::{GremlinAsyncPool, GremlinConnectionManager};
+use crate::aio::pool::GremlinConnectionManager;
 use crate::aio::GResultSet;
 use crate::io::GraphSON;
 use crate::message::{message_with_args, message_with_args_and_uuid, Message, Response};
@@ -11,7 +11,6 @@ use mobc::runtime::DefaultExecutor;
 use mobc::{Pool, PooledConnection};
 use serde::Serialize;
 use std::collections::{HashMap, VecDeque};
-use std::future::Future;
 
 use futures::future::{BoxFuture, FutureExt};
 

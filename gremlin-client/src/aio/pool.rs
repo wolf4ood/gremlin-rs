@@ -1,17 +1,11 @@
+use mobc::runtime::DefaultExecutor;
 use mobc::AnyFuture;
 use mobc::ConnectionManager;
-
-use mobc::futures::prelude::*;
-use mobc::runtime::DefaultExecutor;
 use mobc::Executor;
-use mobc::Pool;
 
 use crate::aio::connection::Connection;
 use crate::connection::ConnectionOptions;
 use crate::error::GremlinError;
-use crate::GremlinResult;
-
-pub(crate) type GremlinAsyncPool<T> = Pool<GremlinConnectionManager<T>>;
 
 #[derive(Debug)]
 pub(crate) struct GremlinConnectionManager<T> {
@@ -44,11 +38,11 @@ where
         self.executor.clone()
     }
 
-    fn is_valid(&self, conn: Self::Connection) -> AnyFuture<Self::Connection, Self::Error> {
+    fn is_valid(&self, _conn: Self::Connection) -> AnyFuture<Self::Connection, Self::Error> {
         unimplemented!()
     }
 
-    fn has_broken(&self, conn: &mut Option<Self::Connection>) -> bool {
+    fn has_broken(&self, _conn: &mut Option<Self::Connection>) -> bool {
         false
     }
 }
@@ -61,6 +55,7 @@ mod tests {
 
     use async_std::task;
     use mobc::Pool;
+    use std::time::Duration;
 
     #[test]
     fn it_should_create_a_connection_pool() {
@@ -84,7 +79,7 @@ mod tests {
             drop(conn);
 
             task::spawn_blocking(move || {
-                std::thread::sleep_ms(200);
+                std::thread::sleep(Duration::from_millis(200));
             })
             .await;
 
