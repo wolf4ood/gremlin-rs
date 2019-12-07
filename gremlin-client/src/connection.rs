@@ -175,7 +175,7 @@ impl Connection {
 }
 
 impl TlsOptions {
-    fn tls_connector(&self) -> native_tls::Result<TlsConnector> {
+    pub(crate) fn tls_connector(&self) -> native_tls::Result<TlsConnector> {
         TlsConnector::builder()
             .danger_accept_invalid_certs(self.accept_invalid_certs)
             .build()
