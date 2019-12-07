@@ -1,7 +1,7 @@
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async_gremlin")]
 mod common_async;
 
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async_gremlin")]
 mod aio {
     use gremlin_client::process::traversal::traversal;
 

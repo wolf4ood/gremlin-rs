@@ -17,7 +17,12 @@ readme = "README.md"
 default = []
 
 
-async_std = ["async-std","async-tungstenite","async-trait","mobc","url","async-tls","futures","pin-project-lite"]
+
+async_gremlin = ["futures"]
+
+async_std = ["async_gremlin","async-std","async-tungstenite","async-trait","mobc","url","async-tls","pin-project-lite"]
+
+ 
 
 [badges]
 travis-ci = { repository = "wolf4ood/gremlin-rs" }
@@ -39,7 +44,7 @@ async-tungstenite = { version = "0.1.0", optional = true }
 async-std =  { version = "1.2.0", optional = true, features = ["unstable"] }
 async-trait = { version = "0.1.10", optional = true }
 async-tls =  { version = "0.6.0", optional = true }
-mobc = { version = "0.2.8", optional = true, features = ["async-std-runtime"] }
+mobc = {  default-features = false, version = "0.2.8", optional = true, features = ["async-std-runtime"] }
 url =  {version = "2.1.0", optional = true}
 futures = { version = "0.3.1", optional = true}
 pin-project-lite = { version = "0.1.1", optional = true}

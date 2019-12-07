@@ -7,7 +7,6 @@ use async_std::stream::Stream;
 use core::task::Context;
 use core::task::Poll;
 use mobc::runtime::DefaultExecutor;
-use mobc::Executor;
 use mobc::PooledConnection;
 use std::collections::VecDeque;
 use std::future::Future;

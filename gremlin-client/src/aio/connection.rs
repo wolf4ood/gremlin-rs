@@ -1,6 +1,6 @@
 use crate::{GremlinError, GremlinResult};
 
-use crate::connection::{ConnectionOptions, Credentials, TlsOptions};
+use crate::connection::ConnectionOptions;
 
 use async_std::net::TcpStream;
 use async_std::prelude::*;
@@ -46,50 +46,6 @@ impl ConnectionStream {
 #[derive(Debug)]
 pub(crate) struct Connection {
     stream: ConnectionStream,
-}
-
-pub struct ConnectionOptionsBuilder(ConnectionOptions);
-
-impl ConnectionOptionsBuilder {
-    pub fn host<T>(mut self, host: T) -> Self
-    where
-        T: Into<String>,
-    {
-        self.0.host = host.into();
-        self
-    }
-
-    pub fn port(mut self, port: u16) -> Self {
-        self.0.port = port;
-        self
-    }
-
-    pub fn pool_size(mut self, pool_size: u32) -> Self {
-        self.0.pool_size = pool_size;
-        self
-    }
-
-    pub fn build(self) -> ConnectionOptions {
-        self.0
-    }
-
-    pub fn credentials(mut self, username: &str, password: &str) -> Self {
-        self.0.credentials = Some(Credentials {
-            username: String::from(username),
-            password: String::from(password),
-        });
-        self
-    }
-
-    pub fn ssl(mut self, ssl: bool) -> Self {
-        self.0.ssl = ssl;
-        self
-    }
-
-    pub fn tls_options(mut self, options: TlsOptions) -> Self {
-        self.0.tls_options = Some(options);
-        self
-    }
 }
 
 impl Connection {

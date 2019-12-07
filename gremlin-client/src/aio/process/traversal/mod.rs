@@ -3,7 +3,6 @@ pub(crate) mod remote;
 use crate::conversion::FromGValue;
 use crate::structure::Traverser;
 use crate::GremlinResult;
-use async_std::prelude::*;
 use async_std::stream::Stream;
 use core::task::Context;
 use core::task::Poll;
@@ -31,7 +30,7 @@ impl<T> RemoteTraversalStream<T> {
 impl<T: FromGValue> Stream for RemoteTraversalStream<T> {
     type Item = GremlinResult<T>;
 
-    fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+    fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
         let this = self.project();
 
         let item = futures::ready!(this.stream.poll_next(cx));

@@ -3,9 +3,9 @@ use crate::process::traversal::strategies::{
     RemoteStrategy, TraversalStrategies, TraversalStrategy,
 };
 
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async_gremlin")]
 use crate::aio::process::traversal::remote::AsyncTerminator;
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async_gremlin")]
 use crate::aio::GremlinClient as GremlinAsyncClient;
 use crate::process::traversal::remote::{MockTerminator, SyncTerminator, Terminator};
 use crate::process::traversal::Bytecode;
@@ -39,7 +39,7 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
         }
     }
 
-    #[cfg(feature = "async_std")]
+    #[cfg(feature = "async_gremlin")]
     pub fn with_async_remote(
         &self,
         client: GremlinAsyncClient,
