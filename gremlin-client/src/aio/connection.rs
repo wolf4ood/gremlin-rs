@@ -23,7 +23,7 @@ impl ConnectionStream {
     async fn connect(options: ConnectionOptions) -> GremlinResult<Self> {
         let url = url::Url::parse(&options.websocket_url()).expect("failed to pars url");
 
-        let (client, _) = connect_async(url).await.expect("failed to connect");
+        let (client, _) = connect_async(url).await?;
 
         Ok(ConnectionStream(client))
     }
@@ -36,7 +36,9 @@ impl ConnectionStream {
     }
 
     async fn recv(&mut self) -> GremlinResult<Vec<u8>> {
-        match self.0.next().await.unwrap()? {
+        match self.0.next().await.ok_or_else(|| {
+            GremlinError::Generic(String::from("No message received in from the network"))
+        })?? {
             Message::Binary(binary) => Ok(binary),
             _ => unimplemented!(),
         }
