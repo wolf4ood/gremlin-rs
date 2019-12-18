@@ -1,7 +1,5 @@
-#[cfg(feature = "async_gremlin")]
 mod common_async;
 
-#[cfg(feature = "async_gremlin")]
 mod aio {
 
     use gremlin_client::GremlinError;

@@ -51,13 +51,6 @@ pin-project-lite = { version = "0.1.1", optional = true}
 
 
 
-
-
-
-
-
-
-
 [dependencies.websocket]
 version="0.23"
 default-features = false 
@@ -68,3 +61,20 @@ features = ["serde", "v4"]
 version = "0.7.2"
 
 
+
+[[test]]
+name = "integration_client_async"
+required-features = ["async_std"]
+
+[[test]]
+name = "integration_traversal_async"
+required-features = ["async_std"]
+
+[[test]]
+name = "common_async"
+required-features = ["async_std"]
+
+
+[[example]]
+name = "traversal_async"
+required-features = ["async_std"]
