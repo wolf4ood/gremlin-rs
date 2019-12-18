@@ -1,5 +1,5 @@
 //! Experimental Rust client for Apache Tinkerpop Gremlin Server.
-//! The driver supports only the execution of raw Gremlin queries
+//! The driver supports the execution of raw Gremlin queries and GLV traversal
 //!
 //!
 //! You can use gremlin-client this lines in your `Cargo.toml`
