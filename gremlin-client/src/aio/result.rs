@@ -12,7 +12,6 @@ use std::collections::VecDeque;
 use std::future::Future;
 use std::pin::Pin;
 
-// #[derive(Debug)]
 pub struct GResultSet {
     client: GremlinClient,
     results: VecDeque<GValue>,
@@ -91,7 +90,7 @@ impl Stream for GResultSet {
                 GResultState::NextPage(page) => {
                     let (response, resuts, conn) =
                         futures::ready!(unsafe { Pin::new_unchecked(page.as_mut()) }.poll(cx))
-                            .unwrap();
+                            .expect("Failed to fetch the next page");
 
                     self.conn = Some(conn);
                     self.response = response;

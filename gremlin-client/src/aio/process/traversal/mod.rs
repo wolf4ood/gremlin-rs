@@ -35,6 +35,11 @@ impl<T: FromGValue> Stream for RemoteTraversalStream<T> {
 
         let item = futures::ready!(this.stream.poll_next(cx));
 
-        Poll::Ready(item.map(|e| e.unwrap().take::<Traverser>().unwrap().take::<T>()))
+        Poll::Ready(item.map(|e| {
+            e.expect("Failed to take an item from the result set")
+                .take::<Traverser>()
+                .expect("Failed to convert the item to a Traverser")
+                .take::<T>()
+        }))
     }
 }
