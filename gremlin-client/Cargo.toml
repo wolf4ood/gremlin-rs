@@ -52,7 +52,7 @@ pin-project-lite = { version = "0.1.1", optional = true}
 
 
 [dependencies.websocket]
-version="0.23"
+version="0.24"
 default-features = false 
 features = ["sync","sync-ssl"]
 
