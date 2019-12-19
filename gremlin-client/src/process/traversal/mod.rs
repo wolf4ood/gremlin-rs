@@ -10,7 +10,7 @@ mod bytecode;
 mod graph_traversal;
 mod graph_traversal_source;
 mod order;
-mod remote;
+pub(crate) mod remote;
 mod scope;
 mod step;
 mod strategies;
