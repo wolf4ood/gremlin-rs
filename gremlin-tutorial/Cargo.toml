@@ -5,4 +5,4 @@ authors = ["wolf4ood <enrico.risa@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-gremlin-client = { path = "../gremlin-client", version = "0.2.0" }
+gremlin-client = { path = "../gremlin-client", version = "0.3.0" }
