@@ -39,7 +39,7 @@ impl<T: FromGValue + std::marker::Send + 'static> Terminator<T> for AsyncTermina
             }
             Ok(vec)
         }
-            .boxed()
+        .boxed()
     }
 
     fn next<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::Next
@@ -57,7 +57,7 @@ impl<T: FromGValue + std::marker::Send + 'static> Terminator<T> for AsyncTermina
             }
             Ok(vec.pop())
         }
-            .boxed()
+        .boxed()
     }
 
     fn has_next<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::HasNext
@@ -75,7 +75,7 @@ impl<T: FromGValue + std::marker::Send + 'static> Terminator<T> for AsyncTermina
             }
             Ok(vec.len() > 0)
         }
-            .boxed()
+        .boxed()
     }
 
     fn iter<S, E>(&self, traversal: &GraphTraversal<S, T, E>) -> Self::Iter
@@ -90,6 +90,6 @@ impl<T: FromGValue + std::marker::Send + 'static> Terminator<T> for AsyncTermina
 
             Ok(RemoteTraversalStream::new(stream))
         }
-            .boxed()
+        .boxed()
     }
 }

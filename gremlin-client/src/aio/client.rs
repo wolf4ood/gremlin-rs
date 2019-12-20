@@ -203,7 +203,7 @@ impl GremlinClient {
                 ))),
             }
         }
-            .boxed()
+        .boxed()
     }
     fn build_message<T: Serialize>(&self, msg: Message<T>) -> GremlinResult<String> {
         serde_json::to_string(&msg).map_err(GremlinError::from)
