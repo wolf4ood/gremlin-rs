@@ -85,7 +85,7 @@ where
     }
 }
 
-impl IntoHasStep for (String) {
+impl IntoHasStep for String {
     fn into_step(self) -> HasStep {
         HasStep {
             label: None,
@@ -95,7 +95,7 @@ impl IntoHasStep for (String) {
     }
 }
 
-impl IntoHasStep for (&str) {
+impl IntoHasStep for &str {
     fn into_step(self) -> HasStep {
         HasStep {
             label: None,
