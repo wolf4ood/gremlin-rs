@@ -7,9 +7,8 @@ use async_tls::client::TlsStream;
 use async_tungstenite::tungstenite::protocol::Message;
 use async_tungstenite::{self, stream};
 use async_tungstenite::{connect_async, WebSocketStream};
-use url;
 use futures::{SinkExt, StreamExt};
-
+use url;
 
 type WSStream = WebSocketStream<stream::Stream<TcpStream, TlsStream<TcpStream>>>;
 struct ConnectionStream(WSStream);
