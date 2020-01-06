@@ -19,11 +19,11 @@ impl RemoteTraversalSource {
     }
 
     #[cfg(feature = "async_gremlin")]
-    pub fn with_async_remote(
+    pub fn with_remote_async(
         &self,
         client: GremlinAsyncClient,
     ) -> GraphTraversalSource<AsyncTerminator> {
-        GraphTraversalSource::<MockTerminator>::new(MockTerminator {}).with_async_remote(client)
+        GraphTraversalSource::<MockTerminator>::new(MockTerminator {}).with_remote_async(client)
     }
 }
 

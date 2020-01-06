@@ -30,7 +30,7 @@ mod aio {
             )
             .await;
 
-            let g = traversal().with_async_remote(client);
+            let g = traversal().with_remote_async(client);
 
             let results = g
                 .v(vec![vertex.id(), vertex2.id()])

@@ -115,7 +115,7 @@ fn main() -> Result<(), Box<std::error::Error>> {
 
         let client = GremlinClient::connect("localhost").await?;
 
-        let g = traversal().with_async_remote(client);
+        let g = traversal().with_remote_async(client);
 
         let results = g.v(()).has_label("person").has(("name","Jon")).to_list().await?;   
     

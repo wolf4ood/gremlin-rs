@@ -40,7 +40,7 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
     }
 
     #[cfg(feature = "async_gremlin")]
-    pub fn with_async_remote(
+    pub fn with_remote_async(
         &self,
         client: GremlinAsyncClient,
     ) -> GraphTraversalSource<AsyncTerminator> {
