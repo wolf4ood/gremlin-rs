@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.3.0] - 2020-01-06
+
+### Added
+
+- [#15](https://github.com/wolf4ood/gremlin-rs/issues/15) Async support
+- [#51](https://github.com/wolf4ood/gremlin-rs/pull/51)  Repeat, until, simplePath, sample, loops and local
+- [#47](https://github.com/wolf4ood/gremlin-rs/pull/47) Implements Pop enum for .select() and .v() 
+- [#48](https://github.com/wolf4ood/gremlin-rs/pull/48) Implements basic with_side_effect
+- [#55](https://github.com/wolf4ood/gremlin-rs/pull/55) Added out_e
+
+### Fixed
+
+
 ## [0.2.2] - 2019-11-06
 
 ### Added
