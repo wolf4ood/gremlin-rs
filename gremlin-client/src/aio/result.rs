@@ -6,8 +6,7 @@ use crate::GremlinResult;
 use async_std::stream::Stream;
 use core::task::Context;
 use core::task::Poll;
-use mobc::runtime::DefaultExecutor;
-use mobc::PooledConnection;
+use mobc::Connection;
 use std::collections::VecDeque;
 use std::future::Future;
 use std::pin::Pin;
@@ -16,7 +15,7 @@ pub struct GResultSet {
     client: GremlinClient,
     results: VecDeque<GValue>,
     response: Response,
-    conn: Option<PooledConnection<GremlinConnectionManager<DefaultExecutor>>>,
+    conn: Option<Connection<GremlinConnectionManager>>,
     state: GResultState,
 }
 
@@ -37,7 +36,7 @@ enum GResultState {
                     Output = GremlinResult<(
                         Response,
                         VecDeque<GValue>,
-                        PooledConnection<GremlinConnectionManager<DefaultExecutor>>,
+                        Connection<GremlinConnectionManager>,
                     )>,
                 > + Send,
         >,
@@ -49,7 +48,7 @@ impl GResultSet {
         client: GremlinClient,
         results: VecDeque<GValue>,
         response: Response,
-        conn: PooledConnection<GremlinConnectionManager<DefaultExecutor>>,
+        conn: Connection<GremlinConnectionManager>,
     ) -> GResultSet {
         GResultSet {
             client,

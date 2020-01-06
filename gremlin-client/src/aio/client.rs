@@ -7,8 +7,7 @@ use crate::GValue;
 use crate::ToGValue;
 use crate::{ConnectionOptions, GremlinError, GremlinResult};
 use base64::encode;
-use mobc::runtime::DefaultExecutor;
-use mobc::{Pool, PooledConnection};
+use mobc::{Connection, Pool};
 use serde::Serialize;
 use std::collections::{HashMap, VecDeque};
 
@@ -16,7 +15,7 @@ use futures::future::{BoxFuture, FutureExt};
 
 #[derive(Clone)]
 pub struct GremlinClient {
-    pool: Pool<GremlinConnectionManager<DefaultExecutor>>,
+    pool: Pool<GremlinConnectionManager>,
     io: GraphSON,
     alias: Option<String>,
     options: ConnectionOptions,
@@ -31,7 +30,7 @@ impl GremlinClient {
         let pool_size = opts.pool_size;
         let manager = GremlinConnectionManager::new(opts.clone());
 
-        let pool = Pool::builder().max_size(pool_size).build(manager).await?;
+        let pool = Pool::builder().max_open(pool_size as u64).build(manager);
 
         Ok(GremlinClient {
             pool,
@@ -97,7 +96,7 @@ impl GremlinClient {
 
     pub(crate) async fn write_message<T: Serialize>(
         &self,
-        conn: &mut PooledConnection<GremlinConnectionManager<DefaultExecutor>>,
+        conn: &mut Connection<GremlinConnectionManager>,
         msg: Message<T>,
     ) -> GremlinResult<()> {
         let message = self.build_message(msg)?;
@@ -115,7 +114,7 @@ impl GremlinClient {
 
     pub(crate) async fn send_message<T: Serialize>(
         &self,
-        mut conn: PooledConnection<GremlinConnectionManager<DefaultExecutor>>,
+        mut conn: Connection<GremlinConnectionManager>,
         msg: Message<T>,
     ) -> GremlinResult<GResultSet> {
         self.write_message(&mut conn, msg).await?;
@@ -153,7 +152,7 @@ impl GremlinClient {
     }
     pub(crate) fn read_response<'a>(
         &'a self,
-        conn: &'a mut PooledConnection<GremlinConnectionManager<DefaultExecutor>>,
+        conn: &'a mut Connection<GremlinConnectionManager>,
     ) -> BoxFuture<'a, GremlinResult<(Response, VecDeque<GValue>)>> {
         async move {
             let result = conn.recv().await?;

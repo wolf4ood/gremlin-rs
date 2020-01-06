@@ -30,6 +30,9 @@ impl From<mobc::Error<GremlinError>> for GremlinError {
     fn from(e: mobc::Error<GremlinError>) -> GremlinError {
         match e {
             mobc::Error::Inner(e) => e,
+            mobc::Error::BadConn => {
+                GremlinError::Generic(String::from("Async pool bad connection"))
+            }
             mobc::Error::Timeout => GremlinError::Generic(String::from("Async pool timeout")),
         }
     }

@@ -1,49 +1,31 @@
-use mobc::runtime::DefaultExecutor;
-use mobc::AnyFuture;
-use mobc::ConnectionManager;
-use mobc::Executor;
+use mobc::Manager;
+use mobc::ResultFuture;
 
 use crate::aio::connection::Connection;
 use crate::connection::ConnectionOptions;
 use crate::error::GremlinError;
 
 #[derive(Debug)]
-pub(crate) struct GremlinConnectionManager<T> {
+pub(crate) struct GremlinConnectionManager {
     options: ConnectionOptions,
-    executor: T,
 }
 
-impl GremlinConnectionManager<DefaultExecutor> {
-    pub(crate) fn new(options: ConnectionOptions) -> GremlinConnectionManager<DefaultExecutor> {
-        GremlinConnectionManager {
-            options,
-            executor: DefaultExecutor::current(),
-        }
+impl GremlinConnectionManager {
+    pub(crate) fn new(options: ConnectionOptions) -> GremlinConnectionManager {
+        GremlinConnectionManager { options }
     }
 }
 
-impl<T> ConnectionManager for GremlinConnectionManager<T>
-where
-    T: Executor,
-{
+impl Manager for GremlinConnectionManager {
     type Connection = Connection;
     type Error = GremlinError;
-    type Executor = T;
 
-    fn connect(&self) -> AnyFuture<Self::Connection, Self::Error> {
+    fn connect(&self) -> ResultFuture<Self::Connection, Self::Error> {
         Box::pin(Connection::connect(self.options.clone()))
     }
 
-    fn get_executor(&self) -> Self::Executor {
-        self.executor.clone()
-    }
-
-    fn is_valid(&self, _conn: Self::Connection) -> AnyFuture<Self::Connection, Self::Error> {
-        unimplemented!()
-    }
-
-    fn has_broken(&self, _conn: &mut Option<Self::Connection>) -> bool {
-        false
+    fn check(&self, conn: Self::Connection) -> ResultFuture<Self::Connection, Self::Error> {
+        Box::pin(futures::future::ok(conn))
     }
 }
 
@@ -62,19 +44,15 @@ mod tests {
         task::block_on(async {
             let manager = GremlinConnectionManager::new(ConnectionOptions::default());
 
-            let pool = Pool::builder()
-                .max_size(16)
-                .build(manager)
-                .await
-                .expect("Failed to create the pool");
+            let pool = Pool::builder().max_open(16).build(manager);
 
             let conn = pool.get().await.expect("Failed to get the connection");
 
             pool.state().await;
 
-            assert_eq!(16, pool.state().await.connections);
+            assert_eq!(1, pool.state().await.connections);
 
-            assert_eq!(15, pool.state().await.idle_connections);
+            assert_eq!(0, pool.state().await.idle);
 
             drop(conn);
 
@@ -83,7 +61,7 @@ mod tests {
             })
             .await;
 
-            assert_eq!(16, pool.state().await.idle_connections);
+            assert_eq!(1, pool.state().await.idle);
         });
     }
 }
