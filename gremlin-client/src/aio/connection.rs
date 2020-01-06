@@ -4,9 +4,10 @@ use crate::connection::ConnectionOptions;
 
 use async_std::net::TcpStream;
 use async_tls::client::TlsStream;
+use async_tungstenite::async_std::connect_async;
 use async_tungstenite::tungstenite::protocol::Message;
+use async_tungstenite::WebSocketStream;
 use async_tungstenite::{self, stream};
-use async_tungstenite::{connect_async, WebSocketStream};
 use futures::{SinkExt, StreamExt};
 use url;
 
