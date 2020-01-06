@@ -1,7 +1,7 @@
 use crate::structure::GValue;
 use std::error::Error;
 use std::fmt::Display;
-use uuid::parser::ParseError;
+
 use websocket::WebSocketError;
 
 #[cfg(feature = "async_std")]
@@ -22,7 +22,7 @@ pub enum GremlinError {
     Serde(serde_json::Error),
     #[cfg(feature = "async_gremlin")]
     WebSocketAsync(tungstenite::error::Error),
-    Uuid(ParseError),
+    Uuid(uuid::Error),
 }
 
 #[cfg(feature = "async_gremlin")]
@@ -55,8 +55,8 @@ impl From<serde_json::Error> for GremlinError {
         GremlinError::Serde(e)
     }
 }
-impl From<ParseError> for GremlinError {
-    fn from(e: ParseError) -> GremlinError {
+impl From<uuid::Error> for GremlinError {
+    fn from(e: uuid::Error) -> GremlinError {
         GremlinError::Uuid(e)
     }
 }
