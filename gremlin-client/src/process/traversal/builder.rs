@@ -16,7 +16,7 @@ use crate::process::traversal::step::until::IntoUntilStep;
 use crate::process::traversal::step::where_step::IntoWhereStep;
 
 use crate::process::traversal::{Bytecode, Scope};
-use crate::structure::Labels;
+use crate::structure::{Cardinality, Labels};
 use crate::{structure::GIDs, structure::IntoPredicate, GValue};
 
 #[derive(Clone)]
@@ -81,6 +81,22 @@ impl TraversalBuilder {
         self.bytecode.add_step(
             String::from("property"),
             vec![String::from(key).into(), value.into()],
+        );
+        self
+    }
+
+    pub fn property_with_cardinality<A>(
+        mut self,
+        cardinality: Cardinality,
+        key: &str,
+        value: A,
+    ) -> Self
+    where
+        A: Into<GValue>,
+    {
+        self.bytecode.add_step(
+            String::from("property"),
+            vec![cardinality.into(), String::from(key).into(), value.into()],
         );
         self
     }

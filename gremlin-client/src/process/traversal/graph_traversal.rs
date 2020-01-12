@@ -17,7 +17,7 @@ use crate::process::traversal::step::where_step::IntoWhereStep;
 
 use crate::process::traversal::remote::Terminator;
 use crate::process::traversal::{Bytecode, Scope, TraversalBuilder};
-use crate::structure::Labels;
+use crate::structure::{Cardinality, Labels};
 use crate::{
     structure::GIDs, structure::GProperty, structure::IntoPredicate, Edge, GValue, List, Map, Path,
     Vertex,
@@ -71,12 +71,43 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self
     }
 
+    pub fn property_with_cardinality<A>(
+        mut self,
+        cardinality: Cardinality,
+        key: &str,
+        value: A,
+    ) -> Self
+    where
+        A: Into<GValue>,
+    {
+        self.builder = self
+            .builder
+            .property_with_cardinality(cardinality, key, value);
+        self
+    }
+
     pub fn property_many<A>(mut self, values: Vec<(String, A)>) -> Self
     where
         A: Into<GValue>,
     {
         for property in values {
             self.builder = self.builder.property(property.0.as_ref(), property.1)
+        }
+
+        self
+    }
+
+    pub fn property_many_with_cardinality<A>(
+        mut self,
+        values: Vec<(Cardinality, String, A)>,
+    ) -> Self
+    where
+        A: Into<GValue>,
+    {
+        for property in values {
+            self.builder =
+                self.builder
+                    .property_with_cardinality(property.0, property.1.as_ref(), property.2);
         }
 
         self

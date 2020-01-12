@@ -4,7 +4,7 @@ mod serializer_v3;
 
 use crate::conversion::ToGValue;
 use crate::process::traversal::{Order, Scope};
-use crate::structure::{GValue, T};
+use crate::structure::{Cardinality, GValue, T};
 use serde_json::{json, Value};
 use std::string::ToString;
 
@@ -173,6 +173,19 @@ impl GraphSON {
                 "@type": "g:Pop",
                 "@value": *pop.to_string(),
             })),
+
+            GValue::Cardinality(cardinality) => {
+                let v = match cardinality {
+                    Cardinality::List => "list",
+                    Cardinality::Single => "single",
+                    Cardinality::Set => "set",
+                };
+
+                Ok(json!({
+                    "@type" : "g:Cardinality",
+                    "@value" : v
+                }))
+            }
 
             _ => panic!("Type {:?} not supported.", value),
         }

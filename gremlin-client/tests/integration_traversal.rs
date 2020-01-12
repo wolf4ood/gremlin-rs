@@ -1,5 +1,5 @@
 use gremlin_client::process::traversal::{traversal, Order, __};
-use gremlin_client::structure::{List, Map, Pop, TextP, Vertex, VertexProperty, P, T};
+use gremlin_client::structure::{Cardinality, List, Map, Pop, TextP, Vertex, VertexProperty, P, T};
 use gremlin_client::utils;
 
 mod common;
@@ -1709,4 +1709,35 @@ fn test_local() {
         .unwrap();
 
     assert_eq!(results.len(), 2);
+}
+
+#[test]
+fn test_property_cardinality() {
+    let client = graph();
+
+    drop_vertices(&client, "test_property_cardinality").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    let v1 = g
+        .add_v("test_property_cardinality")
+        .property("name", "a")
+        .to_list()
+        .unwrap();
+
+    assert!(v1.len() > 0);
+
+    g.v(v1[0].id())
+        .property_with_cardinality(Cardinality::List, "name", "b")
+        .next()
+        .unwrap();
+    let new_v = g.v(v1[0].id()).property_map(()).next().unwrap().unwrap();
+    assert_eq!(2, new_v["name"].get::<List>().unwrap().len());
+
+    g.v(v1[0].id())
+        .property_with_cardinality(Cardinality::Single, "name", "b")
+        .next()
+        .unwrap();
+    let new_v = g.v(v1[0].id()).property_map(()).next().unwrap().unwrap();
+    assert_eq!(1, new_v["name"].get::<List>().unwrap().len());
 }
