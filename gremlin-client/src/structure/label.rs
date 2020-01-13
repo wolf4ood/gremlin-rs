@@ -45,6 +45,14 @@ impl Into<Labels> for bool {
     }
 }
 
+impl Into<Labels> for (bool, Vec<&str>) {
+    fn into(self) -> Labels {
+        let mut out: Vec<LabelType> = vec![LabelType::Bool(self.0)];
+        out.append(&mut Into::<Labels>::into(self.1).0.drain(..).collect());
+        Labels(out)
+    }
+}
+
 macro_rules! impl_into_labels_str {
     ($n:expr) => {
         impl Into<Labels> for [&str; $n] {
