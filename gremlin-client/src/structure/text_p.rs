@@ -30,4 +30,39 @@ impl TextP {
     {
         TextP::new("containing", value.to_gvalue())
     }
+
+    pub fn starting_with<V>(value: V) -> TextP
+    where
+        V: ToGValue,
+    {
+        TextP::new("startingWith", value.to_gvalue())
+    }
+
+    pub fn ending_with<V>(value: V) -> TextP
+    where
+        V: ToGValue,
+    {
+        TextP::new("endingWith", value.to_gvalue())
+    }
+
+    pub fn not_starting_with<V>(value: V) -> TextP
+    where
+        V: ToGValue,
+    {
+        TextP::new("notStartingWith", value.to_gvalue())
+    }
+
+    pub fn not_ending_with<V>(value: V) -> TextP
+    where
+        V: ToGValue,
+    {
+        TextP::new("notEndingWith", value.to_gvalue())
+    }
+
+    pub fn not_containing<V>(value: V) -> TextP
+    where
+        V: ToGValue,
+    {
+        TextP::new("notContaining", value.to_gvalue())
+    }
 }
