@@ -418,9 +418,7 @@ mod tests {
 
     use crate::{edge, vertex};
 
-    use crate::structure::{
-        GValue, Map, Metric, Path, Property, Token, TraversalMetrics, Vertex, VertexProperty, GID,
-    };
+    use crate::structure::{GValue, Map, Path, Property, Token, Vertex, VertexProperty, GID};
     use chrono::offset::TimeZone;
     use std::collections::HashMap;
 
