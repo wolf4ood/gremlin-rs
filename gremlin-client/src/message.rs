@@ -4,11 +4,31 @@ use uuid::Uuid;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Message<T> {
-    pub request_id: Uuid,
-    op: String,
-    processor: String,
-    args: T,
+pub struct RequestIdV2 {
+    #[serde(rename = "@type")]
+    id_type: String,
+
+    #[serde(rename = "@value")]
+    value: Uuid,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase", untagged)]
+pub enum Message<T> {
+    #[serde(rename_all = "camelCase")]
+    V2 {
+        request_id: RequestIdV2,
+        op: String,
+        processor: String,
+        args: T,
+    },
+    #[serde(rename_all = "camelCase")]
+    V3 {
+        request_id: Uuid,
+        op: String,
+        processor: String,
+        args: T,
+    },
 }
 
 #[derive(Debug, Deserialize)]
@@ -30,6 +50,27 @@ pub struct ReponseStatus {
     pub message: String,
 }
 
+pub fn message_with_args_v2<T>(op: String, processor: String, args: T) -> Message<T> {
+    message_with_args_and_uuid_v2(op, processor, Uuid::new_v4(), args)
+}
+
+pub fn message_with_args_and_uuid_v2<T>(
+    op: String,
+    processor: String,
+    id: Uuid,
+    args: T,
+) -> Message<T> {
+    Message::V2 {
+        request_id: RequestIdV2 {
+            id_type: "g:UUID".to_string(),
+            value: id,
+        },
+        op: op,
+        processor: processor,
+        args: args,
+    }
+}
+
 pub fn message_with_args<T>(op: String, processor: String, args: T) -> Message<T> {
     message_with_args_and_uuid(op, processor, Uuid::new_v4(), args)
 }
@@ -40,7 +81,7 @@ pub fn message_with_args_and_uuid<T>(
     id: Uuid,
     args: T,
 ) -> Message<T> {
-    Message {
+    Message::V3 {
         request_id: id,
         op,
         processor,

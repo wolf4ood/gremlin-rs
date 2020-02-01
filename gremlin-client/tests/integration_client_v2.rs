@@ -2,22 +2,22 @@ mod common;
 
 use gremlin_client::{
     ConnectionOptions, GremlinClient, GremlinError, List, TlsOptions, ToGValue,
-    TraversalExplanation, TraversalMetrics, VertexProperty,
+    TraversalExplanation, TraversalMetrics, Version, VertexProperty,
 };
-use gremlin_client::{Edge, GValue, Map, Vertex};
+use gremlin_client::{Edge, GKey, GValue, Map, Vertex, GID};
 
-use common::{create_edge, create_vertex, expect_client, graph};
+use common::{create_edge, create_vertex, expect_client_version, graph_version};
 
 #[test]
-fn test_client_connection_ok() {
-    expect_client();
+fn test_client_connection_ok_v2() {
+    expect_client_version(Version::V2);
 }
 
 #[test]
-fn test_empty_query() {
+fn test_empty_query_v2() {
     assert_eq!(
         0,
-        graph()
+        graph_version(Version::V2)
             .execute("g.V().hasLabel('NotFound')", &[])
             .expect("It should execute a traversal")
             .count()
@@ -25,16 +25,17 @@ fn test_empty_query() {
 }
 
 #[test]
-fn test_ok_credentials() {
+fn test_ok_credentials_v2() {
     let client = GremlinClient::connect(
         ConnectionOptions::builder()
             .host("localhost")
-            .port(8183)
+            .port(8185)
             .credentials("stephen", "password")
             .ssl(true)
             .tls_options(TlsOptions {
                 accept_invalid_certs: true,
             })
+            .version(Version::V2)
             .build(),
     )
     .expect("Cannot connect");
@@ -44,16 +45,17 @@ fn test_ok_credentials() {
 }
 
 #[test]
-fn test_ko_credentials() {
+fn test_ko_credentials_v2() {
     let client = GremlinClient::connect(
         ConnectionOptions::builder()
             .host("localhost")
-            .port(8183)
+            .port(8185)
             .credentials("stephen", "pwd")
             .ssl(true)
             .tls_options(TlsOptions {
                 accept_invalid_certs: true,
             })
+            .version(Version::V2)
             .build(),
     )
     .expect("Cannot connect");
@@ -63,8 +65,8 @@ fn test_ko_credentials() {
 }
 
 #[test]
-fn test_wrong_query() {
-    let error = graph()
+fn test_wrong_query_v2() {
+    let error = graph_version(Version::V2)
         .execute("g.V", &[])
         .expect_err("it should return an error");
 
@@ -78,8 +80,8 @@ fn test_wrong_query() {
 }
 
 #[test]
-fn test_wrong_alias() {
-    let error = graph()
+fn test_wrong_alias_v2() {
+    let error = graph_version(Version::V2)
         .alias("foo")
         .execute("g.V()", &[])
         .expect_err("it should return an error");
@@ -95,8 +97,8 @@ fn test_wrong_alias() {
 
 #[test]
 
-fn test_vertex_query() {
-    let graph = graph();
+fn test_vertex_query_v2() {
+    let graph = graph_version(Version::V2);
     let vertices = graph
         .execute(
             "g.V().hasLabel('person').has('name',name)",
@@ -108,13 +110,11 @@ fn test_vertex_query() {
         .collect::<Result<Vec<Vertex>, _>>()
         .expect("It should be ok");
 
-    println!("Vertices: {:#?}", vertices);
-
     assert_eq!("person", vertices[0].label());
 }
 #[test]
-fn test_edge_query() {
-    let graph = graph();
+fn test_edge_query_v2() {
+    let graph = graph_version(Version::V2);
     let edges = graph
         .execute("g.E().hasLabel('knows').limit(1)", &[])
         .expect("it should execute a query")
@@ -127,8 +127,8 @@ fn test_edge_query() {
 }
 
 #[test]
-fn test_vertex_creation() {
-    let graph = graph();
+fn test_vertex_creation_v2() {
+    let graph = graph_version(Version::V2);
     let mark = create_vertex(&graph, "mark");
 
     assert_eq!("person", mark.label());
@@ -150,10 +150,10 @@ fn test_vertex_creation() {
 }
 
 #[test]
-fn test_complex_vertex_creation_with_properties() {
+fn test_complex_vertex_creation_with_properties_v2() {
     use chrono::offset::TimeZone;
 
-    let graph = graph();
+    let graph = graph_version(Version::V2);
 
     let q = r#"
         g.addV('person')
@@ -260,8 +260,8 @@ fn test_complex_vertex_creation_with_properties() {
 }
 
 #[test]
-fn test_edge_creation() {
-    let graph = graph();
+fn test_edge_creation_v2() {
+    let graph = graph_version(Version::V2);
     let mark = create_vertex(&graph, "mark");
     let frank = create_vertex(&graph, "frank");
 
@@ -291,8 +291,8 @@ fn test_edge_creation() {
 }
 
 #[test]
-fn test_profile() {
-    let graph = graph();
+fn test_profile_v2() {
+    let graph = graph_version(Version::V2);
 
     let metrics = graph
         .execute("g.V().limit(1).profile()", &[])
@@ -322,8 +322,8 @@ fn test_profile() {
 }
 
 #[test]
-fn test_explain() {
-    let graph = graph();
+fn test_explain_v2() {
+    let graph = graph_version(Version::V2);
 
     let metrics = graph
         .execute("g.V().limit(1).explain()", &[])
@@ -357,10 +357,12 @@ fn test_explain() {
 
 #[test]
 
-fn test_group_count_vertex() {
-    let graph = graph();
+fn test_group_count_vertex_v2() {
+    let graph = graph_version(Version::V2);
     let mark = create_vertex(&graph, "mark");
     let frank = create_vertex(&graph, "frank");
+
+    println!("FRANK: {:#?}", frank);
 
     create_edge(&graph, &mark, &frank, "knows");
 
@@ -375,21 +377,27 @@ fn test_group_count_vertex() {
         .collect::<Result<Vec<Map>, _>>()
         .expect("It should be ok");
 
+    println!("MAP IS: {:#?}", map);
+
     assert_eq!(1, map.len());
 
     let first = &map[0];
 
     assert_eq!(1, first.len());
 
-    let count = first.get(&frank);
+    let count = first.get(GKey::String(match frank.id() {
+        GID::String(s) => s.to_string(),
+        GID::Int32(i) => i.to_string(),
+        GID::Int64(i) => i.to_string(),
+    }));
 
     assert_eq!(Some(&GValue::Int64(1)), count);
 }
 
 #[test]
 
-fn test_group_count_edge() {
-    let graph = graph();
+fn test_group_count_edge_v2() {
+    let graph = graph_version(Version::V2);
     let mark = create_vertex(&graph, "mark");
     let frank = create_vertex(&graph, "frank");
 
@@ -412,7 +420,11 @@ fn test_group_count_edge() {
 
     assert_eq!(1, first.len());
 
-    let count = first.get(&edge);
+    let count = first.get(GKey::String(match edge.id() {
+        GID::String(s) => s.to_string(),
+        GID::Int32(i) => i.to_string(),
+        GID::Int64(i) => i.to_string(),
+    }));
 
     assert_eq!(Some(&GValue::Int64(1)), count);
 }

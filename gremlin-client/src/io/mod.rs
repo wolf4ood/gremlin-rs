@@ -1,17 +1,19 @@
 #[macro_use]
 mod macros;
+mod serializer_v2;
 mod serializer_v3;
 
 use crate::conversion::ToGValue;
 use crate::process::traversal::{Order, Scope};
 use crate::structure::{Cardinality, GValue, T};
-use serde_json::{json, Value};
+use serde_json::{json, Map, Value};
 use std::string::ToString;
 
-use crate::GremlinResult;
+use crate::{GremlinError, GremlinResult};
 
 #[derive(Debug, Clone)]
 pub enum GraphSON {
+    V2,
     V3,
 }
 
@@ -21,41 +23,47 @@ impl GraphSON {
             return Ok(None);
         }
         match self {
+            GraphSON::V2 => serializer_v2::deserializer_v2(value).map(Some),
             GraphSON::V3 => serializer_v3::deserializer_v3(value).map(Some),
         }
     }
 
     pub fn write(&self, value: &GValue) -> GremlinResult<Value> {
-        match value {
-            GValue::Double(f) => Ok(json!({
+        match (self, value) {
+            (_, GValue::Double(f)) => Ok(json!({
                 "@type" : "g:Double",
                 "@value" : f
             })),
-            GValue::Float(f) => Ok(json!({
+            (_, GValue::Float(f)) => Ok(json!({
                 "@type" : "g:Float",
                 "@value" : f
             })),
-            GValue::Int32(f) => Ok(json!({
+            (_, GValue::Int32(f)) => Ok(json!({
                 "@type" : "g:Int32",
                 "@value" : f
             })),
-            GValue::Int64(f) => Ok(json!({
+            (_, GValue::Int64(f)) => Ok(json!({
                 "@type" : "g:Int64",
                 "@value" : f
             })),
 
-            GValue::String(s) => Ok(Value::String(s.clone())),
+            (_, GValue::String(s)) => Ok(Value::String(s.clone())),
 
-            GValue::Uuid(s) => Ok(json!({
+            (_, GValue::Uuid(s)) => Ok(json!({
                 "@type" : "g:UUID",
                 "@value" : s.to_string()
             })),
-            GValue::Date(d) => Ok(json!({
+            (_, GValue::Date(d)) => Ok(json!({
                 "@type" : "g:Date",
                 "@value" : d.timestamp()
             })),
 
-            GValue::List(d) => {
+            (GraphSON::V2, GValue::List(d)) => {
+                let elements: GremlinResult<Vec<Value>> = d.iter().map(|e| self.write(e)).collect();
+                Ok(json!(elements?))
+            }
+
+            (GraphSON::V3, GValue::List(d)) => {
                 let elements: GremlinResult<Vec<Value>> = d.iter().map(|e| self.write(e)).collect();
                 Ok(json!({
                     "@type" : "g:List",
@@ -63,7 +71,7 @@ impl GraphSON {
                 }))
             }
 
-            GValue::P(p) => Ok(json!({
+            (_, GValue::P(p)) => Ok(json!({
                 "@type" : "g:P",
                 "@value" : {
                     "predicate" : p.operator(),
@@ -71,7 +79,7 @@ impl GraphSON {
                 }
             })),
 
-            GValue::Bytecode(code) => {
+            (_, GValue::Bytecode(code)) => {
                 let steps: GremlinResult<Vec<Value>> = code
                     .steps()
                     .iter()
@@ -93,7 +101,7 @@ impl GraphSON {
                     }
                 }))
             }
-            GValue::Vertex(v) => {
+            (_, GValue::Vertex(v)) => {
                 let id = self.write(&v.id().to_gvalue())?;
                 Ok(json!({
                     "@type" : "g:Vertex",
@@ -102,7 +110,24 @@ impl GraphSON {
                     }
                 }))
             }
-            GValue::Map(map) => {
+            (GraphSON::V2, GValue::Map(map)) => {
+                let mut params = Map::new();
+
+                for (k, v) in map.iter() {
+                    params.insert(
+                        self.write(&k.clone().into())?
+                            .as_str()
+                            .ok_or_else(|| {
+                                GremlinError::Generic("Non-string key value.".to_string())
+                            })?
+                            .to_string(),
+                        self.write(&v)?,
+                    );
+                }
+
+                Ok(json!(params))
+            }
+            (GraphSON::V3, GValue::Map(map)) => {
                 let mut params = vec![];
 
                 for (k, v) in map.iter() {
@@ -115,7 +140,7 @@ impl GraphSON {
                     "@value" : params
                 }))
             }
-            GValue::T(t) => {
+            (_, GValue::T(t)) => {
                 let v = match t {
                     T::Id => "id",
                     T::Key => "key",
@@ -128,7 +153,7 @@ impl GraphSON {
                     "@value" : v
                 }))
             }
-            GValue::Scope(s) => {
+            (_, GValue::Scope(s)) => {
                 let v = match s {
                     Scope::Global => "global",
                     Scope::Local => "local",
@@ -140,7 +165,7 @@ impl GraphSON {
                 }))
             }
 
-            GValue::Order(s) => {
+            (_, GValue::Order(s)) => {
                 let v = match s {
                     Order::Asc => "asc",
                     Order::Desc => "desc",
@@ -153,7 +178,7 @@ impl GraphSON {
                 }))
             }
 
-            GValue::Bool(b) => {
+            (_, GValue::Bool(b)) => {
                 let json_string = match b {
                     true => "true",
                     false => "false",
@@ -161,7 +186,7 @@ impl GraphSON {
                 Ok(serde_json::from_str(json_string).unwrap())
             }
 
-            GValue::TextP(text_p) => Ok(json!({
+            (_, GValue::TextP(text_p)) => Ok(json!({
                 "@type" : "g:TextP",
                 "@value" : {
                     "predicate" : text_p.operator(),
@@ -169,12 +194,12 @@ impl GraphSON {
                 }
             })),
 
-            GValue::Pop(pop) => Ok(json!({
+            (_, GValue::Pop(pop)) => Ok(json!({
                 "@type": "g:Pop",
                 "@value": *pop.to_string(),
             })),
 
-            GValue::Cardinality(cardinality) => {
+            (_, GValue::Cardinality(cardinality)) => {
                 let v = match cardinality {
                     Cardinality::List => "list",
                     Cardinality::Single => "single",
@@ -187,7 +212,7 @@ impl GraphSON {
                 }))
             }
 
-            _ => panic!("Type {:?} not supported.", value),
+            (_, _) => panic!("Type {:?} not supported.", value),
         }
     }
 }

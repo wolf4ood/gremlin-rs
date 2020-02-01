@@ -19,6 +19,50 @@ macro_rules! g_serializer {
     };
 }
 
+macro_rules! g_serializer_2 {
+    ($name:ident, { $($key:expr => $value:ident),*}) => {
+        pub fn $name(val: &Value) -> GremlinResult<GValue> {
+            if let Value::String(ref s) = val {
+                return Ok(s.clone().into())
+            }
+            if let Value::Array(_) = val {
+                let _type = "g:List";
+                let _value = &val;
+
+                return match _type {
+                    $($key => {
+                        $value(&$name,_value)
+                    })*
+                    _ => Err($crate::GremlinError::Json(format!("Type {} not supported",_type)))
+                }
+            }
+            if let Value::Object(ref o) = val {
+                if o.contains_key("@type") {
+                    let _type = o.get("@type").ok_or_else(|| $crate::GremlinError::Generic("Type missing".to_string()))?.as_str().ok_or_else(|| $crate::GremlinError::Generic("Type should be a string".to_string()))?;
+                    let _value = &o.get("@value").ok_or_else(|| $crate::GremlinError::Generic("Value missing".to_string()))?;
+
+                    return match _type {
+                        $($key => {
+                            $value(&$name,_value)
+                        })*
+                        _ => Err($crate::GremlinError::Json(format!("Type {} not supported",_type)))
+                    }
+                }
+            }
+
+            let _type = "g:Map";
+            let _value = &val;
+
+            match _type {
+                $($key => {
+                    $value(&$name,_value)
+                })*
+                _ => Err($crate::GremlinError::Json(format!("Type {} not supported",_type)))
+            }
+        }
+    };
+}
+
 macro_rules! get_value {
     ($value:expr,$v:path) => {
         match $value {

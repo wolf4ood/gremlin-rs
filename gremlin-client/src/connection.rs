@@ -2,6 +2,12 @@ use crate::{GremlinError, GremlinResult};
 use native_tls::TlsConnector;
 use websocket::{stream::sync::NetworkStream, sync::Client, ClientBuilder, OwnedMessage};
 
+#[derive(Clone, Debug)]
+pub enum Version {
+    V2,
+    V3,
+}
+
 struct ConnectionStream(Client<Box<dyn NetworkStream + Send>>);
 
 impl std::fmt::Debug for ConnectionStream {
@@ -108,6 +114,11 @@ impl ConnectionOptionsBuilder {
         self.0.tls_options = Some(options);
         self
     }
+
+    pub fn version(mut self, version: Version) -> Self {
+        self.0.version = version;
+        self
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -118,6 +129,7 @@ pub struct ConnectionOptions {
     pub(crate) credentials: Option<Credentials>,
     pub(crate) ssl: bool,
     pub(crate) tls_options: Option<TlsOptions>,
+    pub(crate) version: Version,
 }
 
 #[derive(Clone, Debug)]
@@ -140,6 +152,7 @@ impl Default for ConnectionOptions {
             credentials: None,
             ssl: false,
             tls_options: None,
+            version: Version::V3,
         }
     }
 }

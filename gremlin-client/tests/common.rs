@@ -1,15 +1,45 @@
-use gremlin_client::{Edge, GremlinClient, GremlinResult, Vertex};
+use gremlin_client::{ConnectionOptions, Edge, GremlinClient, GremlinResult, Version, Vertex};
 
+#[allow(dead_code)]
 pub fn connect() -> GremlinResult<GremlinClient> {
     GremlinClient::connect(("localhost", 8182))
 }
 
+#[allow(dead_code)]
+pub fn connect_version(version: Version) -> GremlinResult<GremlinClient> {
+    let port = match version {
+        Version::V2 => 8184,
+        Version::V3 => 8182,
+    };
+    GremlinClient::connect(
+        ConnectionOptions::builder()
+            .host("localhost")
+            .port(port)
+            .version(version)
+            .build(),
+    )
+}
+
+#[allow(dead_code)]
 pub fn expect_client() -> GremlinClient {
     connect().expect("It should connect")
 }
 
+#[allow(dead_code)]
+pub fn expect_client_version(version: Version) -> GremlinClient {
+    connect_version(version).expect("It should connect")
+}
+
+#[allow(dead_code)]
 pub fn graph() -> GremlinClient {
     let client = expect_client();
+
+    client
+}
+
+#[allow(dead_code)]
+pub fn graph_version(version: Version) -> GremlinClient {
+    let client = expect_client_version(version);
 
     client
 }
