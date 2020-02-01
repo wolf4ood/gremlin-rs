@@ -1,13 +1,31 @@
 use gremlin_client::aio::GremlinClient;
 
-use gremlin_client::{Edge, GremlinResult, Vertex};
+use gremlin_client::{ConnectionOptions, Edge, GremlinResult, Version, Vertex};
 
 use async_std::prelude::*;
 
+#[allow(dead_code)]
 pub async fn connect() -> GremlinClient {
     GremlinClient::connect(("localhost", 8182))
         .await
         .expect("It should connect")
+}
+
+#[allow(dead_code)]
+pub async fn connect_version(version: Version) -> GremlinClient {
+    let port = match version {
+        Version::V2 => 8184,
+        Version::V3 => 8182,
+    };
+    GremlinClient::connect(
+        ConnectionOptions::builder()
+            .host("localhost")
+            .port(port)
+            .version(version)
+            .build(),
+    )
+    .await
+    .expect("It should connect")
 }
 
 #[allow(dead_code)]

@@ -1,11 +1,13 @@
 use crate::aio::pool::GremlinConnectionManager;
 use crate::aio::GResultSet;
 use crate::io::GraphSON;
-use crate::message::{message_with_args, message_with_args_and_uuid, Message, Response};
+use crate::message::{
+    message_with_args, message_with_args_and_uuid, message_with_args_v2, Message, Response,
+};
 use crate::process::traversal::Bytecode;
 use crate::GValue;
 use crate::ToGValue;
-use crate::{ConnectionOptions, GremlinError, GremlinResult};
+use crate::{ConnectionOptions, GremlinError, GremlinResult, Version};
 use base64::encode;
 use mobc::{Connection, Pool};
 use serde::Serialize;
@@ -34,7 +36,10 @@ impl GremlinClient {
 
         Ok(GremlinClient {
             pool,
-            io: GraphSON::V3,
+            io: match opts.version {
+                Version::V2 => GraphSON::V2,
+                Version::V3 => GraphSON::V3,
+            },
             alias: None,
             options: opts,
         })
@@ -87,7 +92,10 @@ impl GremlinClient {
 
         let args = self.io.write(&GValue::from(args))?;
 
-        let message = message_with_args(String::from("eval"), String::default(), args);
+        let message = match self.options.version {
+            Version::V2 => message_with_args_v2(String::from("eval"), String::default(), args),
+            Version::V3 => message_with_args(String::from("eval"), String::default(), args),
+        };
 
         let conn = self.pool.get().await?;
 
@@ -101,7 +109,10 @@ impl GremlinClient {
     ) -> GremlinResult<()> {
         let message = self.build_message(msg)?;
 
-        let content_type = "application/vnd.gremlin-v3.0+json";
+        let content_type = match self.options.version {
+            Version::V2 => "application/vnd.gremlin-v2.0+json",
+            Version::V3 => "application/vnd.gremlin-v3.0+json",
+        };
         let payload = String::from("") + content_type + &message;
 
         let mut binary = payload.into_bytes();

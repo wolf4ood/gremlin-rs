@@ -120,7 +120,7 @@ mod message;
 mod pool;
 
 pub use client::GremlinClient;
-pub use connection::{ConnectionOptions, TlsOptions};
+pub use connection::{ConnectionOptions, TlsOptions, Version};
 pub use conversion::{BorrowFromGValue, FromGValue, ToGValue};
 pub use error::GremlinError;
 
