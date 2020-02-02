@@ -36,6 +36,7 @@ before_install:
   - cargo fmt --all -- --check
 
 script:
+  - while ! curl -s 127.0.0.1:8182 >/dev/null; do sleep 1 done
   - cargo test --all-features
 
 before_script:
