@@ -1,6 +1,7 @@
 use crate::process::traversal::step::has::IntoHasStep;
 use crate::process::traversal::step::loops::LoopsStep;
 use crate::process::traversal::step::not::IntoNotStep;
+use crate::process::traversal::step::select::IntoSelectStep;
 use crate::process::traversal::TraversalBuilder;
 use crate::structure::{GIDs, Labels};
 
@@ -87,6 +88,14 @@ impl AnonymousTraversalSource {
     {
         self.traversal.clone().loops(step)
     }
+
+    pub fn select<A>(&self, step: A) -> TraversalBuilder
+    where
+        A: IntoSelectStep,
+    {
+        self.traversal.clone().select(step)
+    }
+
 }
 
 impl Default for AnonymousTraversalSource {
