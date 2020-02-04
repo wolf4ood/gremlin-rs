@@ -7,7 +7,7 @@ use crate::message::{
 use crate::process::traversal::Bytecode;
 use crate::GValue;
 use crate::ToGValue;
-use crate::{ConnectionOptions, GremlinError, GremlinResult, Version};
+use crate::{ConnectionOptions, GremlinError, GremlinResult};
 use base64::encode;
 use mobc::{Connection, Pool};
 use serde::Serialize;
@@ -18,7 +18,6 @@ use futures::future::{BoxFuture, FutureExt};
 #[derive(Clone)]
 pub struct GremlinClient {
     pool: Pool<GremlinConnectionManager>,
-    io: GraphSON,
     alias: Option<String>,
     options: ConnectionOptions,
 }
@@ -36,10 +35,6 @@ impl GremlinClient {
 
         Ok(GremlinClient {
             pool,
-            io: match opts.version {
-                Version::V2 => GraphSON::V2,
-                Version::V3 => GraphSON::V3,
-            },
             alias: None,
             options: opts,
         })
@@ -90,11 +85,11 @@ impl GremlinClient {
 
         args.insert(String::from("bindings"), GValue::from(bindings));
 
-        let args = self.io.write(&GValue::from(args))?;
+        let args = self.options.serializer.write(&GValue::from(args))?;
 
-        let message = match self.options.version {
-            Version::V2 => message_with_args_v2(String::from("eval"), String::default(), args),
-            Version::V3 => message_with_args(String::from("eval"), String::default(), args),
+        let message = match self.options.serializer {
+            GraphSON::V2 => message_with_args_v2(String::from("eval"), String::default(), args),
+            GraphSON::V3 => message_with_args(String::from("eval"), String::default(), args),
         };
 
         let conn = self.pool.get().await?;
@@ -109,9 +104,9 @@ impl GremlinClient {
     ) -> GremlinResult<()> {
         let message = self.build_message(msg)?;
 
-        let content_type = match self.options.version {
-            Version::V2 => "application/vnd.gremlin-v2.0+json",
-            Version::V3 => "application/vnd.gremlin-v3.0+json",
+        let content_type = match self.options.serializer {
+            GraphSON::V2 => "application/vnd.gremlin-v2.0+json",
+            GraphSON::V3 => "application/vnd.gremlin-v3.0+json",
         };
         let payload = String::from("") + content_type + &message;
 
@@ -153,7 +148,7 @@ impl GremlinClient {
 
         args.insert(String::from("aliases"), GValue::from(aliases));
 
-        let args = self.io.write(&GValue::from(args))?;
+        let args = self.options.serializer.write(&GValue::from(args))?;
 
         let message = message_with_args(String::from("bytecode"), String::from("traversal"), args);
 
@@ -173,7 +168,8 @@ impl GremlinClient {
             match response.status.code {
                 200 | 206 => {
                     let results: VecDeque<GValue> = self
-                        .io
+                        .options
+                        .serializer
                         .read(&response.result.data)?
                         .map(|v| v.into())
                         .unwrap_or_else(VecDeque::new);
@@ -190,7 +186,7 @@ impl GremlinClient {
                             GValue::String(encode(&format!("\0{}\0{}", c.username, c.password))),
                         );
 
-                        let args = self.io.write(&GValue::from(args))?;
+                        let args = self.options.serializer.write(&GValue::from(args))?;
                         let message = message_with_args_and_uuid(
                             String::from("authentication"),
                             String::from("traversal"),

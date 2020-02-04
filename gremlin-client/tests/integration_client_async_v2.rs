@@ -3,23 +3,23 @@ mod common_async;
 mod aio {
 
     use gremlin_client::GremlinError;
-    use gremlin_client::{Edge, GValue, Map, Version, Vertex};
+    use gremlin_client::{Edge, GValue, GraphSON, Map, Vertex};
 
-    use super::common_async::{connect_version, create_edge, create_vertex};
+    use super::common_async::{connect_serializer, create_edge, create_vertex};
     use async_std::prelude::*;
     use async_std::task;
 
     #[test]
     fn test_client_connection_ok_v2() {
         task::block_on(async {
-            connect_version(Version::V2).await;
+            connect_serializer(GraphSON::V2).await;
         })
     }
 
     #[test]
     fn test_empty_query_v2() {
         task::block_on(async {
-            let graph = connect_version(Version::V2).await;
+            let graph = connect_serializer(GraphSON::V2).await;
 
             assert_eq!(
                 0,
@@ -45,7 +45,7 @@ mod aio {
     //                 .tls_options(TlsOptions {
     //                     accept_invalid_certs: true,
     //                 })
-    //                 .version(Version::V2)
+    //                 .serializer(GraphSON::V2)
     //                 .build(),
     //         )
     //         .await
@@ -67,7 +67,7 @@ mod aio {
     //             .tls_options(TlsOptions {
     //                 accept_invalid_certs: true,
     //             })
-    //             .version(Version::V2)
+    //             .serializer(GraphSON::V2)
     //             .build(),
     //     )
     //     .expect("Cannot connect");
@@ -79,7 +79,7 @@ mod aio {
     #[test]
     fn test_wrong_query_v2() {
         task::block_on(async {
-            let error = connect_version(Version::V2)
+            let error = connect_serializer(GraphSON::V2)
                 .await
                 .execute("g.V", &[])
                 .await
@@ -98,7 +98,7 @@ mod aio {
     #[test]
     fn test_wrong_alias_v2() {
         task::block_on(async {
-            let error = connect_version(Version::V2)
+            let error = connect_serializer(GraphSON::V2)
                 .await
                 .alias("foo")
                 .execute("g.V()", &[])
@@ -119,7 +119,7 @@ mod aio {
 
     fn test_vertex_query_v2() {
         task::block_on(async {
-            let graph = connect_version(Version::V2).await;
+            let graph = connect_serializer(GraphSON::V2).await;
             // TODO
             println!("About to execute query.");
             let vertices = graph
@@ -144,7 +144,7 @@ mod aio {
             // TODO
             println!("About to execute query.");
 
-            let graph = connect_version(Version::V2).await;
+            let graph = connect_serializer(GraphSON::V2).await;
             let edges = graph
                 .execute("g.E().hasLabel('knows').limit(1)", &[])
                 .await
@@ -162,7 +162,7 @@ mod aio {
     #[test]
     fn test_vertex_creation_v2() {
         task::block_on(async {
-            let graph = connect_version(Version::V2).await;
+            let graph = connect_serializer(GraphSON::V2).await;
             let mark = create_vertex(&graph, "mark").await;
 
             assert_eq!("person", mark.label());
@@ -189,7 +189,7 @@ mod aio {
     #[test]
     fn test_edge_creation_v2() {
         task::block_on(async {
-            let graph = connect_version(Version::V2).await;
+            let graph = connect_serializer(GraphSON::V2).await;
             let mark = create_vertex(&graph, "mark").await;
             let frank = create_vertex(&graph, "frank").await;
 

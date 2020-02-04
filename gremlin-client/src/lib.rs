@@ -120,9 +120,10 @@ mod message;
 mod pool;
 
 pub use client::GremlinClient;
-pub use connection::{ConnectionOptions, TlsOptions, Version};
+pub use connection::{ConnectionOptions, TlsOptions};
 pub use conversion::{BorrowFromGValue, FromGValue, ToGValue};
 pub use error::GremlinError;
+pub use io::GraphSON;
 
 pub type GremlinResult<T> = Result<T, error::GremlinError>;
 
