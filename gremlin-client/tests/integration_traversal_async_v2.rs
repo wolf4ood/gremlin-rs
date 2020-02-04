@@ -3,16 +3,16 @@ mod common_async;
 mod aio {
     use gremlin_client::process::traversal::traversal;
 
-    use super::common_async::{connect_version, create_vertex_with_label, drop_vertices};
+    use super::common_async::{connect_serializer, create_vertex_with_label, drop_vertices};
 
     use async_std::prelude::*;
     use async_std::task;
-    use gremlin_client::{Version, Vertex};
+    use gremlin_client::{GraphSON, Vertex};
 
     #[test]
     fn test_simple_vertex_traversal_with_multiple_id_v2() {
         task::block_on(async {
-            let client = connect_version(Version::V2).await;
+            let client = connect_serializer(GraphSON::V2).await;
             drop_vertices(&client, "test_simple_vertex_traversal_async")
                 .await
                 .unwrap();

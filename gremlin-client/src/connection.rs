@@ -1,12 +1,6 @@
-use crate::{GremlinError, GremlinResult};
+use crate::{GraphSON, GremlinError, GremlinResult};
 use native_tls::TlsConnector;
 use websocket::{stream::sync::NetworkStream, sync::Client, ClientBuilder, OwnedMessage};
-
-#[derive(Clone, Debug)]
-pub enum Version {
-    V2,
-    V3,
-}
 
 struct ConnectionStream(Client<Box<dyn NetworkStream + Send>>);
 
@@ -115,8 +109,8 @@ impl ConnectionOptionsBuilder {
         self
     }
 
-    pub fn version(mut self, version: Version) -> Self {
-        self.0.version = version;
+    pub fn serializer(mut self, serializer: GraphSON) -> Self {
+        self.0.serializer = serializer;
         self
     }
 }
@@ -129,7 +123,7 @@ pub struct ConnectionOptions {
     pub(crate) credentials: Option<Credentials>,
     pub(crate) ssl: bool,
     pub(crate) tls_options: Option<TlsOptions>,
-    pub(crate) version: Version,
+    pub(crate) serializer: GraphSON,
 }
 
 #[derive(Clone, Debug)]
@@ -152,7 +146,7 @@ impl Default for ConnectionOptions {
             credentials: None,
             ssl: false,
             tls_options: None,
-            version: Version::V3,
+            serializer: GraphSON::V3,
         }
     }
 }

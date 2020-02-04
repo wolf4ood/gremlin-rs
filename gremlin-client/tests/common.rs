@@ -1,4 +1,4 @@
-use gremlin_client::{ConnectionOptions, Edge, GremlinClient, GremlinResult, Version, Vertex};
+use gremlin_client::{ConnectionOptions, Edge, GraphSON, GremlinClient, GremlinResult, Vertex};
 
 #[allow(dead_code)]
 pub fn connect() -> GremlinResult<GremlinClient> {
@@ -6,16 +6,16 @@ pub fn connect() -> GremlinResult<GremlinClient> {
 }
 
 #[allow(dead_code)]
-pub fn connect_version(version: Version) -> GremlinResult<GremlinClient> {
-    let port = match version {
-        Version::V2 => 8184,
-        Version::V3 => 8182,
+pub fn connect_serializer(serializer: GraphSON) -> GremlinResult<GremlinClient> {
+    let port = match serializer {
+        GraphSON::V2 => 8184,
+        GraphSON::V3 => 8182,
     };
     GremlinClient::connect(
         ConnectionOptions::builder()
             .host("localhost")
             .port(port)
-            .version(version)
+            .serializer(serializer)
             .build(),
     )
 }
@@ -26,8 +26,8 @@ pub fn expect_client() -> GremlinClient {
 }
 
 #[allow(dead_code)]
-pub fn expect_client_version(version: Version) -> GremlinClient {
-    connect_version(version).expect("It should connect")
+pub fn expect_client_serializer(serializer: GraphSON) -> GremlinClient {
+    connect_serializer(serializer).expect("It should connect")
 }
 
 #[allow(dead_code)]
@@ -38,8 +38,8 @@ pub fn graph() -> GremlinClient {
 }
 
 #[allow(dead_code)]
-pub fn graph_version(version: Version) -> GremlinClient {
-    let client = expect_client_version(version);
+pub fn graph_serializer(serializer: GraphSON) -> GremlinClient {
+    let client = expect_client_serializer(serializer);
 
     client
 }

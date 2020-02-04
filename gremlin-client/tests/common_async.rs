@@ -1,6 +1,6 @@
 use gremlin_client::aio::GremlinClient;
 
-use gremlin_client::{ConnectionOptions, Edge, GremlinResult, Version, Vertex};
+use gremlin_client::{ConnectionOptions, Edge, GraphSON, GremlinResult, Vertex};
 
 use async_std::prelude::*;
 
@@ -12,16 +12,16 @@ pub async fn connect() -> GremlinClient {
 }
 
 #[allow(dead_code)]
-pub async fn connect_version(version: Version) -> GremlinClient {
-    let port = match version {
-        Version::V2 => 8184,
-        Version::V3 => 8182,
+pub async fn connect_serializer(serializer: GraphSON) -> GremlinClient {
+    let port = match serializer {
+        GraphSON::V2 => 8184,
+        GraphSON::V3 => 8182,
     };
     GremlinClient::connect(
         ConnectionOptions::builder()
             .host("localhost")
             .port(port)
-            .version(version)
+            .serializer(serializer)
             .build(),
     )
     .await
