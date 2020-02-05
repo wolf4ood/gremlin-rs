@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [#62](https://github.com/wolf4ood/gremlin-rs/issues/62) Added support for GraphSONv2
+
+
 ### Fixed
 
 ## [0.3.0] - 2020-01-06
