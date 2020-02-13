@@ -524,4 +524,14 @@ impl TraversalBuilder {
 
         self
     }
+
+    pub fn aggregate<A>(mut self, alias: A) -> Self
+    where
+        A: Into<String>,
+    {
+        self.bytecode
+            .add_step(String::from("aggregate"), vec![alias.into().into()]);
+
+        self
+    }
 }
