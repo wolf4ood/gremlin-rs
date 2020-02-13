@@ -95,7 +95,6 @@ impl AnonymousTraversalSource {
     {
         self.traversal.clone().select(step)
     }
-
 }
 
 impl Default for AnonymousTraversalSource {
