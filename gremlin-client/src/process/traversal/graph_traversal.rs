@@ -551,4 +551,13 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self.builder = self.builder.local(step);
         self
     }
+
+    pub fn aggregate<A>(mut self, alias: A) -> Self
+    where
+        A: Into<String>,
+    {
+        self.builder = self.builder.aggregate(alias);
+
+        self
+    }
 }
