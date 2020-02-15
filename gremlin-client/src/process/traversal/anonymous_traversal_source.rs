@@ -4,6 +4,7 @@ use crate::process::traversal::step::not::IntoNotStep;
 use crate::process::traversal::step::select::IntoSelectStep;
 use crate::process::traversal::TraversalBuilder;
 use crate::structure::{GIDs, Labels};
+use crate::GValue;
 
 pub struct AnonymousTraversalSource {
     traversal: TraversalBuilder,
@@ -14,6 +15,20 @@ impl AnonymousTraversalSource {
         AnonymousTraversalSource {
             traversal: TraversalBuilder::default(),
         }
+    }
+
+    pub fn add_v<A>(&self, label: A) -> TraversalBuilder
+    where
+        A: Into<Labels>,
+    {
+        self.traversal.clone().add_v(label)
+    }
+
+    pub fn property<A>(&self, key: &str, value: A) -> TraversalBuilder
+    where
+        A: Into<GValue>,
+    {
+        self.traversal.clone().property(key, value)
     }
 
     pub fn v<T>(&self, ids: T) -> TraversalBuilder
