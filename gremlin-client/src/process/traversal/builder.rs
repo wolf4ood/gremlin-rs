@@ -1,5 +1,6 @@
 use crate::conversion::ToGValue;
 use crate::process::traversal::step::by::IntoByStep;
+use crate::process::traversal::step::choose::IntoChooseStep;
 use crate::process::traversal::step::dedup::DedupStep;
 use crate::process::traversal::step::from::IntoFromStep;
 use crate::process::traversal::step::has::IntoHasStep;
@@ -521,7 +522,6 @@ impl TraversalBuilder {
     {
         self.bytecode
             .add_step(String::from("local"), step.into_step().take_params());
-
         self
     }
 
@@ -531,7 +531,20 @@ impl TraversalBuilder {
     {
         self.bytecode
             .add_step(String::from("aggregate"), vec![alias.into().into()]);
+        self
+    }
 
+    pub fn value(mut self) -> Self {
+        self.bytecode.add_step(String::from("value"), vec![]);
+        self
+    }
+
+    pub fn choose<A>(mut self, step: A) -> Self
+    where
+        A: IntoChooseStep,
+    {
+        self.bytecode
+            .add_step(String::from("choose"), step.into_step());
         self
     }
 }
