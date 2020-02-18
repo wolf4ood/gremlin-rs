@@ -17,6 +17,18 @@ impl AnonymousTraversalSource {
         }
     }
 
+    pub fn in_v(&self) -> TraversalBuilder
+    {
+        self.traversal.clone().in_v()
+    }
+
+    pub fn aggregate<A>(&self, alias: A) -> TraversalBuilder
+    where
+        A: Into<String>,
+    {
+        self.traversal.clone().aggregate(alias)
+    }
+
     pub fn add_v<A>(&self, label: A) -> TraversalBuilder
     where
         A: Into<Labels>,

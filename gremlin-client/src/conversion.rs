@@ -1,5 +1,6 @@
 use crate::{
     structure::{TextP, P as Predicate},
+    process::traversal::Bytecode,
     Edge, GKey, GValue, GremlinError, GremlinResult, IntermediateRepr, List, Map, Metric, Path,
     Property, Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
 };
@@ -72,6 +73,13 @@ impl ToGValue for String {
         GValue::String(self.clone())
     }
 }
+
+impl ToGValue for Bytecode {
+    fn to_gvalue(&self) -> GValue {
+        GValue::Bytecode(self.clone())
+    }
+}
+
 // Take from GValue
 
 #[doc(hidden)]
