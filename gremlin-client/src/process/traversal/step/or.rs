@@ -44,7 +44,7 @@ macro_rules! impl_into_or {
         impl IntoOrStep for [TraversalBuilder; $n] {
             fn into_step(self) -> OrStep {
                 OrStep::new(
-                    self.into_iter()
+                    self.iter()
                         .map(|s| s.bytecode.clone().into())
                         .collect(),
                 )
