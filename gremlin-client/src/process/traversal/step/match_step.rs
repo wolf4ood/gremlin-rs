@@ -37,11 +37,7 @@ macro_rules! impl_into_match {
     ($n:expr) => {
         impl IntoMatchStep for [TraversalBuilder; $n] {
             fn into_step(self) -> MatchStep {
-                MatchStep::new(
-                    self.iter()
-                        .map(|s| s.bytecode.clone().into())
-                        .collect(),
-                )
+                MatchStep::new(self.iter().map(|s| s.bytecode.clone().into()).collect())
             }
         }
     };
