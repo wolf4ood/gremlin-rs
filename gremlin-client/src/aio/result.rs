@@ -1,22 +1,23 @@
-use crate::aio::pool::GremlinConnectionManager;
 use crate::aio::GremlinClient;
 use crate::message::Response;
 use crate::structure::GValue;
 use crate::GremlinResult;
 use async_std::stream::Stream;
+use async_std::sync::Receiver;
 use core::task::Context;
 use core::task::Poll;
-use mobc::Connection;
+use pin_project_lite::pin_project;
 use std::collections::VecDeque;
-use std::future::Future;
 use std::pin::Pin;
 
-pub struct GResultSet {
-    client: GremlinClient,
-    results: VecDeque<GValue>,
-    response: Response,
-    conn: Option<Connection<GremlinConnectionManager>>,
-    state: GResultState,
+pin_project! {
+    pub struct GResultSet {
+        client: GremlinClient,
+        results: VecDeque<GValue>,
+        response: Response,
+        #[pin]
+        receiver: Receiver<GremlinResult<Response>>,
+    }
 }
 
 impl std::fmt::Debug for GResultSet {
@@ -28,34 +29,19 @@ impl std::fmt::Debug for GResultSet {
         )
     }
 }
-enum GResultState {
-    Looping,
-    NextPage(
-        Box<
-            dyn Future<
-                    Output = GremlinResult<(
-                        Response,
-                        VecDeque<GValue>,
-                        Connection<GremlinConnectionManager>,
-                    )>,
-                > + Send,
-        >,
-    ),
-}
 
 impl GResultSet {
     pub(crate) fn new(
         client: GremlinClient,
         results: VecDeque<GValue>,
         response: Response,
-        conn: Connection<GremlinConnectionManager>,
+        receiver: Receiver<GremlinResult<Response>>,
     ) -> GResultSet {
         GResultSet {
             client,
             results,
             response,
-            conn: Some(conn),
-            state: GResultState::Looping,
+            receiver,
         }
     }
 }
@@ -63,38 +49,36 @@ impl GResultSet {
 impl Stream for GResultSet {
     type Item = GremlinResult<GValue>;
 
-    fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+    fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+        let mut this = self.project();
         loop {
-            match &mut self.state {
-                GResultState::Looping => match self.results.pop_front() {
-                    Some(r) => return Poll::Ready(Some(Ok(r))),
-                    None => {
-                        if self.response.status.code == 206 {
-                            let client = self.client.clone();
-                            let mut conn = self
-                                .conn
-                                .take()
-                                .expect("It should have the connection at this point");
-                            let future = async move {
-                                let (response, results) = client.read_response(&mut conn).await?;
-                                Ok((response, results, conn))
-                            };
+            match this.results.pop_front() {
+                Some(r) => return Poll::Ready(Some(Ok(r))),
+                None => {
+                    if this.response.status.code == 206 {
+                        match futures::ready!(this.receiver.as_mut().poll_next(cx)) {
+                            Some(Ok(response)) => {
+                                let results: VecDeque<GValue> = this
+                                    .client
+                                    .options
+                                    .serializer
+                                    .read(&response.result.data)?
+                                    .map(|v| v.into())
+                                    .unwrap_or_else(VecDeque::new);
 
-                            self.state = GResultState::NextPage(Box::new(future));
-                        } else {
-                            return Poll::Ready(None);
+                                *this.results = results;
+                                *this.response = response;
+                            }
+                            Some(Err(e)) => {
+                                return Poll::Ready(Some(Err(e)));
+                            }
+                            None => {
+                                return Poll::Ready(None);
+                            }
                         }
+                    } else {
+                        return Poll::Ready(None);
                     }
-                },
-                GResultState::NextPage(page) => {
-                    let (response, resuts, conn) =
-                        futures::ready!(unsafe { Pin::new_unchecked(page.as_mut()) }.poll(cx))
-                            .expect("Failed to fetch the next page");
-
-                    self.conn = Some(conn);
-                    self.response = response;
-                    self.results = resuts;
-                    self.state = GResultState::Looping;
                 }
             }
         }
