@@ -31,6 +31,14 @@ pub enum Message<T> {
     },
 }
 
+impl<T> Message<T> {
+    pub fn id(&self) -> &Uuid {
+        match self {
+            Message::V2 { request_id, .. } => &request_id.value,
+            Message::V3 { request_id, .. } => request_id,
+        }
+    }
+}
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Response {

@@ -1,6 +1,6 @@
 use mobc::Manager;
 
-use crate::aio::connection::Connection;
+use crate::aio::connection::Conn;
 use crate::connection::ConnectionOptions;
 use crate::error::GremlinError;
 use async_trait::async_trait;
@@ -18,11 +18,11 @@ impl GremlinConnectionManager {
 
 #[async_trait]
 impl Manager for GremlinConnectionManager {
-    type Connection = Connection;
+    type Connection = Conn;
     type Error = GremlinError;
 
     async fn connect(&self) -> Result<Self::Connection, Self::Error> {
-        Connection::connect(self.options.clone()).await
+        Conn::connect(self.options.clone()).await
     }
 
     async fn check(&self, conn: Self::Connection) -> Result<Self::Connection, Self::Error> {
