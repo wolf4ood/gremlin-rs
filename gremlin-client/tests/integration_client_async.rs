@@ -67,7 +67,9 @@ mod aio {
         task::block_on(async {
             let graph = connect().await;
 
-            drop_vertices(&graph, "Partial").await.expect("Failed to drop vertices");
+            drop_vertices(&graph, "Partial")
+                .await
+                .expect("Failed to drop vertices");
 
             for i in 0..1000 {
                 graph
