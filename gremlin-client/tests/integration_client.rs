@@ -318,6 +318,7 @@ fn test_profile() {
             .iter()
             .map(|s| s.perc_duration())
             .fold(0.0, |acc, x| acc + x)
+            .round()
     );
 }
 
