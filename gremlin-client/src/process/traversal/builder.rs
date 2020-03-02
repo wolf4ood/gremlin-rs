@@ -1,5 +1,6 @@
 use crate::conversion::ToGValue;
 use crate::process::traversal::step::by::IntoByStep;
+use crate::process::traversal::step::coalesce::IntoCoalesceStep;
 use crate::process::traversal::step::dedup::DedupStep;
 use crate::process::traversal::step::from::IntoFromStep;
 use crate::process::traversal::step::has::IntoHasStep;
@@ -531,6 +532,16 @@ impl TraversalBuilder {
     {
         self.bytecode
             .add_step(String::from("aggregate"), vec![alias.into().into()]);
+
+        self
+    }
+
+    pub fn coalesce<A>(mut self, coalesce: A) -> Self
+    where
+        A: IntoCoalesceStep,
+    {
+        self.bytecode
+            .add_step(String::from("coalesce"), coalesce.into_step().take_params());
 
         self
     }

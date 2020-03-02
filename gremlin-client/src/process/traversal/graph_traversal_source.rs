@@ -916,4 +916,31 @@ mod tests {
 
         assert_eq!(&code, g.v(()).or(()).bytecode());
     }
+
+    #[test]
+    fn coalesce_test() {
+        let g = empty();
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("hasLabel"), vec!["Person".into()]);
+        code.add_step(
+            String::from("coalesce"),
+            vec![
+                __.values("nickname").bytecode().clone().into(),
+                __.values("name").bytecode().clone().into(),
+            ],
+        );
+
+        assert_eq!(
+            &code,
+            g.v(())
+                .has_label("Person")
+                .coalesce::<GValue, _>([__.values("nickname"), __.values("name")])
+                .bytecode()
+        );
+    }
+
+    // g.V().hasLabel('person').coalesce(values('nickname'), values('name'))
 }
