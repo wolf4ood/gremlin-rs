@@ -1741,3 +1741,39 @@ fn test_property_cardinality() {
     let new_v = g.v(v1[0].id()).property_map(()).next().unwrap().unwrap();
     assert_eq!(1, new_v["name"].get::<List>().unwrap().len());
 }
+
+#[test]
+fn test_coalesce() {
+    let client = graph();
+
+    use gremlin_client::GValue;
+
+    drop_vertices(&client, "test_coalesce").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    g.add_v("test_coalesce")
+        .property("name", "a")
+        .to_list()
+        .unwrap();
+
+    g.add_v("test_coalesce")
+        .property("nickname", "b")
+        .to_list()
+        .unwrap();
+
+    let v = g
+        .v(())
+        .has_label("test_coalesce")
+        .coalesce::<GValue, _>([__.values("nickname"), __.values("name")])
+        .to_list()
+        .unwrap();
+
+    let values = v
+        .into_iter()
+        .map(|e| e.take::<String>().unwrap())
+        .collect::<Vec<_>>();
+
+    assert!(values.contains(&String::from("a")));
+    assert!(values.contains(&String::from("b")));
+}
