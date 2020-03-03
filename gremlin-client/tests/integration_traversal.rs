@@ -1777,3 +1777,60 @@ fn test_coalesce() {
     assert!(values.contains(&String::from("a")));
     assert!(values.contains(&String::from("b")));
 }
+
+#[test]
+fn test_coalesce_unfold() {
+    let client = graph();
+
+    drop_vertices(&client, "test_coalesce_unfold").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    g.v(())
+        .has(("test_coalesce_unfold", "name", "unfold"))
+        .fold()
+        .coalesce::<Vertex, _>([__.unfold(), __.add_v("test_coalesce_unfold")])
+        .property("name", "unfold")
+        .next()
+        .expect("It should create a vertex with coalesce");
+
+    let v = g
+        .v(())
+        .has_label("test_coalesce_unfold")
+        .value_map(())
+        .to_list()
+        .unwrap();
+
+    let values = v.into_iter().collect::<Vec<_>>();
+
+    assert_eq!(1, values.len());
+
+    assert_eq!(
+        "unfold",
+        utils::unwrap_map::<String>(&values[0], "name", 0).unwrap()
+    );
+
+    g.v(())
+        .has(("test_coalesce_unfold", "name", "unfold"))
+        .fold()
+        .coalesce::<Vertex, _>([__.unfold(), __.add_v("test_coalesce_unfold")])
+        .property("name", "unfold")
+        .next()
+        .expect("It should create a vertex with coalesce");
+
+    let v = g
+        .v(())
+        .has_label("test_coalesce_unfold")
+        .value_map(())
+        .to_list()
+        .unwrap();
+
+    let values = v.into_iter().collect::<Vec<_>>();
+
+    assert_eq!(1, values.len());
+
+    assert_eq!(
+        "unfold",
+        utils::unwrap_map::<String>(&values[0], "name", 0).unwrap()
+    );
+}

@@ -23,6 +23,20 @@ impl AnonymousTraversalSource {
         self.traversal.clone().v(ids)
     }
 
+    pub fn add_v<A>(&self, label: A) -> TraversalBuilder
+    where
+        A: Into<Labels>,
+    {
+        self.traversal.clone().add_v(label)
+    }
+
+    pub fn add_e<A>(&self, label: A) -> TraversalBuilder
+    where
+        A: Into<String>,
+    {
+        self.traversal.clone().add_e(label)
+    }
+
     pub fn count(&self) -> TraversalBuilder {
         self.traversal.clone().count()
     }
@@ -94,6 +108,14 @@ impl AnonymousTraversalSource {
         A: IntoSelectStep,
     {
         self.traversal.clone().select(step)
+    }
+
+    pub fn fold(&self) -> TraversalBuilder {
+        self.traversal.clone().fold()
+    }
+
+    pub fn unfold(&self) -> TraversalBuilder {
+        self.traversal.clone().unfold()
     }
 }
 
