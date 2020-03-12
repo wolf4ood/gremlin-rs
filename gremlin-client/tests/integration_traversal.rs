@@ -1761,11 +1761,11 @@ fn test_choose() {
         .next()
         .unwrap();
 
-    let success_vertices = g.v(()).has_label("test_choose_failure").next().unwrap();
-    assert_eq!(success_vertices.is_some(), true);
-
     let success_vertices = g.v(()).has_label("test_choose_success").next().unwrap();
     assert_eq!(success_vertices.is_some(), true);
+
+    let success_vertices = g.v(()).has_label("test_choose_failure").next().unwrap();
+    assert_eq!(success_vertices.is_some(), false);
 
     g.add_v("test_choose")
         .property("name", "b")
