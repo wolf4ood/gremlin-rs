@@ -558,4 +558,21 @@ impl TraversalBuilder {
 
         self
     }
+
+    pub fn identity(mut self) -> Self {
+        self.bytecode.add_step(String::from("identity"), vec![]);
+        self
+    }
+
+    pub fn range(mut self, step: i64, step2: i64) -> Self {
+        self.bytecode
+            .add_step(String::from("range"), vec![step.into(), step2.into()]);
+        self
+    }
+
+    pub fn cap(mut self, step: &'static str) -> Self {
+        self.bytecode
+            .add_step(String::from("cap"), vec![step.into()]);
+        self
+    }
 }

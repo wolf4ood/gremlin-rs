@@ -586,4 +586,19 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
         GraphTraversal::new(self.terminator, self.builder)
     }
+
+    pub fn identity(mut self) -> Self {
+        self.builder = self.builder.identity();
+        self
+    }
+
+    pub fn range(mut self, step: i64, step2: i64) -> Self {
+        self.builder = self.builder.range(step, step2);
+        self
+    }
+
+    pub fn cap(mut self, step: &'static str) -> Self {
+        self.builder = self.builder.cap(step);
+        self
+    }
 }
