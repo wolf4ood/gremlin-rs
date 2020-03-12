@@ -1,6 +1,6 @@
 use crate::{
-    structure::{TextP, P as Predicate},
     process::traversal::Bytecode,
+    structure::{TextP, P as Predicate},
     Edge, GKey, GValue, GremlinError, GremlinResult, IntermediateRepr, List, Map, Metric, Path,
     Property, Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
 };
