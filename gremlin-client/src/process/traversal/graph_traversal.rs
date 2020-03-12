@@ -1,6 +1,7 @@
 use crate::conversion::FromGValue;
 use crate::process::traversal::step::by::IntoByStep;
 use crate::process::traversal::step::choose::IntoChooseStep;
+use crate::process::traversal::step::coalesce::IntoCoalesceStep;
 use crate::process::traversal::step::dedup::DedupStep;
 use crate::process::traversal::step::from::IntoFromStep;
 use crate::process::traversal::step::has::IntoHasStep;
@@ -573,5 +574,16 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
     {
         self.builder = self.builder.choose(step);
         self
+    }
+
+    pub fn coalesce<B, A>(mut self, colaesce: A) -> GraphTraversal<S, B, T>
+    where
+        A: IntoCoalesceStep,
+        B: FromGValue,
+        T: Terminator<B>,
+    {
+        self.builder = self.builder.coalesce(colaesce);
+
+        GraphTraversal::new(self.terminator, self.builder)
     }
 }

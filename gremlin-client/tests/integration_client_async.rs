@@ -5,7 +5,7 @@ mod aio {
     use gremlin_client::GremlinError;
     use gremlin_client::{Edge, GValue, Map, Vertex};
 
-    use super::common_async::{connect, create_edge, create_vertex};
+    use super::common_async::{connect, create_edge, create_vertex, drop_vertices};
     use async_std::prelude::*;
     use async_std::task;
 
@@ -30,6 +30,63 @@ mod aio {
                     .count()
                     .await
             )
+        })
+    }
+
+    #[test]
+    fn test_keep_alive_query() {
+        task::block_on(async {
+            let graph = connect().await;
+
+            assert_eq!(
+                0,
+                graph
+                    .execute("g.V().hasLabel('NotFound')", &[])
+                    .await
+                    .expect("It should execute a traversal")
+                    .count()
+                    .await
+            );
+
+            task::sleep(std::time::Duration::from_millis(2500)).await;
+
+            assert_eq!(
+                0,
+                graph
+                    .execute("g.V().hasLabel('NotFound')", &[])
+                    .await
+                    .expect("It should execute a traversal")
+                    .count()
+                    .await
+            )
+        })
+    }
+
+    #[test]
+    fn test_partial_content() {
+        task::block_on(async {
+            let graph = connect().await;
+
+            drop_vertices(&graph, "Partial")
+                .await
+                .expect("Failed to drop vertices");
+
+            for i in 0..1000 {
+                graph
+                    .execute("g.addV('Partial').property('id',_id)", &[("_id", &i)])
+                    .await
+                    .expect("It should execute a traversal");
+            }
+
+            assert_eq!(
+                1000,
+                graph
+                    .execute("g.V().hasLabel('Partial')", &[])
+                    .await
+                    .expect("It should execute a traversal")
+                    .count()
+                    .await
+            );
         })
     }
 

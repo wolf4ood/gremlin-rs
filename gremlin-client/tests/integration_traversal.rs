@@ -1783,3 +1783,95 @@ fn test_choose() {
     let success_vertices = g.v(()).has_label("test_choose_success2").next().unwrap();
     assert_eq!(success_vertices.is_some(), true);
 }
+
+fn test_coalesce() {
+    let client = graph();
+
+    use gremlin_client::GValue;
+
+    drop_vertices(&client, "test_coalesce").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    g.add_v("test_coalesce")
+        .property("name", "a")
+        .to_list()
+        .unwrap();
+
+    g.add_v("test_coalesce")
+        .property("nickname", "b")
+        .to_list()
+        .unwrap();
+
+    let v = g
+        .v(())
+        .has_label("test_coalesce")
+        .coalesce::<GValue, _>([__.values("nickname"), __.values("name")])
+        .to_list()
+        .unwrap();
+
+    let values = v
+        .into_iter()
+        .map(|e| e.take::<String>().unwrap())
+        .collect::<Vec<_>>();
+
+    assert!(values.contains(&String::from("a")));
+    assert!(values.contains(&String::from("b")));
+}
+
+#[test]
+fn test_coalesce_unfold() {
+    let client = graph();
+
+    drop_vertices(&client, "test_coalesce_unfold").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    g.v(())
+        .has(("test_coalesce_unfold", "name", "unfold"))
+        .fold()
+        .coalesce::<Vertex, _>([__.unfold(), __.add_v("test_coalesce_unfold")])
+        .property("name", "unfold")
+        .next()
+        .expect("It should create a vertex with coalesce");
+
+    let v = g
+        .v(())
+        .has_label("test_coalesce_unfold")
+        .value_map(())
+        .to_list()
+        .unwrap();
+
+    let values = v.into_iter().collect::<Vec<_>>();
+
+    assert_eq!(1, values.len());
+
+    assert_eq!(
+        "unfold",
+        utils::unwrap_map::<String>(&values[0], "name", 0).unwrap()
+    );
+
+    g.v(())
+        .has(("test_coalesce_unfold", "name", "unfold"))
+        .fold()
+        .coalesce::<Vertex, _>([__.unfold(), __.add_v("test_coalesce_unfold")])
+        .property("name", "unfold")
+        .next()
+        .expect("It should create a vertex with coalesce");
+
+    let v = g
+        .v(())
+        .has_label("test_coalesce_unfold")
+        .value_map(())
+        .to_list()
+        .unwrap();
+
+    let values = v.into_iter().collect::<Vec<_>>();
+
+    assert_eq!(1, values.len());
+
+    assert_eq!(
+        "unfold",
+        utils::unwrap_map::<String>(&values[0], "name", 0).unwrap()
+    );
+}
