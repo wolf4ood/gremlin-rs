@@ -1,4 +1,5 @@
 pub mod by;
+pub mod choose;
 pub mod coalesce;
 pub mod dedup;
 pub mod from;

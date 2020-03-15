@@ -1,9 +1,12 @@
 use crate::process::traversal::step::has::IntoHasStep;
 use crate::process::traversal::step::loops::LoopsStep;
 use crate::process::traversal::step::not::IntoNotStep;
+use crate::process::traversal::step::or::IntoOrStep;
 use crate::process::traversal::step::select::IntoSelectStep;
+use crate::process::traversal::step::where_step::IntoWhereStep;
 use crate::process::traversal::TraversalBuilder;
-use crate::structure::{GIDs, Labels};
+use crate::structure::{GIDs, IntoPredicate, Labels};
+use crate::GValue;
 
 pub struct AnonymousTraversalSource {
     traversal: TraversalBuilder,
@@ -16,11 +19,15 @@ impl AnonymousTraversalSource {
         }
     }
 
-    pub fn v<T>(&self, ids: T) -> TraversalBuilder
+    pub fn in_v(&self) -> TraversalBuilder {
+        self.traversal.clone().in_v()
+    }
+
+    pub fn aggregate<A>(&self, alias: A) -> TraversalBuilder
     where
-        T: Into<GIDs>,
+        A: Into<String>,
     {
-        self.traversal.clone().v(ids)
+        self.traversal.clone().aggregate(alias)
     }
 
     pub fn add_v<A>(&self, label: A) -> TraversalBuilder
@@ -28,6 +35,20 @@ impl AnonymousTraversalSource {
         A: Into<Labels>,
     {
         self.traversal.clone().add_v(label)
+    }
+
+    pub fn property<A>(&self, key: &str, value: A) -> TraversalBuilder
+    where
+        A: Into<GValue>,
+    {
+        self.traversal.clone().property(key, value)
+    }
+
+    pub fn v<T>(&self, ids: T) -> TraversalBuilder
+    where
+        T: Into<GIDs>,
+    {
+        self.traversal.clone().v(ids)
     }
 
     pub fn add_e<A>(&self, label: A) -> TraversalBuilder
@@ -116,6 +137,35 @@ impl AnonymousTraversalSource {
 
     pub fn unfold(&self) -> TraversalBuilder {
         self.traversal.clone().unfold()
+    }
+
+    pub fn out_v(&self) -> TraversalBuilder {
+        self.traversal.clone().out_v()
+    }
+
+    pub fn is<A>(&self, val: A) -> TraversalBuilder
+    where
+        A: IntoPredicate,
+    {
+        self.traversal.clone().is(val)
+    }
+
+    pub fn or<A>(&self, step: A) -> TraversalBuilder
+    where
+        A: IntoOrStep,
+    {
+        self.traversal.clone().or(step)
+    }
+
+    pub fn where_<A>(&self, step: A) -> TraversalBuilder
+    where
+        A: IntoWhereStep,
+    {
+        self.traversal.clone().where_(step)
+    }
+
+    pub fn cap(&self, step: &'static str) -> TraversalBuilder {
+        self.traversal.clone().cap(step)
     }
 }
 

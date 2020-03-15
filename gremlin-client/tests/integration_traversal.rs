@@ -1743,6 +1743,47 @@ fn test_property_cardinality() {
 }
 
 #[test]
+fn test_choose() {
+    let client = graph();
+
+    drop_vertices(&client, "test_choose").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    g.add_v("test_choose")
+        .property("name", "a")
+        .as_("source")
+        .choose((
+            __.select("source").has("name"),
+            __.add_v("test_choose_success"),
+            __.add_v("test_choose_failure"),
+        ))
+        .next()
+        .unwrap();
+
+    let success_vertices = g.v(()).has_label("test_choose_success").next().unwrap();
+    assert_eq!(success_vertices.is_some(), true);
+
+    let success_vertices = g.v(()).has_label("test_choose_failure").next().unwrap();
+    assert_eq!(success_vertices.is_some(), false);
+
+    g.add_v("test_choose")
+        .property("name", "b")
+        .as_("source")
+        .choose((
+            __.select("source").has("name"),
+            __.add_v("test_choose_success2"),
+        ))
+        .next()
+        .unwrap();
+
+    let success_vertices = g.v(()).has_label("test_choose_failure2").next().unwrap();
+    assert_eq!(success_vertices.is_some(), false);
+
+    let success_vertices = g.v(()).has_label("test_choose_success2").next().unwrap();
+    assert_eq!(success_vertices.is_some(), true);
+}
+
 fn test_coalesce() {
     let client = graph();
 

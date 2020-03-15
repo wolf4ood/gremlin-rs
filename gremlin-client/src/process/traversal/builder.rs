@@ -1,5 +1,6 @@
 use crate::conversion::ToGValue;
 use crate::process::traversal::step::by::IntoByStep;
+use crate::process::traversal::step::choose::IntoChooseStep;
 use crate::process::traversal::step::coalesce::IntoCoalesceStep;
 use crate::process::traversal::step::dedup::DedupStep;
 use crate::process::traversal::step::from::IntoFromStep;
@@ -522,7 +523,6 @@ impl TraversalBuilder {
     {
         self.bytecode
             .add_step(String::from("local"), step.into_step().take_params());
-
         self
     }
 
@@ -532,7 +532,20 @@ impl TraversalBuilder {
     {
         self.bytecode
             .add_step(String::from("aggregate"), vec![alias.into().into()]);
+        self
+    }
 
+    pub fn value(mut self) -> Self {
+        self.bytecode.add_step(String::from("value"), vec![]);
+        self
+    }
+
+    pub fn choose<A>(mut self, step: A) -> Self
+    where
+        A: IntoChooseStep,
+    {
+        self.bytecode
+            .add_step(String::from("choose"), step.into_step());
         self
     }
 
@@ -543,6 +556,23 @@ impl TraversalBuilder {
         self.bytecode
             .add_step(String::from("coalesce"), coalesce.into_step().take_params());
 
+        self
+    }
+
+    pub fn identity(mut self) -> Self {
+        self.bytecode.add_step(String::from("identity"), vec![]);
+        self
+    }
+
+    pub fn range(mut self, step: i64, step2: i64) -> Self {
+        self.bytecode
+            .add_step(String::from("range"), vec![step.into(), step2.into()]);
+        self
+    }
+
+    pub fn cap(mut self, step: &'static str) -> Self {
+        self.bytecode
+            .add_step(String::from("cap"), vec![step.into()]);
         self
     }
 }
