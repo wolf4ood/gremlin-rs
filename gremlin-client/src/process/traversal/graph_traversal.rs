@@ -17,12 +17,15 @@ use crate::process::traversal::step::to::ToStep;
 use crate::process::traversal::step::until::UntilStep;
 use crate::process::traversal::step::where_step::WhereStep;
 
-use crate::process::traversal::remote::Terminator;
-use crate::process::traversal::{Bytecode, Scope, TraversalBuilder};
+use crate::process::traversal::remote::{Terminator, SyncTerminator};
+use crate::process::traversal::{Bytecode, Scope, TraversalBuilder, WRITE_OPERATORS};
+use crate::process::traversal::strategies::{
+    RemoteStrategy, TraversalStrategies, TraversalStrategy,
+};
 use crate::structure::{Cardinality, Labels};
 use crate::{
     structure::GIDs, structure::GProperty, structure::IntoPredicate, Edge, GValue, List, Map, Path,
-    Vertex,
+    Vertex, GremlinClient
 };
 use std::marker::PhantomData;
 
@@ -43,6 +46,24 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
             terminator,
         }
     }
+
+    pub fn change_remote(self, client: GremlinClient) -> GraphTraversal<S, E, SyncTerminator> {
+        let mut strategies = TraversalStrategies::new(vec![]);
+
+        strategies.add_strategy(TraversalStrategy::Remote(RemoteStrategy::new(client)));
+
+        GraphTraversal {
+            start: self.start,
+            end: self.end,
+            builder: self.builder,
+            terminator: SyncTerminator::new(strategies)
+        }
+    }
+
+    pub fn does_write(&self) -> bool {
+        self.bytecode().steps().iter().any(|instruction| WRITE_OPERATORS.contains(&&*instruction.operator().as_ref()))
+    }
+
     pub fn bytecode(&self) -> &Bytecode {
         &self.builder.bytecode
     }
