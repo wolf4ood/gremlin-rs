@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Fixed
+
+## [0.3.2] - 2020-03-22
+
+### Added
+
+- [#67](https://github.com/wolf4ood/gremlin-rs/issues/67) Implemented coalesce 
+- [#66](https://github.com/wolf4ood/gremlin-rs/pull/66)  Added anonymous steps (add_v,property) and traversal steps (choose,value)
 
 ### Fixed
 
