@@ -32,6 +32,7 @@ pub enum Message<T> {
 }
 
 impl<T> Message<T> {
+    #[allow(dead_code)]
     pub fn id(&self) -> &Uuid {
         match self {
             Message::V2 { request_id, .. } => &request_id.value,

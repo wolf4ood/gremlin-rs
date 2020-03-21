@@ -1784,6 +1784,7 @@ fn test_choose() {
     assert_eq!(success_vertices.is_some(), true);
 }
 
+#[test]
 fn test_coalesce() {
     let client = graph();
 
