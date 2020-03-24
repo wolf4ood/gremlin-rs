@@ -23,8 +23,8 @@ addons:
 
 
 env:
-  - GREMLIN_SERVER=3.4.2
-  - GREMLIN_SERVER=3.4.3
+  - GREMLIN_SERVER=3.4.5
+  - GREMLIN_SERVER=3.4.6
 
 
 matrix:
