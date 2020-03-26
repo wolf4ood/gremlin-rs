@@ -622,4 +622,14 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self.builder = self.builder.cap(step);
         self
     }
+
+    pub fn barrier(mut self) -> Self {
+        self.builder = self.builder.barrier();
+        self
+    }
+
+    pub fn optional(mut self, step: TraversalBuilder) -> Self {
+        self.builder = self.builder.optional(step);
+        self
+    }
 }
