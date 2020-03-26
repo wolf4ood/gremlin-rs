@@ -575,4 +575,14 @@ impl TraversalBuilder {
             .add_step(String::from("cap"), vec![step.into()]);
         self
     }
+
+    pub fn barrier(mut self) -> Self {
+        self.bytecode.add_step(String::from("barrier"), vec![]);
+        self
+    }
+
+    pub fn optional(mut self, step: TraversalBuilder) -> Self {
+        self.bytecode.add_step(String::from("optional"), vec![step.bytecode.into()]);
+        self
+    }
 }
