@@ -1,6 +1,7 @@
 use crate::io::GraphSON;
 use crate::message::{
-    message_with_args, message_with_args_and_uuid, message_with_args_v2, Message, Response,
+    message_with_args, message_with_args_and_uuid, message_with_args_v1, message_with_args_v2,
+    Message, Response,
 };
 use crate::pool::GremlinConnectionManager;
 use crate::process::traversal::Bytecode;
@@ -85,6 +86,7 @@ impl GremlinClient {
         let args = self.options.serializer.write(&GValue::from(args))?;
 
         let message = match self.options.serializer {
+            GraphSON::V1 => message_with_args_v1(String::from("eval"), String::default(), args),
             GraphSON::V2 => message_with_args_v2(String::from("eval"), String::default(), args),
             GraphSON::V3 => message_with_args(String::from("eval"), String::default(), args),
         };
@@ -102,10 +104,14 @@ impl GremlinClient {
         let message = self.build_message(msg)?;
 
         let content_type = match self.options.serializer {
+            GraphSON::V1 => "application/vnd.gremlin-v1.0+json",
             GraphSON::V2 => "application/vnd.gremlin-v2.0+json",
             GraphSON::V3 => "application/vnd.gremlin-v3.0+json",
         };
         let payload = String::from("") + content_type + &message;
+
+        println!("GremlinClient::write_message message: {:#?}", payload);
+        println!();
 
         let mut binary = payload.into_bytes();
         binary.insert(0, content_type.len() as u8);
@@ -123,6 +129,11 @@ impl GremlinClient {
         self.write_message(&mut conn, msg)?;
 
         let (response, results) = self.read_response(&mut conn)?;
+
+        println!("GremlinClient::send_message response: {:#?}", response);
+        println!();
+        println!("GremlinClient::send_message results: {:#?}", results);
+        println!();
 
         Ok(GResultSet::new(self.clone(), results, response, conn))
     }
@@ -158,14 +169,13 @@ impl GremlinClient {
         conn: &mut r2d2::PooledConnection<GremlinConnectionManager>,
     ) -> GremlinResult<(Response, VecDeque<GValue>)> {
         let result = conn.recv()?;
-
         let response: Response = serde_json::from_slice(&result)?;
 
         match response.status.code {
             200 | 206 => {
                 let results: VecDeque<GValue> = self
                     .options
-                    .serializer
+                    .deserializer
                     .read(&response.result.data)?
                     .map(|v| v.into())
                     .unwrap_or_else(VecDeque::new);

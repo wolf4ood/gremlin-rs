@@ -36,3 +36,21 @@ services:
     command : ["conf/gremlin-server-credentials-v2.yaml"]
     ports:
       - "8185:8182"
+  gremlin-server-v1:
+    build:
+      context: "./version-1"
+      dockerfile: Dockerfile
+      args:
+        - GREMLIN_SERVER=${GREMLIN_SERVER}
+    command : ["conf/gremlin-server-v1.yaml"]
+    ports:
+      - "8186:8182"
+  gremlin-server-secure-v1:
+    build:
+      context: "./credentials-version-1"
+      dockerfile: Dockerfile
+      args:
+        - GREMLIN_SERVER=${GREMLIN_SERVER}
+    command : ["conf/gremlin-server-credentials-v1.yaml"]
+    ports:
+      - "8187:8182"
