@@ -21,7 +21,6 @@ pub enum GraphSON {
 
 impl GraphSON {
     pub fn read(&self, value: &Value) -> GremlinResult<Option<GValue>> {
-        println!("GraphSON::read value: {:#?}", value);
         if let Value::Null = value {
             return Ok(None);
         }

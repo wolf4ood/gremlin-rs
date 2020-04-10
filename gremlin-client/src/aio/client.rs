@@ -107,11 +107,6 @@ impl GremlinClient {
         let id = msg.id().clone();
         let message = self.build_message(msg).unwrap();
 
-        println!(
-            "aio::GremlinClient::send_message_new message: {:#?}",
-            message,
-        );
-
         async move {
             let content_type = match self.options.serializer {
                 GraphSON::V1 => "application/vnd.gremlin-v1.0+json",
@@ -119,9 +114,6 @@ impl GremlinClient {
                 GraphSON::V3 => "application/vnd.gremlin-v3.0+json",
             };
             let payload = String::from("") + content_type + &message;
-
-            println!("Payload: {:#?}", payload);
-
             let mut binary = payload.into_bytes();
             binary.insert(0, content_type.len() as u8);
 

@@ -110,9 +110,6 @@ impl GremlinClient {
         };
         let payload = String::from("") + content_type + &message;
 
-        println!("GremlinClient::write_message message: {:#?}", payload);
-        println!();
-
         let mut binary = payload.into_bytes();
         binary.insert(0, content_type.len() as u8);
 
@@ -129,11 +126,6 @@ impl GremlinClient {
         self.write_message(&mut conn, msg)?;
 
         let (response, results) = self.read_response(&mut conn)?;
-
-        println!("GremlinClient::send_message response: {:#?}", response);
-        println!();
-        println!("GremlinClient::send_message results: {:#?}", results);
-        println!();
 
         Ok(GResultSet::new(self.clone(), results, response, conn))
     }
