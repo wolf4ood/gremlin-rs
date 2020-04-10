@@ -275,8 +275,6 @@ where
 
 // deserialzer v1
 pub fn deserializer_v1(val: &Value) -> GremlinResult<GValue> {
-    println!("Deserializing value {:#?}", val);
-
     let retval = match val {
         Value::Null => Err(GremlinError::Json(format!("Val {:#?} not supported.", val))),
         Value::Bool(b) => Ok(GValue::Bool(*b)),
@@ -310,8 +308,6 @@ pub fn deserializer_v1(val: &Value) -> GremlinResult<GValue> {
             }
         }
     };
-
-    println!("Returning GValue {:#?}", retval);
 
     retval
 }
