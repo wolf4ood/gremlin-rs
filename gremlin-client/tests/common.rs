@@ -8,6 +8,7 @@ pub fn connect() -> GremlinResult<GremlinClient> {
 #[allow(dead_code)]
 pub fn connect_serializer(serializer: GraphSON) -> GremlinResult<GremlinClient> {
     let port = match serializer {
+        GraphSON::V1 => 8186,
         GraphSON::V2 => 8184,
         GraphSON::V3 => 8182,
     };
@@ -15,7 +16,8 @@ pub fn connect_serializer(serializer: GraphSON) -> GremlinResult<GremlinClient> 
         ConnectionOptions::builder()
             .host("localhost")
             .port(port)
-            .serializer(serializer)
+            .serializer(serializer.clone())
+            .deserializer(serializer)
             .build(),
     )
 }

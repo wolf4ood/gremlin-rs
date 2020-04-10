@@ -16,6 +16,13 @@ pub struct RequestIdV2 {
 #[serde(rename_all = "camelCase", untagged)]
 pub enum Message<T> {
     #[serde(rename_all = "camelCase")]
+    V1 {
+        request_id: Uuid,
+        op: String,
+        processor: String,
+        args: T,
+    },
+    #[serde(rename_all = "camelCase")]
     V2 {
         request_id: RequestIdV2,
         op: String,
@@ -35,6 +42,7 @@ impl<T> Message<T> {
     #[allow(dead_code)]
     pub fn id(&self) -> &Uuid {
         match self {
+            Message::V1 { request_id, .. } => request_id,
             Message::V2 { request_id, .. } => &request_id.value,
             Message::V3 { request_id, .. } => request_id,
         }
@@ -59,8 +67,26 @@ pub struct ReponseStatus {
     pub message: String,
 }
 
+pub fn message_with_args_v1<T>(op: String, processor: String, args: T) -> Message<T> {
+    message_with_args_and_uuid_v1(op, processor, Uuid::new_v4(), args)
+}
+
 pub fn message_with_args_v2<T>(op: String, processor: String, args: T) -> Message<T> {
     message_with_args_and_uuid_v2(op, processor, Uuid::new_v4(), args)
+}
+
+pub fn message_with_args_and_uuid_v1<T>(
+    op: String,
+    processor: String,
+    id: Uuid,
+    args: T,
+) -> Message<T> {
+    Message::V1 {
+        request_id: id,
+        op: op,
+        processor: processor,
+        args: args,
+    }
 }
 
 pub fn message_with_args_and_uuid_v2<T>(

@@ -22,6 +22,7 @@ macro_rules! g_serializer {
 macro_rules! g_serializer_2 {
     ($name:ident, { $($key:expr => $value:ident),*}) => {
         pub fn $name(val: &Value) -> GremlinResult<GValue> {
+            println!("deserializer2: {:#?}", val);
             if let Value::String(ref s) = val {
                 return Ok(s.clone().into())
             }

@@ -113,6 +113,11 @@ impl ConnectionOptionsBuilder {
         self.0.serializer = serializer;
         self
     }
+
+    pub fn deserializer(mut self, deserializer: GraphSON) -> Self {
+        self.0.deserializer = deserializer;
+        self
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -124,6 +129,7 @@ pub struct ConnectionOptions {
     pub(crate) ssl: bool,
     pub(crate) tls_options: Option<TlsOptions>,
     pub(crate) serializer: GraphSON,
+    pub(crate) deserializer: GraphSON,
 }
 
 #[derive(Clone, Debug)]
@@ -147,6 +153,7 @@ impl Default for ConnectionOptions {
             ssl: false,
             tls_options: None,
             serializer: GraphSON::V3,
+            deserializer: GraphSON::V3,
         }
     }
 }

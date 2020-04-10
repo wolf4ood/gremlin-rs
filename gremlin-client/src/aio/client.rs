@@ -2,7 +2,8 @@ use crate::aio::pool::GremlinConnectionManager;
 use crate::aio::GResultSet;
 use crate::io::GraphSON;
 use crate::message::{
-    message_with_args, message_with_args_and_uuid, message_with_args_v2, Message,
+    message_with_args, message_with_args_and_uuid, message_with_args_v1, message_with_args_v2,
+    Message,
 };
 use crate::process::traversal::Bytecode;
 use crate::GValue;
@@ -88,6 +89,7 @@ impl GremlinClient {
         let args = self.options.serializer.write(&GValue::from(args))?;
 
         let message = match self.options.serializer {
+            GraphSON::V1 => message_with_args_v1(String::from("eval"), String::default(), args),
             GraphSON::V2 => message_with_args_v2(String::from("eval"), String::default(), args),
             GraphSON::V3 => message_with_args(String::from("eval"), String::default(), args),
         };
@@ -105,12 +107,20 @@ impl GremlinClient {
         let id = msg.id().clone();
         let message = self.build_message(msg).unwrap();
 
+        println!(
+            "aio::GremlinClient::send_message_new message: {:#?}",
+            message,
+        );
+
         async move {
             let content_type = match self.options.serializer {
+                GraphSON::V1 => "application/vnd.gremlin-v1.0+json",
                 GraphSON::V2 => "application/vnd.gremlin-v2.0+json",
                 GraphSON::V3 => "application/vnd.gremlin-v3.0+json",
             };
             let payload = String::from("") + content_type + &message;
+
+            println!("Payload: {:#?}", payload);
 
             let mut binary = payload.into_bytes();
             binary.insert(0, content_type.len() as u8);
@@ -121,7 +131,7 @@ impl GremlinClient {
                 200 | 206 => {
                     let results: VecDeque<GValue> = self
                         .options
-                        .serializer
+                        .deserializer
                         .read(&response.result.data)?
                         .map(|v| v.into())
                         .unwrap_or_else(VecDeque::new);
