@@ -1,5 +1,6 @@
 use crate::structure::VertexProperty;
 use crate::structure::GID;
+use std::collections::hash_map::Iter;
 use std::collections::HashMap;
 use std::hash::Hasher;
 
@@ -32,6 +33,10 @@ impl Vertex {
 
     pub fn label(&self) -> &String {
         &self.label
+    }
+
+    pub fn properties(&self) -> Iter<String, Vec<VertexProperty>> {
+        self.properties.iter()
     }
 
     pub fn property(&self, key: &str) -> Option<&VertexProperty> {
