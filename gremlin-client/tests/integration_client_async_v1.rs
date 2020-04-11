@@ -77,8 +77,7 @@ mod aio {
     fn test_vertex_query_v1() {
         task::block_on(async {
             let graph = connect_serializer(GraphSON::V1).await;
-            // TODO
-            println!("About to execute query.");
+            
             let vertices = graph
                 .execute(
                     "g.V().hasLabel('person').has('name',name)",
@@ -98,9 +97,7 @@ mod aio {
     #[test]
     fn test_edge_query_v1() {
         task::block_on(async {
-            // TODO
-            println!("About to execute query.");
-
+        
             let graph = connect_serializer(GraphSON::V1).await;
             let edges = graph
                 .execute("g.E().hasLabel('knows').limit(1)", &[])
