@@ -376,7 +376,6 @@ fn test_group_count_vertex_v1() {
         .collect::<Result<Vec<Map>, _>>()
         .expect("It should be ok");
 
-
     assert_eq!(1, map.len());
 
     let first = &map[0];
