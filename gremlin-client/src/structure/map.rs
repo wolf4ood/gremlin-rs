@@ -1,5 +1,6 @@
 use crate::structure::{Edge, GValue, Vertex};
 use crate::Token;
+use std::collections::hash_map::IntoIter;
 use std::collections::{BTreeMap, HashMap};
 
 /// Represent a Map<[GKey](struct.GKey),[GValue](struct.GValue)> which has ability to allow for non-String keys.
@@ -71,6 +72,15 @@ impl<T: Into<GKey>> std::ops::Index<T> for Map {
         self.0.get(&key.into()).expect("no entry found for key")
     }
 }
+
+impl IntoIterator for Map {
+    type Item = (GKey, GValue);
+    type IntoIter = IntoIter<GKey, GValue>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
 impl std::iter::FromIterator<(String, GValue)> for Map {
     fn from_iter<I: IntoIterator<Item = (String, GValue)>>(iter: I) -> Self {
         Map(iter

@@ -1,4 +1,5 @@
 use crate::GValue;
+use std::vec::IntoIter;
 
 // pub type Set = Vec<GValue>;
 
@@ -18,5 +19,13 @@ impl Set {
 impl Into<Set> for Vec<GValue> {
     fn into(self) -> Set {
         Set(self)
+    }
+}
+
+impl IntoIterator for Set {
+    type Item = GValue;
+    type IntoIter = IntoIter<GValue>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
     }
 }
