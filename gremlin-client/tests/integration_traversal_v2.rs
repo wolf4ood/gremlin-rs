@@ -6,7 +6,7 @@ use gremlin_client::{utils, GraphSON};
 
 mod common;
 
-use common::{
+use common::io::{
     create_edge, create_vertex, create_vertex_with_label, drop_edges, drop_vertices,
     graph_serializer,
 };

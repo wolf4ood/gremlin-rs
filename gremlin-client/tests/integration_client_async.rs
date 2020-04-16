@@ -1,11 +1,11 @@
-mod common_async;
+mod common;
 
 mod aio {
 
     use gremlin_client::GremlinError;
     use gremlin_client::{Edge, GValue, Map, Vertex};
 
-    use super::common_async::{connect, create_edge, create_vertex, drop_vertices};
+    use super::common::aio::{connect, create_edge, create_vertex, drop_vertices};
     use async_std::prelude::*;
     use async_std::task;
 

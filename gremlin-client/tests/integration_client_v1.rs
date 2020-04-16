@@ -6,7 +6,7 @@ use gremlin_client::{
 };
 use gremlin_client::{Edge, GKey, GValue, Map, Vertex, GID};
 
-use common::{create_edge, create_vertex, expect_client_serializer, graph_serializer};
+use common::io::{create_edge, create_vertex, expect_client_serializer, graph_serializer};
 
 #[test]
 fn test_client_connection_ok_v1() {

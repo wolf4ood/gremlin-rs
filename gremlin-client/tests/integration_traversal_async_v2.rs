@@ -1,9 +1,13 @@
-mod common_async;
+#[allow(dead_code)]
+mod common;
 
+#[cfg(feature = "async_std")]
 mod aio {
     use gremlin_client::process::traversal::traversal;
 
-    use super::common_async::{connect_serializer, create_vertex_with_label, drop_vertices};
+    use super::common::aio::{
+        connect_serializer, create_vertex_with_label, drop_vertices,
+    };
 
     use async_std::prelude::*;
     use async_std::task;

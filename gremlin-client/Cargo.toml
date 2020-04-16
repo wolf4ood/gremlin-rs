@@ -70,10 +70,6 @@ required-features = ["async_std"]
 name = "integration_traversal_async"
 required-features = ["async_std"]
 
-[[test]]
-name = "common_async"
-required-features = ["async_std"]
-
 
 [[example]]
 name = "traversal_async"

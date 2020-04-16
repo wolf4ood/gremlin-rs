@@ -1,11 +1,13 @@
-mod common_async;
+#[allow(dead_code)]
+mod common;
 
+#[cfg(feature = "async_std")]
 mod aio {
 
     use gremlin_client::GremlinError;
     use gremlin_client::{Edge, GValue, GraphSON, Map, Vertex};
 
-    use super::common_async::{connect_serializer, create_edge, create_vertex};
+    use super::common::aio::{connect_serializer, create_edge, create_vertex};
     use async_std::prelude::*;
     use async_std::task;
 
