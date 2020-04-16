@@ -4,8 +4,8 @@ use crate::conversion::FromGValue;
 use crate::process::traversal::remote::Terminator;
 use crate::process::traversal::GraphTraversal;
 use crate::GremlinResult;
-use async_std::prelude::*;
 use futures::future::{BoxFuture, FutureExt};
+use futures::StreamExt;
 
 #[derive(Clone)]
 pub struct AsyncTerminator {

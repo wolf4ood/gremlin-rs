@@ -2,8 +2,10 @@ use crate::aio::GremlinClient;
 use crate::message::Response;
 use crate::structure::GValue;
 use crate::GremlinResult;
-use async_std::stream::Stream;
-use async_std::sync::Receiver;
+use futures::Stream;
+// use async_std::sync::Receiver;
+
+use futures::channel::mpsc::Receiver;
 use core::task::Context;
 use core::task::Poll;
 use pin_project_lite::pin_project;

@@ -13,7 +13,6 @@ use base64::encode;
 use mobc::{Connection, Pool};
 use serde::Serialize;
 use std::collections::{HashMap, VecDeque};
-
 use futures::future::{BoxFuture, FutureExt};
 
 #[derive(Clone)]

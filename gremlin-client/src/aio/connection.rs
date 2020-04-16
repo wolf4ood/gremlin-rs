@@ -4,7 +4,6 @@ use crate::connection::ConnectionOptions;
 
 use crate::message::Response;
 use async_std::net::TcpStream;
-use async_std::sync::{channel, Mutex, Receiver, Sender};
 use async_std::task;
 use async_tls::client::TlsStream;
 use async_tungstenite::async_std::connect_async;
@@ -12,9 +11,12 @@ use async_tungstenite::tungstenite::protocol::Message;
 use async_tungstenite::WebSocketStream;
 use async_tungstenite::{self, stream};
 use futures::{
+    lock::Mutex,
     stream::{SplitSink, SplitStream},
     SinkExt, StreamExt,
 };
+
+use futures::channel::mpsc::{channel, Receiver, Sender};
 use std::collections::HashMap;
 use std::sync::Arc;
 use url;
@@ -63,12 +65,12 @@ impl Conn {
         id: Uuid,
         payload: Vec<u8>,
     ) -> GremlinResult<(Response, Receiver<GremlinResult<Response>>)> {
-        let (sender, receiver) = channel(1);
+        let (sender, mut receiver) = channel(1);
 
-        self.sender.send(Cmd::Msg((sender, id, payload))).await;
+        self.sender.send(Cmd::Msg((sender, id, payload))).await?;
 
         receiver
-            .recv()
+            .next()
             .await
             .expect("It should contain the response")
             .map(|r| (r, receiver))
@@ -77,25 +79,33 @@ impl Conn {
 
 impl Drop for Conn {
     fn drop(&mut self) {
-        task::block_on(async { self.sender.send(Cmd::Shutdown).await });
+        task::block_on(async {
+            match self.sender.send(Cmd::Shutdown).await {
+                Ok(_e) => {}
+                Err(_e) => {}
+            }
+        });
     }
 }
 
 fn sender_loop(
     mut sink: SplitSink<WSStream, Message>,
     requests: Arc<Mutex<HashMap<Uuid, Sender<GremlinResult<Response>>>>>,
-    receiver: Receiver<Cmd>,
+    mut receiver: Receiver<Cmd>,
 ) {
     task::spawn(async move {
         loop {
-            match receiver.recv().await {
+            match receiver.next().await {
                 Some(item) => match item {
                     Cmd::Msg(msg) => {
                         let mut guard = requests.lock().await;
                         guard.insert(msg.1, msg.0);
                         if let Err(e) = sink.send(Message::Binary(msg.2)).await {
-                            let sender = guard.remove(&msg.1).unwrap();
-                            sender.send(Err(GremlinError::from(e))).await;
+                            let mut sender = guard.remove(&msg.1).unwrap();
+                            sender
+                                .send(Err(GremlinError::from(e)))
+                                .await
+                                .expect("Failed to send error");
                         }
                         drop(guard);
                     }
@@ -118,15 +128,18 @@ fn sender_loop(
 fn receiver_loop(
     mut stream: SplitStream<WSStream>,
     requests: Arc<Mutex<HashMap<Uuid, Sender<GremlinResult<Response>>>>>,
-    sender: Sender<Cmd>,
+    mut sender: Sender<Cmd>,
 ) {
     task::spawn(async move {
         loop {
             match stream.next().await {
                 Some(Err(error)) => {
                     let mut guard = requests.lock().await;
-                    for s in guard.values() {
-                        s.send(Err(GremlinError::from(&error))).await;
+                    for s in guard.values_mut() {
+                        match s.send(Err(GremlinError::from(&error))).await {
+                            Ok(_r) => {}
+                            Err(_e) => {}
+                        }
                     }
                     guard.clear();
                 }
@@ -137,18 +150,24 @@ fn receiver_loop(
                         if response.status.code != 206 {
                             let item = guard.remove(&response.request_id);
                             drop(guard);
-                            if let Some(s) = item {
-                                s.send(Ok(response)).await;
+                            if let Some(mut s) = item {
+                                match s.send(Ok(response)).await {
+                                    Ok(_r) => {}
+                                    Err(_e) => {}
+                                };
                             }
                         } else {
                             let item = guard.get_mut(&response.request_id);
                             if let Some(s) = item {
-                                s.send(Ok(response)).await;
+                                match s.send(Ok(response)).await {
+                                    Ok(_r) => {}
+                                    Err(_e) => {}
+                                };
                             }
                             drop(guard);
                         }
                     }
-                    Message::Ping(data) => sender.send(Cmd::Pong(data)).await,
+                    Message::Ping(data) => sender.send(Cmd::Pong(data)).await.unwrap(),
                     _ => {}
                 },
                 None => {}

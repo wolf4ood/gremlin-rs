@@ -4,7 +4,7 @@ use std::fmt::Display;
 
 use websocket::WebSocketError;
 
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async_gremlin")]
 use async_tungstenite::tungstenite;
 #[cfg(feature = "async_gremlin")]
 use mobc;
@@ -22,6 +22,8 @@ pub enum GremlinError {
     Serde(serde_json::Error),
     #[cfg(feature = "async_gremlin")]
     WebSocketAsync(tungstenite::error::Error),
+    #[cfg(feature = "async_gremlin")]
+    ChannelSend(futures::channel::mpsc::SendError),
     Uuid(uuid::Error),
 }
 
