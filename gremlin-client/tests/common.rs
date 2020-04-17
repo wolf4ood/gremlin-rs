@@ -89,14 +89,18 @@ pub mod io {
     }
 }
 
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async_gremlin")]
 #[allow(dead_code)]
 pub mod aio {
     use gremlin_client::aio::GremlinClient;
 
     use gremlin_client::{ConnectionOptions, Edge, GraphSON, GremlinResult, Vertex};
 
+    #[cfg(feature = "async-std-runtime")]
     use async_std::prelude::*;
+
+    #[cfg(feature = "tokio-runtime")]
+    use tokio::stream::StreamExt;
 
     pub async fn connect() -> GremlinClient {
         GremlinClient::connect(("localhost", 8182))
