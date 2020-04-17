@@ -3,7 +3,7 @@ pub(crate) mod remote;
 use crate::conversion::FromGValue;
 use crate::structure::Traverser;
 use crate::GremlinResult;
-use async_std::stream::Stream;
+use futures::Stream;
 use core::task::Context;
 use core::task::Poll;
 use std::marker::PhantomData;
