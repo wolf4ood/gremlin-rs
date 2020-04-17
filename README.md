@@ -38,7 +38,7 @@ with [async-std](https://async.rs/) support
 gremlin_client = { version = "0.4.0", features = ["async-std-runtime"] }
 ```
 
-with [tokio](https://tokio.rs/) pport 
+with [tokio](https://tokio.rs/) support 
 
 ```toml
 [dependencies]
