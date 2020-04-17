@@ -37,8 +37,8 @@ before_install:
 
 script:
   - cd gremlin-client
-  - cargo test --features=async-std-runtime
   - cargo test --features=tokio-runtime
+  - cargo test --features=async-std-runtime
   - cd ../
 
 before_script:
