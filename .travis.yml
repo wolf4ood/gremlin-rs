@@ -36,7 +36,10 @@ before_install:
   - cargo fmt --all -- --check
 
 script:
+  - cd gremlin-client
   - cargo test --all-features
+  - cargo test --all-features
+  - cd ../
 
 before_script:
   - docker-compose -f docker-compose/docker-compose.yaml up -d 
