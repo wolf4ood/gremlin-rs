@@ -69,3 +69,7 @@ version = "0.8.1"
 [[example]]
 name = "traversal_async"
 required-features = ["async_gremlin"]
+
+[[example]]
+name = "vertex_async"
+required-features = ["async_gremlin"]
