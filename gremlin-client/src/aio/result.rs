@@ -3,11 +3,10 @@ use crate::message::Response;
 use crate::structure::GValue;
 use crate::GremlinResult;
 use futures::Stream;
-// use async_std::sync::Receiver;
 
-use futures::channel::mpsc::Receiver;
 use core::task::Context;
 use core::task::Poll;
+use futures::channel::mpsc::Receiver;
 use pin_project_lite::pin_project;
 use std::collections::VecDeque;
 use std::pin::Pin;

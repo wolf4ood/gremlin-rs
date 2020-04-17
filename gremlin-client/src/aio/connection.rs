@@ -57,6 +57,7 @@ type WSStream = WebSocketStream<
 >;
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub enum Cmd {
     Msg((Sender<GremlinResult<Response>>, Uuid, Vec<u8>)),
     Pong(Vec<u8>),
@@ -119,8 +120,13 @@ impl Drop for Conn {
             }
         });
 
-        // TODO impl tokio
+        #[cfg(feature = "tokio-runtime")]
+        send_shutdown(self);
     }
+}
+#[cfg(feature = "tokio-runtime")]
+fn send_shutdown(_conn: &mut Conn) {
+    // TODO
 }
 
 fn sender_loop(

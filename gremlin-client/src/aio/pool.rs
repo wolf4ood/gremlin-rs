@@ -57,6 +57,7 @@ mod tests {
     
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
     #[cfg_attr(feature = "tokio-runtime", tokio::test)]
+    #[allow(unused_must_use)]
     async fn it_should_create_a_connection_pool() {
         let manager = GremlinConnectionManager::new(ConnectionOptions::default());
 
@@ -72,6 +73,8 @@ mod tests {
 
         drop(conn);
 
+
+        
         task::spawn_blocking(move || {
             std::thread::sleep(Duration::from_millis(200));
         })
