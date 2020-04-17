@@ -54,7 +54,7 @@ mod tests {
 
     #[cfg(feature = "tokio-runtime")]
     use tokio_use::*;
-    
+
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
     #[cfg_attr(feature = "tokio-runtime", tokio::test)]
     #[allow(unused_must_use)]
@@ -73,8 +73,6 @@ mod tests {
 
         drop(conn);
 
-
-        
         task::spawn_blocking(move || {
             std::thread::sleep(Duration::from_millis(200));
         })

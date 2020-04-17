@@ -78,7 +78,7 @@ mod aio {
 
     async fn test_vertex_query_v2() {
         let graph = connect_serializer(GraphSON::V2).await;
-        
+
         println!("About to execute query.");
         let vertices = graph
             .execute(
