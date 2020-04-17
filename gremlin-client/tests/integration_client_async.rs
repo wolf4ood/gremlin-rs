@@ -51,7 +51,7 @@ mod aio {
                 .await
         );
 
-        task::sleep(std::time::Duration::from_millis(2500)).await;
+        async_std::task::sleep(std::time::Duration::from_millis(2500)).await;
 
         assert_eq!(
             0,
