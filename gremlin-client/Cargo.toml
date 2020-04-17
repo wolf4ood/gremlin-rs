@@ -18,11 +18,11 @@ default = []
 
 
 
-async_gremlin = ["futures","mobc","async-tungstenite"]
+async_gremlin = ["futures","mobc","async-tungstenite","async-trait","url","pin-project-lite"]
 
 async_std = ["async-std-runtime"]
-tokio-runtime = ["async_gremlin","tokio","mobc/tokio","async-tungstenite/tokio-runtime"]
-async-std-runtime = ["async_gremlin","async-std","async-tungstenite/async-std-runtime","async-trait","mobc/async-std","url","async-tls","pin-project-lite"]
+tokio-runtime = ["async_gremlin","tokio","mobc/tokio","async-tungstenite/tokio-runtime","async-tungstenite/tokio-tls","tokio-tls"]
+async-std-runtime = ["async_gremlin","async-std","async-tungstenite/async-std-runtime","async-tungstenite/async-tls","mobc/async-std","async-tls"]
  
 
 [badges]
@@ -41,10 +41,12 @@ chrono = "0.4"
 lazy_static = "1.3.0"
 base64 = "0.11.0"
 native-tls = "0.2.3"
-async-tungstenite = { version = "0.4.0", optional = true, default-features=false, features = ["async-tls"] }
+async-tungstenite = { version = "0.4.0", optional = true, default-features=false}
 async-std =  { version = "1.4.0", optional = true, features = ["unstable","attributes"] }
 async-trait = { version = "0.1.10", optional = true }
 async-tls =  { version = "0.6.0", optional = true }
+tokio-tls = { version = "0.3.0", optional = true }
+
 mobc = {version = "0.5.3", optional = true, default-features=false, features = ["unstable"] }
 url =  {version = "2.1.0", optional = true}
 futures = { version = "0.3.1", optional = true}
