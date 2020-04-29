@@ -167,6 +167,20 @@ impl AnonymousTraversalSource {
     pub fn cap(&self, step: &'static str) -> TraversalBuilder {
         self.traversal.clone().cap(step)
     }
+
+    pub fn project<A>(&self, step: A) ->TraversalBuilder
+    where
+        A: IntoSelectStep,
+    {
+        self.traversal.clone().project(step)
+    }
+
+    pub fn constant<A>(&self, value: A) -> TraversalBuilder
+    where
+        A: Into<GValue>,
+    {
+        self.traversal.clone().constant(value)
+    }
 }
 
 impl Default for AnonymousTraversalSource {
