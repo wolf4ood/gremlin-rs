@@ -632,4 +632,13 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self.builder = self.builder.optional(step);
         self
     }
+
+    pub fn constant<A>(mut self, value: A) -> Self
+    where
+        A: Into<GValue>,
+    {
+        self.builder = self.builder.constant(value);
+        self
+    }
+
 }

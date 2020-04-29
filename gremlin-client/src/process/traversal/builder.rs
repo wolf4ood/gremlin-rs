@@ -585,4 +585,15 @@ impl TraversalBuilder {
         self.bytecode.add_step(String::from("optional"), vec![step.bytecode.into()]);
         self
     }
+
+    pub fn constant<A>(mut self, value: A) -> Self
+    where
+        A: Into<GValue>,
+    {
+        self.bytecode.add_step(
+            String::from("constant"),
+            vec![value.into()],
+        );
+        self
+    }
 }
