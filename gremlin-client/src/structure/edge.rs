@@ -1,4 +1,5 @@
 use crate::structure::{Property, Vertex, GID};
+use std::collections::hash_map::{IntoIter, Iter};
 use std::collections::HashMap;
 use std::hash::Hasher;
 
@@ -48,8 +49,20 @@ impl Edge {
         &self.out_v
     }
 
+    pub fn iter(&self) -> Iter<String, Property> {
+        self.properties.iter()
+    }
+
     pub fn property(&self, key: &str) -> Option<&Property> {
         self.properties.get(key)
+    }
+}
+
+impl IntoIterator for Edge {
+    type Item = (String, Property);
+    type IntoIter = IntoIter<String, Property>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.properties.into_iter()
     }
 }
 

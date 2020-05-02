@@ -1,5 +1,6 @@
 use crate::structure::VertexProperty;
 use crate::structure::GID;
+use std::collections::hash_map::{IntoIter, Iter};
 use std::collections::HashMap;
 use std::hash::Hasher;
 
@@ -34,8 +35,20 @@ impl Vertex {
         &self.label
     }
 
+    pub fn iter(&self) -> Iter<String, Vec<VertexProperty>> {
+        self.properties.iter()
+    }
+
     pub fn property(&self, key: &str) -> Option<&VertexProperty> {
         self.properties.get(key).and_then(|v| v.get(0))
+    }
+}
+
+impl IntoIterator for Vertex {
+    type Item = (String, Vec<VertexProperty>);
+    type IntoIter = IntoIter<String, Vec<VertexProperty>>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.properties.into_iter()
     }
 }
 
