@@ -6,7 +6,7 @@ use gremlin_client::{
 };
 use gremlin_client::{Edge, GKey, GValue, Map, Vertex, GID};
 
-use common::{create_edge, create_vertex, expect_client_serializer, graph_serializer};
+use common::io::{create_edge, create_vertex, expect_client_serializer, graph_serializer};
 
 #[test]
 fn test_client_connection_ok_v1() {
@@ -363,8 +363,6 @@ fn test_group_count_vertex_v1() {
     let mark = create_vertex(&graph, "mark");
     let frank = create_vertex(&graph, "frank");
 
-    println!("FRANK: {:#?}", frank);
-
     create_edge(&graph, &mark, &frank, "knows");
 
     let map = graph
@@ -377,8 +375,6 @@ fn test_group_count_vertex_v1() {
         .map(|f| f.take::<Map>())
         .collect::<Result<Vec<Map>, _>>()
         .expect("It should be ok");
-
-    println!("MAP IS: {:#?}", map);
 
     assert_eq!(1, map.len());
 

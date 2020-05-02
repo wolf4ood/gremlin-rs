@@ -10,11 +10,10 @@ use crate::GValue;
 use crate::ToGValue;
 use crate::{ConnectionOptions, GremlinError, GremlinResult};
 use base64::encode;
+use futures::future::{BoxFuture, FutureExt};
 use mobc::{Connection, Pool};
 use serde::Serialize;
 use std::collections::{HashMap, VecDeque};
-
-use futures::future::{BoxFuture, FutureExt};
 
 #[derive(Clone)]
 pub struct GremlinClient {

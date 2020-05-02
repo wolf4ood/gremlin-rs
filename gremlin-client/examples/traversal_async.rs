@@ -1,31 +1,30 @@
-use async_std::task;
 use gremlin_client::{aio::GremlinClient, process::traversal::traversal};
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    task::block_on(async {
-        let client = GremlinClient::connect("localhost").await?;
+#[cfg_attr(feature = "async-std-runtime", async_std::main)]
+#[cfg_attr(feature = "tokio-runtime", tokio::main)]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = GremlinClient::connect("localhost").await?;
 
-        let g = traversal().with_remote_async(client);
+    let g = traversal().with_remote_async(client);
 
-        let vertices = g
-            .v(())
-            .has_label("person")
-            .has(("name", "marko"))
-            .to_list()
-            .await?;
+    let vertices = g
+        .v(())
+        .has_label("person")
+        .has(("name", "marko"))
+        .to_list()
+        .await?;
 
-        println!("{:?}", vertices);
+    println!("{:?}", vertices);
 
-        let friends = g
-            .v(())
-            .has_label("person")
-            .has(("name", "marko"))
-            .out("knows")
-            .to_list()
-            .await?;
+    let friends = g
+        .v(())
+        .has_label("person")
+        .has(("name", "marko"))
+        .out("knows")
+        .to_list()
+        .await?;
 
-        println!("{:?}", friends);
+    println!("{:?}", friends);
 
-        Ok(())
-    })
+    Ok(())
 }

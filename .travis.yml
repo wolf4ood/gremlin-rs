@@ -36,7 +36,10 @@ before_install:
   - cargo fmt --all -- --check
 
 script:
-  - cargo test --all-features
+  - cd gremlin-client
+  - cargo test --features=tokio-runtime
+  - cargo test --features=async-std-runtime
+  - cd ../
 
 before_script:
   - docker-compose -f docker-compose/docker-compose.yaml up -d 
