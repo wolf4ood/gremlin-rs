@@ -14,7 +14,7 @@ use crate::process::traversal::step::or::OrStep;
 use crate::process::traversal::step::repeat::RepeatStep;
 use crate::process::traversal::step::select::SelectStep;
 use crate::process::traversal::step::to::ToStep;
-use crate::process::traversal::step::until::IntoUntilStep;
+use crate::process::traversal::step::until::UntilStep;
 use crate::process::traversal::step::where_step::IntoWhereStep;
 
 use crate::process::traversal::remote::Terminator;
@@ -522,7 +522,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn until<A>(mut self, step: A) -> Self
     where
-        A: IntoUntilStep,
+        A: Into<UntilStep>,
     {
         self.builder = self.builder.until(step);
         self
