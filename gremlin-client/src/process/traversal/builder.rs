@@ -8,7 +8,7 @@ use crate::process::traversal::step::has::HasStep;
 use crate::process::traversal::step::limit::LimitStep;
 use crate::process::traversal::step::local::LocalStep;
 use crate::process::traversal::step::loops::LoopsStep;
-use crate::process::traversal::step::match_step::IntoMatchStep;
+use crate::process::traversal::step::match_step::MatchStep;
 use crate::process::traversal::step::not::IntoNotStep;
 use crate::process::traversal::step::or::IntoOrStep;
 use crate::process::traversal::step::repeat::IntoRepeatStep;
@@ -437,10 +437,10 @@ impl TraversalBuilder {
 
     pub fn match_<A>(mut self, step: A) -> Self
     where
-        A: IntoMatchStep,
+        A: Into<MatchStep>,
     {
         self.bytecode
-            .add_step(String::from("match"), step.into_step().into());
+            .add_step(String::from("match"), step.into().into());
         self
     }
 
