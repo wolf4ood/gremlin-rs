@@ -17,12 +17,8 @@ impl From<UntilStep> for Vec<GValue> {
     }
 }
 
-pub trait IntoUntilStep {
-    fn into_step(self) -> UntilStep;
-}
-
-impl IntoUntilStep for TraversalBuilder {
-    fn into_step(self) -> UntilStep {
-        UntilStep::new(vec![self.bytecode.into()])
+impl From<TraversalBuilder> for UntilStep {
+    fn from(param: TraversalBuilder) -> Self {
+        UntilStep::new(vec![param.bytecode.into()])
     }
 }
