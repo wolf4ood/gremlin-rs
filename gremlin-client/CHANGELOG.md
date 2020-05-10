@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [#77](https://github.com/wolf4ood/gremlin-rs/pull/77) Added Iter and IntoIter impl.
+
 ### Fixed
 
 ## [0.4.0] - 2020-04-18
