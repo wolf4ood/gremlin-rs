@@ -16,20 +16,20 @@ impl From<LoopsStep> for Vec<GValue> {
     }
 }
 
-impl Into<LoopsStep> for () {
-    fn into(self) -> LoopsStep {
+impl From<()> for LoopsStep {
+    fn from(_: ()) -> LoopsStep {
         LoopsStep::new(vec![])
     }
 }
 
-impl Into<LoopsStep> for &str {
-    fn into(self) -> LoopsStep {
-        LoopsStep::new(vec![String::from(self).into()])
+impl From<&str> for LoopsStep {
+    fn from(param: &str) -> LoopsStep {
+        LoopsStep::new(vec![param.into()])
     }
 }
 
-impl Into<LoopsStep> for String {
-    fn into(self) -> LoopsStep {
-        LoopsStep::new(vec![self.into()])
+impl From<String> for LoopsStep {
+    fn from(param: String) -> LoopsStep {
+        LoopsStep::new(vec![param.into()])
     }
 }
