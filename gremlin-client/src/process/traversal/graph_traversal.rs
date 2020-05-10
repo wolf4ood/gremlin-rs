@@ -1,7 +1,7 @@
 use crate::conversion::FromGValue;
 use crate::process::traversal::step::by::ByStep;
 use crate::process::traversal::step::choose::IntoChooseStep;
-use crate::process::traversal::step::coalesce::IntoCoalesceStep;
+use crate::process::traversal::step::coalesce::CoalesceStep;
 use crate::process::traversal::step::dedup::DedupStep;
 use crate::process::traversal::step::from::IntoFromStep;
 use crate::process::traversal::step::has::HasStep;
@@ -578,7 +578,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn coalesce<B, A>(mut self, colaesce: A) -> GraphTraversal<S, B, T>
     where
-        A: IntoCoalesceStep,
+        A: Into<CoalesceStep>,
         B: FromGValue,
         T: Terminator<B>,
     {

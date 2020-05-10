@@ -17,27 +17,23 @@ impl From<CoalesceStep> for Vec<GValue> {
     }
 }
 
-pub trait IntoCoalesceStep {
-    fn into_step(self) -> CoalesceStep;
-}
-
-impl IntoCoalesceStep for TraversalBuilder {
-    fn into_step(self) -> CoalesceStep {
-        CoalesceStep::new(vec![self.bytecode.into()])
+impl From<TraversalBuilder> for CoalesceStep {
+    fn from(param: TraversalBuilder) -> Self {
+        CoalesceStep::new(vec![param.bytecode.into()])
     }
 }
 
-impl IntoCoalesceStep for Vec<TraversalBuilder> {
-    fn into_step(self) -> CoalesceStep {
-        CoalesceStep::new(self.into_iter().map(|s| s.bytecode.into()).collect())
+impl From<Vec<TraversalBuilder>> for CoalesceStep {
+    fn from(param: Vec<TraversalBuilder>) -> Self {
+        CoalesceStep::new(param.into_iter().map(|s| s.bytecode.into()).collect())
     }
 }
 
 macro_rules! impl_into_coalesce {
     ($n:expr) => {
-        impl IntoCoalesceStep for [TraversalBuilder; $n] {
-            fn into_step(self) -> CoalesceStep {
-                CoalesceStep::new(self.iter().map(|s| s.bytecode.clone().into()).collect())
+        impl From<[TraversalBuilder; $n]> for CoalesceStep {
+            fn from(param: [TraversalBuilder; $n]) -> CoalesceStep {
+                CoalesceStep::new(param.iter().map(|s| s.bytecode.clone().into()).collect())
             }
         }
     };

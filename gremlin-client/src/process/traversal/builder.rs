@@ -1,7 +1,7 @@
 use crate::conversion::ToGValue;
 use crate::process::traversal::step::by::ByStep;
 use crate::process::traversal::step::choose::IntoChooseStep;
-use crate::process::traversal::step::coalesce::IntoCoalesceStep;
+use crate::process::traversal::step::coalesce::CoalesceStep;
 use crate::process::traversal::step::dedup::DedupStep;
 use crate::process::traversal::step::from::IntoFromStep;
 use crate::process::traversal::step::has::HasStep;
@@ -551,10 +551,10 @@ impl TraversalBuilder {
 
     pub fn coalesce<A>(mut self, coalesce: A) -> Self
     where
-        A: IntoCoalesceStep,
+        A: Into<CoalesceStep>,
     {
         self.bytecode
-            .add_step(String::from("coalesce"), coalesce.into_step().into());
+            .add_step(String::from("coalesce"), coalesce.into().into());
 
         self
     }
