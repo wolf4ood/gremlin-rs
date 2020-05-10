@@ -18,31 +18,27 @@ impl From<WhereStep> for Vec<GValue> {
     }
 }
 
-pub trait IntoWhereStep {
-    fn into_step(self) -> WhereStep;
-}
-
-impl IntoWhereStep for TraversalBuilder {
-    fn into_step(self) -> WhereStep {
-        WhereStep::new(vec![self.bytecode.into()])
+impl From<TraversalBuilder> for WhereStep {
+    fn from(param: TraversalBuilder) -> WhereStep {
+        WhereStep::new(vec![param.bytecode.into()])
     }
 }
 
-impl<A, B> IntoWhereStep for (A, B)
+impl<A, B> From<(A, B)> for WhereStep
 where
     A: Into<String>,
     B: IntoPredicate,
 {
-    fn into_step(self) -> WhereStep {
-        WhereStep::new(vec![self.0.into().into(), self.1.into_predicate().into()])
+    fn from(param: (A, B)) -> WhereStep {
+        WhereStep::new(vec![param.0.into().into(), param.1.into_predicate().into()])
     }
 }
 
-impl<A> IntoWhereStep for A
+impl<A> From<A> for WhereStep
 where
     A: IntoPredicate,
 {
-    fn into_step(self) -> WhereStep {
-        WhereStep::new(vec![self.into_predicate().into()])
+    fn from(param: A) -> WhereStep {
+        WhereStep::new(vec![param.into_predicate().into()])
     }
 }
