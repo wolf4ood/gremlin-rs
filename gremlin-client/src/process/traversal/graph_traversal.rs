@@ -15,7 +15,7 @@ use crate::process::traversal::step::repeat::RepeatStep;
 use crate::process::traversal::step::select::SelectStep;
 use crate::process::traversal::step::to::ToStep;
 use crate::process::traversal::step::until::UntilStep;
-use crate::process::traversal::step::where_step::IntoWhereStep;
+use crate::process::traversal::step::where_step::WhereStep;
 
 use crate::process::traversal::remote::Terminator;
 use crate::process::traversal::{Bytecode, Scope, TraversalBuilder};
@@ -441,7 +441,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn where_<A>(mut self, step: A) -> Self
     where
-        A: IntoWhereStep,
+        A: Into<WhereStep>,
     {
         self.builder = self.builder.where_(step);
 

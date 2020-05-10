@@ -3,7 +3,7 @@ use crate::process::traversal::step::loops::LoopsStep;
 use crate::process::traversal::step::not::NotStep;
 use crate::process::traversal::step::or::OrStep;
 use crate::process::traversal::step::select::SelectStep;
-use crate::process::traversal::step::where_step::IntoWhereStep;
+use crate::process::traversal::step::where_step::WhereStep;
 use crate::process::traversal::TraversalBuilder;
 use crate::structure::{GIDs, IntoPredicate, Labels};
 use crate::GValue;
@@ -159,7 +159,7 @@ impl AnonymousTraversalSource {
 
     pub fn where_<A>(&self, step: A) -> TraversalBuilder
     where
-        A: IntoWhereStep,
+        A: Into<WhereStep>,
     {
         self.traversal.clone().where_(step)
     }
