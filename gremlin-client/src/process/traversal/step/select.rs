@@ -17,51 +17,47 @@ impl From<SelectStep> for Vec<GValue> {
     }
 }
 
-pub trait IntoSelectStep {
-    fn into_step(self) -> SelectStep;
-}
-
-impl IntoSelectStep for &str {
-    fn into_step(self) -> SelectStep {
-        SelectStep::new(vec![String::from(self).into()])
+impl From<&str> for SelectStep {
+    fn from(param: &str) -> SelectStep {
+        SelectStep::new(vec![String::from(param).into()])
     }
 }
 
-impl IntoSelectStep for Pop {
-    fn into_step(self) -> SelectStep {
-        SelectStep::new(vec![GValue::Pop(self)])
+impl From<Pop> for SelectStep {
+    fn from(param: Pop) -> SelectStep {
+        SelectStep::new(vec![GValue::Pop(param)])
     }
 }
 
-impl IntoSelectStep for Vec<&str> {
-    fn into_step(self) -> SelectStep {
-        SelectStep::new(self.into_iter().map(GValue::from).collect())
+impl From<Vec<&str>> for SelectStep {
+    fn from(param: Vec<&str>) -> SelectStep {
+        SelectStep::new(param.into_iter().map(GValue::from).collect())
     }
 }
 
-impl IntoSelectStep for TraversalBuilder {
-    fn into_step(self) -> SelectStep {
-        SelectStep::new(vec![self.bytecode.into()])
+impl From<TraversalBuilder> for SelectStep {
+    fn from(param: TraversalBuilder) -> SelectStep {
+        SelectStep::new(vec![param.bytecode.into()])
     }
 }
 
-impl<B> IntoSelectStep for (Pop, B)
+impl<B> From<(Pop, B)> for SelectStep
 where
     B: Into<GValue>,
 {
-    fn into_step(self) -> SelectStep {
-        SelectStep::new(vec![GValue::Pop(self.0), self.1.into()])
+    fn from(param: (Pop, B)) -> SelectStep {
+        SelectStep::new(vec![GValue::Pop(param.0), param.1.into()])
     }
 }
 
 macro_rules! impl_into_select {
     ($n:expr) => {
-        impl<T: Clone> IntoSelectStep for [T; $n]
+        impl<T: Clone> From<[T; $n]> for SelectStep
         where
             T: Into<String>,
         {
-            fn into_step(self) -> SelectStep {
-                SelectStep::new(self.iter().map(|e| e.clone().into().into()).collect())
+            fn from(param: [T; $n]) -> SelectStep {
+                SelectStep::new(param.iter().map(|e| e.clone().into().into()).collect())
             }
         }
     };
