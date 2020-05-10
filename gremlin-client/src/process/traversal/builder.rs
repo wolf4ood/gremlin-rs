@@ -1,10 +1,10 @@
 use crate::conversion::ToGValue;
-use crate::process::traversal::step::by::IntoByStep;
+use crate::process::traversal::step::by::ByStep;
 use crate::process::traversal::step::choose::IntoChooseStep;
 use crate::process::traversal::step::coalesce::IntoCoalesceStep;
 use crate::process::traversal::step::dedup::DedupStep;
 use crate::process::traversal::step::from::IntoFromStep;
-use crate::process::traversal::step::has::{HasStep};
+use crate::process::traversal::step::has::HasStep;
 use crate::process::traversal::step::limit::LimitStep;
 use crate::process::traversal::step::local::IntoLocalStep;
 use crate::process::traversal::step::loops::LoopsStep;
@@ -307,10 +307,10 @@ impl TraversalBuilder {
 
     pub fn by<A>(mut self, step: A) -> Self
     where
-        A: IntoByStep,
+        A: Into<ByStep>,
     {
         self.bytecode
-            .add_step(String::from("by"), step.into_step().into());
+            .add_step(String::from("by"), step.into().into());
         self
     }
 
@@ -469,10 +469,10 @@ impl TraversalBuilder {
 
     pub fn map<A>(mut self, step: A) -> Self
     where
-        A: IntoByStep,
+        A: Into<ByStep>,
     {
         self.bytecode
-            .add_step(String::from("map"), step.into_step().into());
+            .add_step(String::from("map"), step.into().into());
         self
     }
 
