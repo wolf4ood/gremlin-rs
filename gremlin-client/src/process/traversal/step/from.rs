@@ -17,24 +17,20 @@ impl From<FromStep> for Vec<GValue> {
     }
 }
 
-pub trait IntoFromStep {
-    fn into_step(self) -> FromStep;
-}
-
-impl IntoFromStep for &str {
-    fn into_step(self) -> FromStep {
-        FromStep::new(vec![self.into()])
+impl From<&str> for FromStep {
+    fn from(param: &str) -> Self {
+        FromStep::new(vec![param.into()])
     }
 }
 
-impl IntoFromStep for &Vertex {
-    fn into_step(self) -> FromStep {
-        FromStep::new(vec![self.into()])
+impl From<&Vertex> for FromStep {
+    fn from(param: &Vertex) -> Self {
+        FromStep::new(vec![param.into()])
     }
 }
 
-impl IntoFromStep for TraversalBuilder {
-    fn into_step(self) -> FromStep {
-        FromStep::new(vec![self.bytecode.into()])
+impl From<TraversalBuilder> for FromStep {
+    fn from(param: TraversalBuilder) -> Self {
+        FromStep::new(vec![param.bytecode.into()])
     }
 }

@@ -3,7 +3,7 @@ use crate::process::traversal::step::by::ByStep;
 use crate::process::traversal::step::choose::IntoChooseStep;
 use crate::process::traversal::step::coalesce::CoalesceStep;
 use crate::process::traversal::step::dedup::DedupStep;
-use crate::process::traversal::step::from::IntoFromStep;
+use crate::process::traversal::step::from::FromStep;
 use crate::process::traversal::step::has::HasStep;
 use crate::process::traversal::step::limit::LimitStep;
 use crate::process::traversal::step::local::IntoLocalStep;
@@ -242,7 +242,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn from<A>(mut self, target: A) -> Self
     where
-        A: IntoFromStep,
+        A: Into<FromStep>,
     {
         self.builder = self.builder.from(target);
 
