@@ -1,4 +1,4 @@
-use crate::process::traversal::step::has::IntoHasStep;
+use crate::process::traversal::step::has::{HasStep};
 use crate::process::traversal::step::loops::LoopsStep;
 use crate::process::traversal::step::not::IntoNotStep;
 use crate::process::traversal::step::or::IntoOrStep;
@@ -98,14 +98,14 @@ impl AnonymousTraversalSource {
 
     pub fn has<A>(&self, step: A) -> TraversalBuilder
     where
-        A: IntoHasStep,
+        A: Into<HasStep>,
     {
         self.traversal.clone().has(step)
     }
 
     pub fn has_many<A>(&self, steps: Vec<A>) -> TraversalBuilder
     where
-        A: IntoHasStep,
+        A: Into<HasStep>,
     {
         self.traversal.clone().has_many(steps)
     }

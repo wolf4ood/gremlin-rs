@@ -52,54 +52,50 @@ impl From<HasStep> for Vec<GValue> {
     }
 }
 
-pub trait IntoHasStep {
-    fn into_step(self) -> HasStep;
-}
-
-impl<A, B> IntoHasStep for (A, B)
+impl<A, B> From<(A, B)> for HasStep
 where
     A: Into<HasStepKey>,
     B: IntoPredicate,
 {
-    fn into_step(self) -> HasStep {
+    fn from(param: (A, B)) -> Self {
         HasStep {
             label: None,
-            key: self.0.into(),
-            predicate: Some(self.1.into_predicate()),
+            key: param.0.into(),
+            predicate: Some(param.1.into_predicate()),
         }
     }
 }
 
-impl<A, B, C> IntoHasStep for (A, B, C)
+impl<A, B, C> From<(A, B, C)> for HasStep
 where
     A: Into<String>,
     B: Into<HasStepKey>,
     C: IntoPredicate,
 {
-    fn into_step(self) -> HasStep {
+    fn from(param: (A, B, C)) -> Self {
         HasStep {
-            label: Some(self.0.into()),
-            key: self.1.into(),
-            predicate: Some(self.2.into_predicate()),
+            label: Some(param.0.into()),
+            key: param.1.into(),
+            predicate: Some(param.2.into_predicate()),
         }
     }
 }
 
-impl IntoHasStep for String {
-    fn into_step(self) -> HasStep {
+impl From<String> for HasStep {
+    fn from(param: String) -> Self {
         HasStep {
             label: None,
-            key: HasStepKey::Str(self),
+            key: HasStepKey::Str(param),
             predicate: None,
         }
     }
 }
 
-impl IntoHasStep for &str {
-    fn into_step(self) -> HasStep {
+impl From<&str> for HasStep {
+    fn from(param: &str) -> Self {
         HasStep {
             label: None,
-            key: HasStepKey::Str(String::from(self)),
+            key: HasStepKey::Str(String::from(param)),
             predicate: None,
         }
     }
