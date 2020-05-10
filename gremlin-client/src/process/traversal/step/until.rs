@@ -11,9 +11,9 @@ impl UntilStep {
     }
 }
 
-impl UntilStep {
-    pub fn take_params(self) -> Vec<GValue> {
-        self.params
+impl From<UntilStep> for Vec<GValue> {
+    fn from(step: UntilStep) -> Self {
+        step.params
     }
 }
 

@@ -11,11 +11,12 @@ impl MatchStep {
     }
 }
 
-impl MatchStep {
-    pub fn take_params(self) -> Vec<GValue> {
-        self.params
+impl From<MatchStep> for Vec<GValue> {
+    fn from(step: MatchStep) -> Self {
+        step.params
     }
 }
+
 
 pub trait IntoMatchStep {
     fn into_step(self) -> MatchStep;

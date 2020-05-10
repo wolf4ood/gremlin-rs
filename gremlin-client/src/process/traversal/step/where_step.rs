@@ -12,9 +12,9 @@ impl WhereStep {
     }
 }
 
-impl WhereStep {
-    pub fn take_params(self) -> Vec<GValue> {
-        self.params
+impl From<WhereStep> for Vec<GValue> {
+    fn from(step: WhereStep) -> Self {
+        step.params
     }
 }
 

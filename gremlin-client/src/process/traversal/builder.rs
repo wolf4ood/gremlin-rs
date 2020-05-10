@@ -108,7 +108,7 @@ impl TraversalBuilder {
         A: IntoHasStep,
     {
         self.bytecode
-            .add_step(String::from("has"), step.into_step().take_params());
+            .add_step(String::from("has"), step.into_step().into());
         self
     }
 
@@ -118,7 +118,7 @@ impl TraversalBuilder {
     {
         for step in steps {
             self.bytecode
-                .add_step(String::from("has"), step.into_step().take_params());
+                .add_step(String::from("has"), step.into_step().into());
         }
         self
     }
@@ -221,7 +221,7 @@ impl TraversalBuilder {
         A: IntoFromStep,
     {
         self.bytecode
-            .add_step(String::from("from"), step.into_step().take_params());
+            .add_step(String::from("from"), step.into_step().into());
 
         self
     }
@@ -231,7 +231,7 @@ impl TraversalBuilder {
         A: IntoToStep,
     {
         self.bytecode
-            .add_step(String::from("to"), step.into_step().take_params());
+            .add_step(String::from("to"), step.into_step().into());
 
         self
     }
@@ -310,7 +310,7 @@ impl TraversalBuilder {
         A: IntoByStep,
     {
         self.bytecode
-            .add_step(String::from("by"), step.into_step().take_params());
+            .add_step(String::from("by"), step.into_step().into());
         self
     }
 
@@ -319,7 +319,7 @@ impl TraversalBuilder {
         A: IntoSelectStep,
     {
         self.bytecode
-            .add_step(String::from("select"), step.into_step().take_params());
+            .add_step(String::from("select"), step.into_step().into());
         self
     }
 
@@ -342,7 +342,7 @@ impl TraversalBuilder {
         A: Into<LimitStep>,
     {
         self.bytecode
-            .add_step(String::from("limit"), limit.into().params());
+            .add_step(String::from("limit"), limit.into().into());
 
         self
     }
@@ -352,7 +352,7 @@ impl TraversalBuilder {
         A: Into<DedupStep>,
     {
         self.bytecode
-            .add_step(String::from("dedup"), limit.into().params());
+            .add_step(String::from("dedup"), limit.into().into());
 
         self
     }
@@ -412,7 +412,7 @@ impl TraversalBuilder {
         A: IntoWhereStep,
     {
         self.bytecode
-            .add_step(String::from("where"), step.into_step().take_params());
+            .add_step(String::from("where"), step.into_step().into());
         self
     }
 
@@ -421,7 +421,7 @@ impl TraversalBuilder {
         A: IntoNotStep,
     {
         self.bytecode
-            .add_step(String::from("not"), step.into_step().take_params());
+            .add_step(String::from("not"), step.into_step().into());
         self
     }
 
@@ -440,7 +440,7 @@ impl TraversalBuilder {
         A: IntoMatchStep,
     {
         self.bytecode
-            .add_step(String::from("match"), step.into_step().take_params());
+            .add_step(String::from("match"), step.into_step().into());
         self
     }
 
@@ -454,7 +454,7 @@ impl TraversalBuilder {
         A: IntoOrStep,
     {
         self.bytecode
-            .add_step(String::from("or"), step.into_step().take_params());
+            .add_step(String::from("or"), step.into_step().into());
         self
     }
 
@@ -463,7 +463,7 @@ impl TraversalBuilder {
         A: IntoSelectStep,
     {
         self.bytecode
-            .add_step(String::from("project"), step.into_step().take_params());
+            .add_step(String::from("project"), step.into_step().into());
         self
     }
 
@@ -472,7 +472,7 @@ impl TraversalBuilder {
         A: IntoByStep,
     {
         self.bytecode
-            .add_step(String::from("map"), step.into_step().take_params());
+            .add_step(String::from("map"), step.into_step().into());
         self
     }
 
@@ -481,7 +481,7 @@ impl TraversalBuilder {
         A: IntoRepeatStep,
     {
         self.bytecode
-            .add_step(String::from("repeat"), step.into_step().take_params());
+            .add_step(String::from("repeat"), step.into_step().into());
 
         self
     }
@@ -491,7 +491,7 @@ impl TraversalBuilder {
         A: IntoUntilStep,
     {
         self.bytecode
-            .add_step(String::from("until"), step.into_step().take_params());
+            .add_step(String::from("until"), step.into_step().into());
 
         self
     }
@@ -513,7 +513,7 @@ impl TraversalBuilder {
         A: Into<LoopsStep>,
     {
         self.bytecode
-            .add_step(String::from("loops"), step.into().params());
+            .add_step(String::from("loops"), step.into().into());
         self
     }
 
@@ -522,7 +522,7 @@ impl TraversalBuilder {
         A: IntoLocalStep,
     {
         self.bytecode
-            .add_step(String::from("local"), step.into_step().take_params());
+            .add_step(String::from("local"), step.into_step().into());
         self
     }
 
@@ -554,7 +554,7 @@ impl TraversalBuilder {
         A: IntoCoalesceStep,
     {
         self.bytecode
-            .add_step(String::from("coalesce"), coalesce.into_step().take_params());
+            .add_step(String::from("coalesce"), coalesce.into_step().into());
 
         self
     }

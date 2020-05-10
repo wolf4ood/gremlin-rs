@@ -8,9 +8,11 @@ impl LoopsStep {
     fn new(params: Vec<GValue>) -> Self {
         LoopsStep { params }
     }
+}
 
-    pub fn params(self) -> Vec<GValue> {
-        self.params
+impl From<LoopsStep> for Vec<GValue> {
+    fn from(step: LoopsStep) -> Self {
+        step.params
     }
 }
 
