@@ -17,53 +17,50 @@ impl From<ByStep> for Vec<GValue> {
     }
 }
 
-pub trait IntoByStep {
-    fn into_step(self) -> ByStep;
-}
-
-impl IntoByStep for () {
-    fn into_step(self) -> ByStep {
+impl From<()> for ByStep {
+    fn from(_: ()) -> Self {
         ByStep::new(vec![])
     }
 }
 
-impl IntoByStep for &str {
-    fn into_step(self) -> ByStep {
-        ByStep::new(vec![String::from(self).into()])
+impl From<&str> for ByStep {
+    fn from(param: &str) -> Self {
+        ByStep::new(vec![String::from(param).into()])
     }
 }
 
-impl IntoByStep for Order {
-    fn into_step(self) -> ByStep {
-        ByStep::new(vec![self.into()])
+impl From<Order> for ByStep {
+    fn from(param: Order) -> Self {
+        ByStep::new(vec![param.into()])
     }
 }
 
-impl IntoByStep for T {
-    fn into_step(self) -> ByStep {
-        ByStep::new(vec![self.into()])
+impl From<T> for ByStep {
+    fn from(param: T) -> Self {
+        ByStep::new(vec![param.into()])
     }
 }
 
-impl<'a> IntoByStep for (&str, Order) {
-    fn into_step(self) -> ByStep {
-        ByStep::new(vec![self.0.into(), self.1.into()])
+impl From<(&str, Order)> for ByStep {
+    fn from(param: (&str, Order)) -> Self {
+        ByStep::new(vec![param.0.into(), param.1.into()])
     }
 }
 
-impl IntoByStep for (String, Order) {
-    fn into_step(self) -> ByStep {
-        ByStep::new(vec![self.0.into(), self.1.into()])
+impl From<(String, Order)> for ByStep {
+    fn from(param: (String, Order)) -> Self {
+        ByStep::new(vec![param.0.into(), param.1.into()])
     }
 }
 
-impl IntoByStep for (TraversalBuilder, Order) {
-    fn into_step(self) -> ByStep {
-        ByStep::new(vec![self.0.bytecode.into(), self.1.into()])
+impl From<(TraversalBuilder, Order)> for ByStep {
+    fn from(param: (TraversalBuilder, Order)) -> Self {
+        ByStep::new(vec![param.0.bytecode.into(), param.1.into()])
     }
 }
-impl IntoByStep for TraversalBuilder {
-    fn into_step(self) -> ByStep {
-        ByStep::new(vec![self.bytecode.into()])
+
+impl From<TraversalBuilder> for ByStep {
+    fn from(param: TraversalBuilder) -> Self {
+        ByStep::new(vec![param.bytecode.into()])
     }
 }
