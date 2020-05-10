@@ -1,7 +1,7 @@
-use crate::process::traversal::step::has::{HasStep};
+use crate::process::traversal::step::has::HasStep;
 use crate::process::traversal::step::loops::LoopsStep;
-use crate::process::traversal::step::not::{NotStep};
-use crate::process::traversal::step::or::IntoOrStep;
+use crate::process::traversal::step::not::NotStep;
+use crate::process::traversal::step::or::OrStep;
 use crate::process::traversal::step::select::IntoSelectStep;
 use crate::process::traversal::step::where_step::IntoWhereStep;
 use crate::process::traversal::TraversalBuilder;
@@ -152,7 +152,7 @@ impl AnonymousTraversalSource {
 
     pub fn or<A>(&self, step: A) -> TraversalBuilder
     where
-        A: IntoOrStep,
+        A: Into<OrStep>,
     {
         self.traversal.clone().or(step)
     }
