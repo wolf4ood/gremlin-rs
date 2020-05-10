@@ -9,7 +9,7 @@ use crate::process::traversal::step::limit::LimitStep;
 use crate::process::traversal::step::local::LocalStep;
 use crate::process::traversal::step::loops::LoopsStep;
 use crate::process::traversal::step::match_step::MatchStep;
-use crate::process::traversal::step::not::IntoNotStep;
+use crate::process::traversal::step::not::NotStep;
 use crate::process::traversal::step::or::IntoOrStep;
 use crate::process::traversal::step::repeat::IntoRepeatStep;
 use crate::process::traversal::step::select::IntoSelectStep;
@@ -450,7 +450,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn not<A>(mut self, step: A) -> Self
     where
-        A: IntoNotStep,
+        A: Into<NotStep>,
     {
         self.builder = self.builder.not(step);
         self
