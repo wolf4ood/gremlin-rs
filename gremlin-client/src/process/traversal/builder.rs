@@ -12,7 +12,7 @@ use crate::process::traversal::step::match_step::MatchStep;
 use crate::process::traversal::step::not::NotStep;
 use crate::process::traversal::step::or::OrStep;
 use crate::process::traversal::step::repeat::RepeatStep;
-use crate::process::traversal::step::select::IntoSelectStep;
+use crate::process::traversal::step::select::SelectStep;
 use crate::process::traversal::step::to::IntoToStep;
 use crate::process::traversal::step::until::IntoUntilStep;
 use crate::process::traversal::step::where_step::IntoWhereStep;
@@ -316,10 +316,10 @@ impl TraversalBuilder {
 
     pub fn select<A>(mut self, step: A) -> Self
     where
-        A: IntoSelectStep,
+        A: Into<SelectStep>,
     {
         self.bytecode
-            .add_step(String::from("select"), step.into_step().into());
+            .add_step(String::from("select"), step.into().into());
         self
     }
 
@@ -460,10 +460,10 @@ impl TraversalBuilder {
 
     pub fn project<A>(mut self, step: A) -> Self
     where
-        A: IntoSelectStep,
+        A: Into<SelectStep>,
     {
         self.bytecode
-            .add_step(String::from("project"), step.into_step().into());
+            .add_step(String::from("project"), step.into().into());
         self
     }
 
