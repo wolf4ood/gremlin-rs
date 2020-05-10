@@ -3,7 +3,7 @@ use crate::process::traversal::step::by::ByStep;
 use crate::process::traversal::step::choose::IntoChooseStep;
 use crate::process::traversal::step::coalesce::CoalesceStep;
 use crate::process::traversal::step::dedup::DedupStep;
-use crate::process::traversal::step::from::IntoFromStep;
+use crate::process::traversal::step::from::FromStep;
 use crate::process::traversal::step::has::HasStep;
 use crate::process::traversal::step::limit::LimitStep;
 use crate::process::traversal::step::local::IntoLocalStep;
@@ -218,10 +218,10 @@ impl TraversalBuilder {
 
     pub fn from<A>(mut self, step: A) -> Self
     where
-        A: IntoFromStep,
+        A: Into<FromStep>,
     {
         self.bytecode
-            .add_step(String::from("from"), step.into_step().into());
+            .add_step(String::from("from"), step.into().into());
 
         self
     }
