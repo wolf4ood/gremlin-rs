@@ -11,9 +11,9 @@ impl CoalesceStep {
     }
 }
 
-impl CoalesceStep {
-    pub fn take_params(self) -> Vec<GValue> {
-        self.params
+impl From<CoalesceStep> for Vec<GValue> {
+    fn from(step: CoalesceStep) -> Self {
+        step.params
     }
 }
 

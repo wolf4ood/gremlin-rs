@@ -8,20 +8,22 @@ impl DedupStep {
     fn new(params: Vec<GValue>) -> Self {
         DedupStep { params }
     }
+}
 
-    pub fn params(self) -> Vec<GValue> {
-        self.params
+impl From<DedupStep> for Vec<GValue> {
+    fn from(step: DedupStep) -> Self {
+        step.params
     }
 }
 
-impl Into<DedupStep> for () {
-    fn into(self) -> DedupStep {
+impl From<()> for DedupStep {
+    fn from(_: ()) -> DedupStep {
         DedupStep::new(vec![])
     }
 }
 
-impl Into<DedupStep> for &str {
-    fn into(self) -> DedupStep {
-        DedupStep::new(vec![String::from(self).into()])
+impl From<&str> for DedupStep {
+    fn from(param: &str) -> DedupStep {
+        DedupStep::new(vec![String::from(param).into()])
     }
 }

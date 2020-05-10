@@ -11,9 +11,9 @@ impl SelectStep {
     }
 }
 
-impl SelectStep {
-    pub fn take_params(self) -> Vec<GValue> {
-        self.params
+impl From<SelectStep> for Vec<GValue> {
+    fn from(step: SelectStep) -> Self {
+        step.params
     }
 }
 

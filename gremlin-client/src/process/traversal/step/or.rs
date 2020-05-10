@@ -11,9 +11,9 @@ impl OrStep {
     }
 }
 
-impl OrStep {
-    pub fn take_params(self) -> Vec<GValue> {
-        self.params
+impl From<OrStep> for Vec<GValue> {
+    fn from(step: OrStep) -> Self {
+        step.params
     }
 }
 

@@ -12,9 +12,9 @@ impl LimitStep {
     }
 }
 
-impl LimitStep {
-    pub fn params(self) -> Vec<GValue> {
-        let mut params = self
+impl From<LimitStep> for Vec<GValue> {
+    fn from(step: LimitStep) -> Self {
+        let mut params = step
             .scope
             .map(|m| match m {
                 Scope::Global => vec![String::from("Global").into()],
@@ -22,13 +22,13 @@ impl LimitStep {
             })
             .unwrap_or_else(|| vec![]);
 
-        params.push(self.limit);
+        params.push(step.limit);
         params
     }
 }
 
-impl Into<LimitStep> for i64 {
-    fn into(self) -> LimitStep {
-        LimitStep::new(self.into(), None)
+impl From<i64> for LimitStep {
+    fn from(param: i64) -> LimitStep {
+        LimitStep::new(param.into(), None)
     }
 }

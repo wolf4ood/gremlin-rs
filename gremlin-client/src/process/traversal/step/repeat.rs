@@ -11,12 +11,11 @@ impl RepeatStep {
     }
 }
 
-impl RepeatStep {
-    pub fn take_params(self) -> Vec<GValue> {
-        self.params
+impl From<RepeatStep> for Vec<GValue> {
+    fn from(step: RepeatStep) -> Self {
+        step.params
     }
 }
-
 pub trait IntoRepeatStep {
     fn into_step(self) -> RepeatStep;
 }

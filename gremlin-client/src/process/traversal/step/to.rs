@@ -11,9 +11,9 @@ impl ToStep {
     }
 }
 
-impl ToStep {
-    pub fn take_params(self) -> Vec<GValue> {
-        self.params
+impl From<ToStep> for Vec<GValue> {
+    fn from(step: ToStep) -> Self {
+        step.params
     }
 }
 

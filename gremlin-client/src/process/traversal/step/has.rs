@@ -31,20 +31,20 @@ pub struct HasStep {
     predicate: Option<Either2<P, TextP>>,
 }
 
-impl HasStep {
-    pub fn take_params(self) -> Vec<GValue> {
+impl From<HasStep> for Vec<GValue> {
+    fn from(step: HasStep) -> Self {
         let mut params: Vec<GValue> = vec![];
 
-        if let Some(s) = self.label {
+        if let Some(s) = step.label {
             params.push(Into::into(s));
         }
 
-        match self.key {
+        match step.key {
             HasStepKey::Str(key) => params.push(Into::into(key)),
             HasStepKey::T(key) => params.push(Into::into(key)),
         };
 
-        if let Some(p) = self.predicate {
+        if let Some(p) = step.predicate {
             params.push(Into::into(p));
         }
 

@@ -11,9 +11,9 @@ impl LocalStep {
     }
 }
 
-impl LocalStep {
-    pub fn take_params(self) -> Vec<GValue> {
-        self.params
+impl From<LocalStep> for Vec<GValue> {
+    fn from(step: LocalStep) -> Self {
+        step.params
     }
 }
 

@@ -11,9 +11,9 @@ impl NotStep {
     }
 }
 
-impl NotStep {
-    pub fn take_params(self) -> Vec<GValue> {
-        self.params
+impl From<NotStep> for Vec<GValue> {
+    fn from(step: NotStep) -> Self {
+        step.params
     }
 }
 
