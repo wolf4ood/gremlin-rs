@@ -17,12 +17,8 @@ impl From<NotStep> for Vec<GValue> {
     }
 }
 
-pub trait IntoNotStep {
-    fn into_step(self) -> NotStep;
-}
-
-impl IntoNotStep for TraversalBuilder {
-    fn into_step(self) -> NotStep {
-        NotStep::new(vec![self.bytecode.into()])
+impl From<TraversalBuilder> for NotStep {
+    fn from(param: TraversalBuilder) -> Self {
+        NotStep::new(vec![param.bytecode.into()])
     }
 }
