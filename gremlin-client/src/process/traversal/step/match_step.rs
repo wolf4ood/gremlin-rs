@@ -17,27 +17,23 @@ impl From<MatchStep> for Vec<GValue> {
     }
 }
 
-pub trait IntoMatchStep {
-    fn into_step(self) -> MatchStep;
-}
-
-impl IntoMatchStep for TraversalBuilder {
-    fn into_step(self) -> MatchStep {
-        MatchStep::new(vec![self.bytecode.into()])
+impl From<TraversalBuilder> for MatchStep {
+    fn from(param: TraversalBuilder) -> MatchStep {
+        MatchStep::new(vec![param.bytecode.into()])
     }
 }
 
-impl IntoMatchStep for Vec<TraversalBuilder> {
-    fn into_step(self) -> MatchStep {
-        MatchStep::new(self.into_iter().map(|s| s.bytecode.into()).collect())
+impl From<Vec<TraversalBuilder>> for MatchStep {
+    fn from(param: Vec<TraversalBuilder>) -> MatchStep {
+        MatchStep::new(param.into_iter().map(|s| s.bytecode.into()).collect())
     }
 }
 
 macro_rules! impl_into_match {
     ($n:expr) => {
-        impl IntoMatchStep for [TraversalBuilder; $n] {
-            fn into_step(self) -> MatchStep {
-                MatchStep::new(self.iter().map(|s| s.bytecode.clone().into()).collect())
+        impl From<[TraversalBuilder; $n]> for MatchStep {
+            fn from(param: [TraversalBuilder; $n]) -> MatchStep {
+                MatchStep::new(param.iter().map(|s| s.bytecode.clone().into()).collect())
             }
         }
     };
