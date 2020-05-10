@@ -16,12 +16,9 @@ impl From<RepeatStep> for Vec<GValue> {
         step.params
     }
 }
-pub trait IntoRepeatStep {
-    fn into_step(self) -> RepeatStep;
-}
 
-impl IntoRepeatStep for TraversalBuilder {
-    fn into_step(self) -> RepeatStep {
-        RepeatStep::new(vec![self.bytecode.into()])
+impl From<TraversalBuilder> for RepeatStep {
+    fn from(param: TraversalBuilder) -> RepeatStep {
+        RepeatStep::new(vec![param.bytecode.into()])
     }
 }
