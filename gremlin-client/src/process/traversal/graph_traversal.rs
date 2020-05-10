@@ -10,7 +10,7 @@ use crate::process::traversal::step::local::LocalStep;
 use crate::process::traversal::step::loops::LoopsStep;
 use crate::process::traversal::step::match_step::MatchStep;
 use crate::process::traversal::step::not::NotStep;
-use crate::process::traversal::step::or::IntoOrStep;
+use crate::process::traversal::step::or::OrStep;
 use crate::process::traversal::step::repeat::IntoRepeatStep;
 use crate::process::traversal::step::select::IntoSelectStep;
 use crate::process::traversal::step::to::IntoToStep;
@@ -481,7 +481,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn or<A>(mut self, step: A) -> Self
     where
-        A: IntoOrStep,
+        A: Into<OrStep>,
     {
         self.builder = self.builder.or(step);
         self

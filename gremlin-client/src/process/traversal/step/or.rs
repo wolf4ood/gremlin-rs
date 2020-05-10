@@ -17,33 +17,29 @@ impl From<OrStep> for Vec<GValue> {
     }
 }
 
-pub trait IntoOrStep {
-    fn into_step(self) -> OrStep;
-}
-
-impl IntoOrStep for () {
-    fn into_step(self) -> OrStep {
+impl From<()> for OrStep {
+    fn from(_: ()) -> Self {
         OrStep::new(vec![])
     }
 }
 
-impl IntoOrStep for TraversalBuilder {
-    fn into_step(self) -> OrStep {
-        OrStep::new(vec![self.bytecode.into()])
+impl From<TraversalBuilder> for OrStep {
+    fn from(param: TraversalBuilder) -> Self {
+        OrStep::new(vec![param.bytecode.into()])
     }
 }
 
-impl IntoOrStep for Vec<TraversalBuilder> {
-    fn into_step(self) -> OrStep {
-        OrStep::new(self.into_iter().map(|s| s.bytecode.into()).collect())
+impl From<Vec<TraversalBuilder>> for OrStep {
+    fn from(param: Vec<TraversalBuilder>) -> Self {
+        OrStep::new(param.into_iter().map(|s| s.bytecode.into()).collect())
     }
 }
 
 macro_rules! impl_into_or {
     ($n:expr) => {
-        impl IntoOrStep for [TraversalBuilder; $n] {
-            fn into_step(self) -> OrStep {
-                OrStep::new(self.iter().map(|s| s.bytecode.clone().into()).collect())
+        impl From<[TraversalBuilder; $n]> for OrStep {
+            fn from(param: [TraversalBuilder; $n]) -> OrStep {
+                OrStep::new(param.iter().map(|s| s.bytecode.clone().into()).collect())
             }
         }
     };
