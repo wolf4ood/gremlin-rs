@@ -17,7 +17,6 @@ impl From<MatchStep> for Vec<GValue> {
     }
 }
 
-
 pub trait IntoMatchStep {
     fn into_step(self) -> MatchStep;
 }
