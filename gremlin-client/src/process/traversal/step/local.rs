@@ -17,12 +17,8 @@ impl From<LocalStep> for Vec<GValue> {
     }
 }
 
-pub trait IntoLocalStep {
-    fn into_step(self) -> LocalStep;
-}
-
-impl IntoLocalStep for TraversalBuilder {
-    fn into_step(self) -> LocalStep {
-        LocalStep::new(vec![self.bytecode.into()])
+impl From<TraversalBuilder> for LocalStep {
+    fn from(param: TraversalBuilder) -> LocalStep {
+        LocalStep::new(vec![param.bytecode.into()])
     }
 }
