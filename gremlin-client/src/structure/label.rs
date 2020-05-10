@@ -5,60 +5,65 @@ pub enum LabelType {
 
 pub struct Labels(pub(crate) Vec<LabelType>);
 
-impl Into<Labels> for &str {
-    fn into(self) -> Labels {
-        Labels(vec![LabelType::Str(String::from(self))])
+impl From<&str> for Labels {
+    fn from(param: &str) -> Labels {
+        Labels(vec![LabelType::Str(String::from(param))])
     }
 }
 
-impl Into<Labels> for String {
-    fn into(self) -> Labels {
-        Labels(vec![LabelType::Str(self)])
+impl From<String> for Labels {
+    fn from(param: String) -> Labels {
+        Labels(vec![LabelType::Str(param)])
     }
 }
 
-impl Into<Labels> for () {
-    fn into(self) -> Labels {
+impl From<()> for Labels {
+    fn from(_: ()) -> Labels {
         Labels(vec![])
     }
 }
-
-impl Into<Labels> for Vec<&str> {
-    fn into(self) -> Labels {
+impl From<Vec<&str>> for Labels {
+    fn from(param: Vec<&str>) -> Labels {
         Labels(
-            self.into_iter()
+            param
+                .into_iter()
+                .map(|val| LabelType::Str(String::from(val)))
+                .collect(),
+        )
+    }
+}
+impl From<Vec<String>> for Labels {
+    fn from(param: Vec<String>) -> Labels {
+        Labels(
+            param
+                .into_iter()
                 .map(|val| LabelType::Str(String::from(val)))
                 .collect(),
         )
     }
 }
 
-impl Into<Labels> for Vec<String> {
-    fn into(self) -> Labels {
-        Labels(self.into_iter().map(|val| LabelType::Str(val)).collect())
+impl From<bool> for Labels {
+    fn from(param: bool) -> Labels {
+        Labels(vec![LabelType::Bool(param)])
     }
 }
 
-impl Into<Labels> for bool {
-    fn into(self) -> Labels {
-        Labels(vec![LabelType::Bool(self)])
-    }
-}
-
-impl Into<Labels> for (bool, Vec<&str>) {
-    fn into(self) -> Labels {
-        let mut out: Vec<LabelType> = vec![LabelType::Bool(self.0)];
-        out.append(&mut Into::<Labels>::into(self.1).0.drain(..).collect());
+impl From<(bool, Vec<&str>)> for Labels {
+    fn from(param: (bool, Vec<&str>)) -> Labels {
+        let mut out: Vec<LabelType> = vec![LabelType::Bool(param.0)];
+        out.append(&mut Into::<Labels>::into(param.1).0.drain(..).collect());
         Labels(out)
     }
 }
 
 macro_rules! impl_into_labels_str {
     ($n:expr) => {
-        impl Into<Labels> for [&str; $n] {
-            fn into(self) -> Labels {
+        impl From<[&str; $n]> for Labels {
+            fn from(param: [&str; $n]) -> Labels {
                 Labels(
-                    self.iter()
+                    param
+                        .iter()
                         .map(|s| LabelType::Str(String::from(*s)))
                         .collect(),
                 )
@@ -80,9 +85,14 @@ impl_into_labels_str!(10);
 
 macro_rules! impl_into_labels_string {
     ($n:expr) => {
-        impl Into<Labels> for [String; $n] {
-            fn into(self) -> Labels {
-                Labels(self.iter().map(|val| LabelType::Str(val.clone())).collect())
+        impl From<[String; $n]> for Labels {
+            fn from(param: [String; $n]) -> Labels {
+                Labels(
+                    param
+                        .iter()
+                        .map(|val| LabelType::Str(val.clone()))
+                        .collect(),
+                )
             }
         }
     };
