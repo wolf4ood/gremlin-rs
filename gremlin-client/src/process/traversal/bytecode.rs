@@ -34,7 +34,8 @@ impl Bytecode {
 }
 
 lazy_static! {
-    pub static ref WRITE_OPERATORS: Vec<&'static str> = vec!["addV", "property", "addE", "from", "to", "drop"];
+    pub static ref WRITE_OPERATORS: Vec<&'static str> =
+        vec!["addV", "property", "addE", "from", "to", "drop"];
 }
 
 #[derive(Debug, PartialEq, Clone)]
