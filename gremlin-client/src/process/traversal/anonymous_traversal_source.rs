@@ -170,7 +170,7 @@ impl AnonymousTraversalSource {
 
     pub fn project<A>(&self, step: A) -> TraversalBuilder
     where
-        A: IntoSelectStep,
+        A: Into<SelectStep>
     {
         self.traversal.clone().project(step)
     }
