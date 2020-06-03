@@ -94,7 +94,6 @@ impl GremlinClient {
         };
 
         let conn = self.pool.get().await?;
-
         self.send_message_new(conn, message).await
     }
 
@@ -126,7 +125,6 @@ impl GremlinClient {
                         .read(&response.result.data)?
                         .map(|v| v.into())
                         .unwrap_or_else(VecDeque::new);
-
                     Ok((response, results))
                 }
                 204 => Ok((response, VecDeque::new())),

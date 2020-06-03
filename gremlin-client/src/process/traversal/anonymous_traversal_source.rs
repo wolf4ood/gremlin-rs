@@ -5,7 +5,7 @@ use crate::process::traversal::step::or::OrStep;
 use crate::process::traversal::step::select::SelectStep;
 use crate::process::traversal::step::where_step::WhereStep;
 use crate::process::traversal::TraversalBuilder;
-use crate::structure::{GIDs, IntoPredicate, Labels};
+use crate::structure::{Either2, GIDs, IntoPredicate, Labels, T};
 use crate::GValue;
 
 pub struct AnonymousTraversalSource {
@@ -37,7 +37,7 @@ impl AnonymousTraversalSource {
         self.traversal.clone().add_v(label)
     }
 
-    pub fn property<A>(&self, key: &str, value: A) -> TraversalBuilder
+    pub fn property<A>(&self, key: Either2<&str, T>, value: A) -> TraversalBuilder
     where
         A: Into<GValue>,
     {
@@ -168,7 +168,7 @@ impl AnonymousTraversalSource {
         self.traversal.clone().cap(step)
     }
 
-    pub fn project<A>(&self, step: A) ->TraversalBuilder
+    pub fn project<A>(&self, step: A) -> TraversalBuilder
     where
         A: IntoSelectStep,
     {
