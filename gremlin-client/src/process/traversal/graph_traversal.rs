@@ -22,7 +22,7 @@ use crate::process::traversal::strategies::{
     RemoteStrategy, TraversalStrategies, TraversalStrategy,
 };
 use crate::process::traversal::{Bytecode, Scope, TraversalBuilder, WRITE_OPERATORS};
-use crate::structure::{Cardinality, Either2, Labels, T as TValue};
+use crate::structure::{Cardinality, Labels, T as TValue};
 use crate::{
     structure::GIDs, structure::GProperty, structure::IntoPredicate, Edge, GValue, GremlinClient,
     List, Map, Path, Vertex,
@@ -89,7 +89,15 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         GraphTraversal::new(self.terminator, self.builder)
     }
 
-    pub fn property<A>(mut self, key: Either2<&str, TValue>, value: A) -> Self
+    pub fn property<A>(mut self, key: &str, value: A) -> Self
+    where
+        A: Into<GValue>,
+    {
+        self.builder = self.builder.property(key, value);
+        self
+    }
+
+    pub fn property_for_id<A>(mut self, key: TValue, value: A) -> Self
     where
         A: Into<GValue>,
     {
@@ -119,7 +127,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         for property in values {
             self.builder = self
                 .builder
-                .property(Either2::A(property.0.as_ref()), property.1)
+                .property::<&str, A>(property.0.as_ref(), property.1)
         }
 
         self

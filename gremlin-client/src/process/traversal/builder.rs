@@ -18,7 +18,7 @@ use crate::process::traversal::step::until::UntilStep;
 use crate::process::traversal::step::where_step::WhereStep;
 
 use crate::process::traversal::{Bytecode, Scope};
-use crate::structure::{Cardinality, Either2, GIDs, IntoPredicate, Labels, T};
+use crate::structure::{Cardinality, GIDs, IntoPredicate, Labels};
 use crate::GValue;
 
 #[derive(Clone)]
@@ -76,8 +76,9 @@ impl TraversalBuilder {
         self
     }
 
-    pub fn property<A>(mut self, key: Either2<&str, T>, value: A) -> Self
+    pub fn property<K, A>(mut self, key: K, value: A) -> Self
     where
+        K: Into<GValue>,
         A: Into<GValue>,
     {
         self.bytecode
