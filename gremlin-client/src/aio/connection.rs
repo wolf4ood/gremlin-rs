@@ -116,14 +116,8 @@ impl Drop for Conn {
     }
 }
 
-fn send_shutdown(conn: &mut Conn) {
-    let mut sender = conn.sender.clone();
-    task::spawn(async move {
-        match sender.send(Cmd::Shutdown).await {
-            Ok(_e) => {}
-            Err(_e) => {}
-        }
-    });
+fn send_shutdown(_conn: &mut Conn) {
+    
 }
 
 fn sender_loop(
