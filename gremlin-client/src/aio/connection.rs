@@ -116,9 +116,7 @@ impl Drop for Conn {
     }
 }
 
-fn send_shutdown(_conn: &mut Conn) {
-    
-}
+fn send_shutdown(_conn: &mut Conn) {}
 
 fn sender_loop(
     mut sink: SplitSink<WSStream, Message>,
