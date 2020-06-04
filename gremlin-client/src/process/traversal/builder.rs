@@ -18,8 +18,8 @@ use crate::process::traversal::step::until::UntilStep;
 use crate::process::traversal::step::where_step::WhereStep;
 
 use crate::process::traversal::{Bytecode, Scope};
-use crate::structure::{Cardinality, Labels};
-use crate::{structure::GIDs, structure::IntoPredicate, GValue};
+use crate::structure::{Cardinality, GIDs, IntoPredicate, Labels};
+use crate::GValue;
 
 #[derive(Clone)]
 pub struct TraversalBuilder {
@@ -76,14 +76,13 @@ impl TraversalBuilder {
         self
     }
 
-    pub fn property<A>(mut self, key: &str, value: A) -> Self
+    pub fn property<K, A>(mut self, key: K, value: A) -> Self
     where
+        K: Into<GValue>,
         A: Into<GValue>,
     {
-        self.bytecode.add_step(
-            String::from("property"),
-            vec![String::from(key).into(), value.into()],
-        );
+        self.bytecode
+            .add_step(String::from("property"), vec![key.into(), value.into()]);
         self
     }
 
@@ -573,6 +572,26 @@ impl TraversalBuilder {
     pub fn cap(mut self, step: &'static str) -> Self {
         self.bytecode
             .add_step(String::from("cap"), vec![step.into()]);
+        self
+    }
+
+    pub fn barrier(mut self) -> Self {
+        self.bytecode.add_step(String::from("barrier"), vec![]);
+        self
+    }
+
+    pub fn optional(mut self, step: TraversalBuilder) -> Self {
+        self.bytecode
+            .add_step(String::from("optional"), vec![step.bytecode.into()]);
+        self
+    }
+
+    pub fn constant<A>(mut self, value: A) -> Self
+    where
+        A: Into<GValue>,
+    {
+        self.bytecode
+            .add_step(String::from("constant"), vec![value.into()]);
         self
     }
 }

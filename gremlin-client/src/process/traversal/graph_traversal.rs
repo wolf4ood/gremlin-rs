@@ -17,12 +17,15 @@ use crate::process::traversal::step::to::ToStep;
 use crate::process::traversal::step::until::UntilStep;
 use crate::process::traversal::step::where_step::WhereStep;
 
-use crate::process::traversal::remote::Terminator;
-use crate::process::traversal::{Bytecode, Scope, TraversalBuilder};
+use crate::process::traversal::remote::{SyncTerminator, Terminator};
+use crate::process::traversal::strategies::{
+    RemoteStrategy, TraversalStrategies, TraversalStrategy,
+};
+use crate::process::traversal::{Bytecode, Scope, TraversalBuilder, WRITE_OPERATORS};
 use crate::structure::{Cardinality, Labels};
 use crate::{
-    structure::GIDs, structure::GProperty, structure::IntoPredicate, Edge, GValue, List, Map, Path,
-    Vertex,
+    structure::GIDs, structure::GProperty, structure::IntoPredicate, Edge, GValue, GremlinClient,
+    List, Map, Path, Vertex,
 };
 use std::marker::PhantomData;
 
@@ -43,6 +46,27 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
             terminator,
         }
     }
+
+    pub fn change_remote(self, client: GremlinClient) -> GraphTraversal<S, E, SyncTerminator> {
+        let mut strategies = TraversalStrategies::new(vec![]);
+
+        strategies.add_strategy(TraversalStrategy::Remote(RemoteStrategy::new(client)));
+
+        GraphTraversal {
+            start: self.start,
+            end: self.end,
+            builder: self.builder,
+            terminator: SyncTerminator::new(strategies),
+        }
+    }
+
+    pub fn does_write(&self) -> bool {
+        self.bytecode()
+            .steps()
+            .iter()
+            .any(|instruction| WRITE_OPERATORS.contains(&&*instruction.operator().as_ref()))
+    }
+
     pub fn bytecode(&self) -> &Bytecode {
         &self.builder.bytecode
     }
@@ -93,7 +117,9 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         A: Into<GValue>,
     {
         for property in values {
-            self.builder = self.builder.property(property.0.as_ref(), property.1)
+            self.builder = self
+                .builder
+                .property::<&str, A>(property.0.as_ref(), property.1)
         }
 
         self
@@ -599,6 +625,24 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn cap(mut self, step: &'static str) -> Self {
         self.builder = self.builder.cap(step);
+        self
+    }
+
+    pub fn barrier(mut self) -> Self {
+        self.builder = self.builder.barrier();
+        self
+    }
+
+    pub fn optional(mut self, step: TraversalBuilder) -> Self {
+        self.builder = self.builder.optional(step);
+        self
+    }
+
+    pub fn constant<A>(mut self, value: A) -> Self
+    where
+        A: Into<GValue>,
+    {
+        self.builder = self.builder.constant(value);
         self
     }
 }

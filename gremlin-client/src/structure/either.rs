@@ -1,4 +1,4 @@
-use crate::structure::{GValue, Vertex};
+use crate::structure::{GValue, Vertex, T};
 
 pub enum Either2<A: Into<GValue>, B: Into<GValue>> {
     A(A),
@@ -21,6 +21,18 @@ where
             Either2::A(a) => a.into(),
             Either2::B(b) => b.into(),
         }
+    }
+}
+
+impl From<&str> for Either2<String, T> {
+    fn from(val: &str) -> Self {
+        Either2::A(String::from(val))
+    }
+}
+
+impl From<T> for Either2<String, T> {
+    fn from(val: T) -> Self {
+        Either2::B(val)
     }
 }
 

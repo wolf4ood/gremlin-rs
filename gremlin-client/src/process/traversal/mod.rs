@@ -18,7 +18,7 @@ pub use order::Order;
 pub use remote::{traversal, SyncTerminator, Terminator};
 
 pub use builder::TraversalBuilder;
-pub use bytecode::Bytecode;
+pub use bytecode::{Bytecode, WRITE_OPERATORS};
 pub use graph_traversal::GraphTraversal;
 pub use graph_traversal_source::GraphTraversalSource;
 pub use scope::Scope;
