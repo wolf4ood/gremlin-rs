@@ -112,21 +112,18 @@ impl Conn {
 
 impl Drop for Conn {
     fn drop(&mut self) {
-        #[cfg(feature = "async-std-runtime")]
-        task::block_on(async {
-            match self.sender.send(Cmd::Shutdown).await {
-                Ok(_e) => {}
-                Err(_e) => {}
-            }
-        });
-
-        #[cfg(feature = "tokio-runtime")]
         send_shutdown(self);
     }
 }
-#[cfg(feature = "tokio-runtime")]
-fn send_shutdown(_conn: &mut Conn) {
-    // TODO
+
+fn send_shutdown(conn: &mut Conn) {
+    let mut sender = conn.sender.clone();
+    task::spawn(async move {
+        match sender.send(Cmd::Shutdown).await {
+            Ok(_e) => {}
+            Err(_e) => {}
+        }
+    });
 }
 
 fn sender_loop(
