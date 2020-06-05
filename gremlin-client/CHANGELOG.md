@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.5.0] - 2020-06-05
+
+### Added
+
+- [#82](https://github.com/wolf4ood/gremlin-rs/pull/82) Added .project(), .constant() & .barrier() and more.
+
+### Fixed
+
 ## [0.5.0] - 2020-05-11
 
 ### Added
