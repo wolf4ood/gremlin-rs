@@ -1,5 +1,6 @@
 mod common;
 
+use chrono::offset::TimeZone;
 use gremlin_client::{
     ConnectionOptions, GremlinClient, GremlinError, List, TlsOptions, ToGValue,
     TraversalExplanation, TraversalMetrics, VertexProperty,
@@ -108,8 +109,6 @@ fn test_vertex_query() {
         .collect::<Result<Vec<Vertex>, _>>()
         .expect("It should be ok");
 
-    println!("Vertices: {:#?}", vertices);
-
     assert_eq!("person", vertices[0].label());
 }
 #[test]
@@ -151,8 +150,6 @@ fn test_vertex_creation() {
 
 #[test]
 fn test_complex_vertex_creation_with_properties() {
-    use chrono::offset::TimeZone;
-
     let graph = graph();
 
     let q = r#"
@@ -416,4 +413,71 @@ fn test_group_count_edge() {
     let count = first.get(&edge);
 
     assert_eq!(Some(&GValue::Int64(1)), count);
+}
+
+#[test]
+#[cfg(feature = "derive")]
+fn test_vertex_mapping() {
+    let graph = graph();
+    use gremlin_client::derive::FromGValue;
+    use std::convert::TryFrom;
+
+    let q = r#"
+    g.addV('person')
+        .property('id',UUID.randomUUID())
+        .property('name',name)
+        .property('age',age)
+        .property('time',time)
+        .property('score',score)
+        .property('uuid',uuid)
+        .property('date',new Date(date))
+        .property('dateTime',dateTime)"#;
+
+    let uuid = uuid::Uuid::new_v4();
+    let params: &[(&str, &dyn ToGValue)] = &[
+        ("age", &22),
+        ("time", &(22 as i64)),
+        ("name", &"mark"),
+        ("score", &3.2),
+        ("uuid", &uuid),
+        ("dateTime", &chrono::Utc.timestamp(1551825863, 0)),
+        ("date", &(1551825863 as i64)),
+    ];
+    let mark = graph
+        .execute(q, params)
+        .expect("should create a vertex")
+        .filter_map(Result::ok)
+        .map(|f| f.take::<Vertex>())
+        .collect::<Result<Vec<Vertex>, _>>()
+        .expect("It should be ok");
+
+    #[derive(Debug, PartialEq, FromGValue)]
+    struct Person {
+        name: String,
+        age: i32,
+        time: i64,
+        optional: Option<String>,
+    }
+
+    assert_eq!("person", mark[0].label());
+
+    let value_map = graph
+        .execute("g.V(identity).valueMap()", &[("identity", mark[0].id())])
+        .expect("should fetch valueMap with properties")
+        .filter_map(Result::ok)
+        .map(|f| Person::try_from(f))
+        .collect::<Result<Vec<Person>, _>>()
+        .expect("It should be ok");
+
+    assert_eq!(1, value_map.len());
+
+    assert_eq!(
+        Person {
+            name: String::from("mark"),
+            age: 22,
+            time: 22,
+            optional: None
+        },
+        value_map[0]
+    );
 }

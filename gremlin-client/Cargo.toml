@@ -23,7 +23,8 @@ async_gremlin = ["futures","mobc","async-tungstenite","async-trait","url","pin-p
 async_std = ["async-std-runtime"]
 tokio-runtime = ["async_gremlin","tokio","mobc/tokio","async-tungstenite/tokio-runtime","async-tungstenite/tokio-tls","tokio-tls"]
 async-std-runtime = ["async_gremlin","async-std","async-tungstenite/async-std-runtime","async-tungstenite/async-tls","mobc/async-std","async-tls"]
- 
+
+derive = ["gremlin-derive"] 
 
 [badges]
 travis-ci = { repository = "wolf4ood/gremlin-rs" }
@@ -46,6 +47,8 @@ async-std =  { version = "1.4.0", optional = true, features = ["unstable","attri
 async-trait = { version = "0.1.10", optional = true }
 async-tls =  { version = "0.6.0", optional = true }
 tokio-tls = { version = "0.3.0", optional = true }
+gremlin-derive = { path="../gremlin-derive", version="0.1", optional=true }
+
 
 mobc = {version = "0.5.3", optional = true, default-features=false, features = ["unstable"] }
 url =  {version = "2.1.0", optional = true}
