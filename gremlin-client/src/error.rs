@@ -1,6 +1,6 @@
 use crate::structure::GValue;
-use std::error::Error;
-use std::fmt::Display;
+
+use thiserror::Error;
 
 use websocket::WebSocketError;
 
@@ -10,21 +10,40 @@ use async_tungstenite::tungstenite;
 use mobc;
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum GremlinError {
+    #[error("data store disconnected")]
     Generic(String),
-    WebSocket(WebSocketError),
-    Pool(r2d2::Error),
+
+    #[error(transparent)]
+    WebSocket(#[from] WebSocketError),
+
+    #[error(transparent)]
+    Pool(#[from] r2d2::Error),
+
+    #[error("Got wrong type {0:?}")]
     WrontType(GValue),
+
+    #[error("Cast error: {0}")]
     Cast(String),
+
+    #[error("JSON error: {0}")]
     Json(String),
+
+    #[error("Request error: {0:?} ")]
     Request((i16, String)),
-    Serde(serde_json::Error),
+
+    #[error(transparent)]
+    Serde(#[from] serde_json::Error),
+
     #[cfg(feature = "async_gremlin")]
-    WebSocketAsync(tungstenite::error::Error),
+    #[error(transparent)]
+    WebSocketAsync(#[from] tungstenite::error::Error),
     #[cfg(feature = "async_gremlin")]
-    ChannelSend(futures::channel::mpsc::SendError),
-    Uuid(uuid::Error),
+    #[error(transparent)]
+    ChannelSend(#[from] futures::channel::mpsc::SendError),
+    #[error(transparent)]
+    Uuid(#[from] uuid::Error),
 }
 
 #[cfg(feature = "async_gremlin")]
@@ -39,32 +58,3 @@ impl From<mobc::Error<GremlinError>> for GremlinError {
         }
     }
 }
-
-impl From<WebSocketError> for GremlinError {
-    fn from(e: WebSocketError) -> GremlinError {
-        GremlinError::WebSocket(e)
-    }
-}
-
-impl From<r2d2::Error> for GremlinError {
-    fn from(e: r2d2::Error) -> GremlinError {
-        GremlinError::Pool(e)
-    }
-}
-
-impl From<serde_json::Error> for GremlinError {
-    fn from(e: serde_json::Error) -> GremlinError {
-        GremlinError::Serde(e)
-    }
-}
-impl From<uuid::Error> for GremlinError {
-    fn from(e: uuid::Error) -> GremlinError {
-        GremlinError::Uuid(e)
-    }
-}
-impl Display for GremlinError {
-    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::result::Result<(), std::fmt::Error> {
-        write!(fmt, "{:?}", self)
-    }
-}
-impl Error for GremlinError {}
