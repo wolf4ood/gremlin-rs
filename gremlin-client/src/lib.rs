@@ -143,6 +143,6 @@ pub mod utils;
 
 #[cfg(feature = "derive")]
 pub mod derive {
-
+    pub use gremlin_derive::FromGMap;
     pub use gremlin_derive::FromGValue;
 }

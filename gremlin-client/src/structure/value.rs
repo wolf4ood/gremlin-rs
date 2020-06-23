@@ -282,6 +282,12 @@ impl From<Cardinality> for GValue {
     }
 }
 
+impl From<uuid::Uuid> for GValue {
+    fn from(val: uuid::Uuid) -> GValue {
+        GValue::Uuid(val)
+    }
+}
+
 impl std::convert::TryFrom<GValue> for String {
     type Error = crate::GremlinError;
 
@@ -321,6 +327,34 @@ impl std::convert::TryFrom<GValue> for i64 {
             GValue::List(s) => from_list(s),
             _ => Err(GremlinError::Cast(format!(
                 "Cannot cast {:?} to i32",
+                value
+            ))),
+        }
+    }
+}
+
+impl std::convert::TryFrom<GValue> for uuid::Uuid {
+    type Error = crate::GremlinError;
+
+    fn try_from(value: GValue) -> GremlinResult<Self> {
+        match value {
+            GValue::Uuid(uid) => Ok(uid),
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot cast {:?} to Uuid",
+                value
+            ))),
+        }
+    }
+}
+
+impl std::convert::TryFrom<GValue> for Date {
+    type Error = crate::GremlinError;
+
+    fn try_from(value: GValue) -> GremlinResult<Self> {
+        match value {
+            GValue::Date(date) => Ok(date),
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot cast {:?} to DateTime<Utc>",
                 value
             ))),
         }

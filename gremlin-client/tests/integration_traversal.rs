@@ -1,4 +1,4 @@
-use gremlin_client::process::traversal::{traversal, Order, __};
+use gremlin_client::process::traversal::{traversal, Bytecode, Order, TraversalBuilder, __};
 use gremlin_client::structure::{Cardinality, List, Map, Pop, TextP, Vertex, VertexProperty, P, T};
 use gremlin_client::utils;
 
@@ -1874,5 +1874,58 @@ fn test_coalesce_unfold() {
     assert_eq!(
         "unfold",
         utils::unwrap_map::<String>(&values[0], "name", 0).unwrap()
+    );
+}
+
+#[test]
+#[cfg(feature = "derive")]
+fn test_traversal_vertex_mapping() {
+    use chrono::{DateTime, TimeZone, Utc};
+    use gremlin_client::derive::FromGMap;
+    use std::convert::TryFrom;
+
+    let client = graph();
+
+    drop_vertices(&client, "test_vertex_mapping").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    let uuid = uuid::Uuid::new_v4();
+    let mark = g
+        .add_v("person")
+        .property("name", "Mark")
+        .property("age", 22)
+        .property("time", 22 as i64)
+        .property("score", 3.2)
+        .property("uuid", uuid.clone())
+        .property("datetime", chrono::Utc.timestamp(1551825863, 0))
+        .property("date", 1551825863 as i64)
+        .value_map(true)
+        .by(TraversalBuilder::new(Bytecode::new()).unfold())
+        .next();
+    assert_eq!(mark.is_ok(), true);
+
+    #[derive(Debug, PartialEq, FromGMap)]
+    struct Person {
+        name: String,
+        age: i32,
+        time: i64,
+        datetime: DateTime<Utc>,
+        uuid: uuid::Uuid,
+        optional: Option<String>,
+    }
+    let person = Person::try_from(mark.unwrap().unwrap());
+    assert_eq!(person.is_ok(), true);
+
+    assert_eq!(
+        Person {
+            name: String::from("Mark"),
+            age: 22,
+            time: 22,
+            datetime: chrono::Utc.timestamp(1551825863, 0),
+            uuid: uuid,
+            optional: None
+        },
+        person.unwrap()
     );
 }
