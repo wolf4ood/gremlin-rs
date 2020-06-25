@@ -6,15 +6,16 @@ use crate::structure::{
     Set, Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty,
 };
 use crate::structure::{Pop, TextP, P, T};
-use crate::GremlinResult;
+use crate::{GremlinError, GremlinResult};
 use chrono;
 use std::collections::{BTreeMap, HashMap, VecDeque};
 pub type Date = chrono::DateTime<chrono::offset::Utc>;
-
+use std::convert::TryInto;
 /// Represent possible values coming from the [Gremlin Server](http://tinkerpop.apache.org/docs/3.4.0/dev/io/)
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, PartialEq, Clone)]
 pub enum GValue {
+    Null,
     Vertex(Vertex),
     Edge(Edge),
     VertexProperty(VertexProperty),
@@ -280,3 +281,114 @@ impl From<Cardinality> for GValue {
         GValue::Cardinality(val)
     }
 }
+
+impl From<uuid::Uuid> for GValue {
+    fn from(val: uuid::Uuid) -> GValue {
+        GValue::Uuid(val)
+    }
+}
+
+impl std::convert::TryFrom<GValue> for String {
+    type Error = crate::GremlinError;
+
+    fn try_from(value: GValue) -> GremlinResult<Self> {
+        match value {
+            GValue::String(s) => Ok(s),
+            GValue::List(s) => from_list(s),
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot cast {:?} to String",
+                value
+            ))),
+        }
+    }
+}
+
+impl std::convert::TryFrom<GValue> for i32 {
+    type Error = crate::GremlinError;
+
+    fn try_from(value: GValue) -> GremlinResult<Self> {
+        match value {
+            GValue::Int32(s) => Ok(s),
+            GValue::List(s) => from_list(s),
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot cast {:?} to i32",
+                value
+            ))),
+        }
+    }
+}
+
+impl std::convert::TryFrom<GValue> for i64 {
+    type Error = crate::GremlinError;
+
+    fn try_from(value: GValue) -> GremlinResult<Self> {
+        match value {
+            GValue::Int64(s) => Ok(s),
+            GValue::List(s) => from_list(s),
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot cast {:?} to i32",
+                value
+            ))),
+        }
+    }
+}
+
+impl std::convert::TryFrom<GValue> for uuid::Uuid {
+    type Error = crate::GremlinError;
+
+    fn try_from(value: GValue) -> GremlinResult<Self> {
+        match value {
+            GValue::Uuid(uid) => Ok(uid),
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot cast {:?} to Uuid",
+                value
+            ))),
+        }
+    }
+}
+
+impl std::convert::TryFrom<GValue> for Date {
+    type Error = crate::GremlinError;
+
+    fn try_from(value: GValue) -> GremlinResult<Self> {
+        match value {
+            GValue::Date(date) => Ok(date),
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot cast {:?} to DateTime<Utc>",
+                value
+            ))),
+        }
+    }
+}
+
+fn from_list<T>(glist: List) -> GremlinResult<T>
+where
+    T: std::convert::TryFrom<GValue, Error = GremlinError>,
+{
+    let mut vec = glist.take();
+
+    match vec.len() {
+        1 => vec.pop().unwrap().try_into(),
+        _ => Err(GremlinError::Cast(format!("Cannot cast a List to String"))),
+    }
+}
+
+// Optional
+
+macro_rules! impl_try_from_option {
+    ($t:ty) => {
+        impl std::convert::TryFrom<GValue> for Option<$t> {
+            type Error = crate::GremlinError;
+
+            fn try_from(value: GValue) -> GremlinResult<Self> {
+                if let GValue::Null = value {
+                    return Ok(None);
+                }
+                let res = value.try_into()?;
+                Ok(res)
+            }
+        }
+    };
+}
+
+impl_try_from_option!(String);

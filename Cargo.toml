@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "gremlin-client",
-    "gremlin-tutorial"	
+    "gremlin-tutorial",
+    "gremlin-derive"	
 ]
