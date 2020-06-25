@@ -9,7 +9,7 @@ pub fn derive(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
         }) => {
             let ident = &input.ident;
 
-            let (m_reads,m_names) = map_properties(named);
+            let (m_reads, m_names) = map_properties(named);
 
             Ok(quote! {
 
@@ -31,7 +31,7 @@ pub fn derive(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
                             }
                         }
 
-                        
+
                     }
                 }
             })
@@ -51,7 +51,7 @@ pub fn derive_map(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
         }) => {
             let ident = &input.ident;
 
-            let (m_reads,m_names) = map_properties(named);
+            let (m_reads, m_names) = map_properties(named);
 
             Ok(quote! {
 
@@ -74,20 +74,23 @@ pub fn derive_map(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> 
     }
 }
 
-fn map_properties(named : &syn::punctuated::Punctuated<syn::Field, syn::token::Comma>) -> (Vec<Stmt>,Vec<&Option<proc_macro2::Ident>>)  {
+fn map_properties(
+    named: &syn::punctuated::Punctuated<syn::Field, syn::token::Comma>,
+) -> (Vec<Stmt>, Vec<&Option<proc_macro2::Ident>>) {
+    let reads = named
+        .iter()
+        .filter_map(|field| -> Option<Stmt> {
+            let id = &field.ident.as_ref()?;
+            let id_s = id.to_string();
+            let ty = &field.ty;
 
-    let reads = named.iter().filter_map(|field| -> Option<Stmt> {
-        let id = &field.ident.as_ref()?;
-        let id_s = id.to_string();
-        let ty = &field.ty;
-
-        Some(parse_quote!(
-            let #id: #ty = map.try_get(#id_s)?;
-        ))
-    }).collect();
+            Some(parse_quote!(
+                let #id: #ty = map.try_get(#id_s)?;
+            ))
+        })
+        .collect();
 
     let names = named.iter().map(|field| &field.ident).collect();
 
-
-    (reads,names)
+    (reads, names)
 }
