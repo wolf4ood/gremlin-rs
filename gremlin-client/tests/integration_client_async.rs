@@ -4,7 +4,7 @@ mod common;
 #[allow(unused_imports)]
 mod aio {
 
-    use gremlin_client::GremlinError;
+    use gremlin_client::{aio::GremlinClient, ConnectionOptions, GremlinError, TlsOptions};
     use gremlin_client::{Edge, GValue, Map, Vertex};
 
     use super::common::aio::{connect, create_edge, create_vertex, drop_vertices};
@@ -18,6 +18,27 @@ mod aio {
     #[cfg_attr(feature = "tokio-runtime", tokio::test)]
     async fn test_client_connection_ok() {
         connect().await;
+    }
+
+    #[cfg_attr(feature = "async-std-runtime", async_std::test)]
+    #[cfg_attr(feature = "tokio-runtime", tokio::test)]
+    async fn test_ok_credentials() {
+        let client = GremlinClient::connect(
+            ConnectionOptions::builder()
+                .host("localhost")
+                .port(8183)
+                .credentials("stephen", "password")
+                .ssl(true)
+                .tls_options(TlsOptions {
+                    accept_invalid_certs: true,
+                })
+                .build(),
+        )
+        .await
+        .expect("Cannot connect");
+
+        let result = client.execute("g.V().limit(1)", &[]).await;
+        assert!(result.is_ok(), format!("{:?}", result));
     }
 
     #[cfg(feature = "async-std-runtime")]
