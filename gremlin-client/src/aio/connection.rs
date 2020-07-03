@@ -28,7 +28,7 @@ use tokio_use::*;
 use async_tungstenite::async_std::connect_async_with_tls_connector;
 
 #[cfg(feature = "tokio-runtime")]
-use async_tungstenite::tokio::{connect_async, TokioAdapter};
+use async_tungstenite::tokio::{connect_async_with_tls_connector, TokioAdapter};
 
 use async_tungstenite::tungstenite::protocol::Message;
 use async_tungstenite::WebSocketStream;
@@ -113,6 +113,18 @@ mod tls {
     }
 }
 
+#[cfg(feature = "tokio-runtime")]
+mod tls {
+
+    use crate::connection::ConnectionOptions;
+    use tokio_tls::TlsConnector;
+
+    pub fn connector(opts: &ConnectionOptions) -> Option<TlsConnector> {
+        opts.tls_options
+            .as_ref()
+            .and_then(|tls| tls.tls_connector().map(TlsConnector::from).ok())
+    }
+}
 impl Conn {
     pub async fn connect<T>(options: T) -> GremlinResult<Conn>
     where
@@ -124,7 +136,7 @@ impl Conn {
         #[cfg(feature = "async-std-runtime")]
         let (client, _) = { connect_async_with_tls_connector(url, tls::connector(&opts)).await? };
         #[cfg(feature = "tokio-runtime")]
-        let (client, _) = { connect_async(url).await? };
+        let (client, _) = { connect_async_with_tls_connector(url, tls::connector(&opts)).await? };
 
         let (sink, stream) = client.split();
         let (sender, receiver) = channel(20);
