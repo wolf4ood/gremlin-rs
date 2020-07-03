@@ -25,10 +25,10 @@ mod tokio_use {
 use tokio_use::*;
 
 #[cfg(feature = "async-std-runtime")]
-use async_tungstenite::async_std::connect_async;
+use async_tungstenite::async_std::connect_async_with_tls_connector;
 
 #[cfg(feature = "tokio-runtime")]
-use async_tungstenite::tokio::{connect_async, TokioAdapter};
+use async_tungstenite::tokio::{connect_async_with_tls_connector, TokioAdapter};
 
 use async_tungstenite::tungstenite::protocol::Message;
 use async_tungstenite::WebSocketStream;
@@ -73,6 +73,58 @@ impl std::fmt::Debug for Conn {
         write!(f, "Conn")
     }
 }
+
+#[cfg(feature = "async-std-runtime")]
+mod tls {
+
+    use crate::connection::ConnectionOptions;
+    pub struct NoCertificateVerification {}
+
+    impl rustls::ServerCertVerifier for NoCertificateVerification {
+        fn verify_server_cert(
+            &self,
+            _roots: &rustls::RootCertStore,
+            _presented_certs: &[rustls::Certificate],
+            _dns_name: webpki::DNSNameRef<'_>,
+            _ocsp: &[u8],
+        ) -> Result<rustls::ServerCertVerified, rustls::TLSError> {
+            Ok(rustls::ServerCertVerified::assertion())
+        }
+    }
+
+    pub fn connector(opts: &ConnectionOptions) -> Option<async_tls::TlsConnector> {
+        use rustls::ClientConfig;
+        use std::sync::Arc;
+        if opts
+            .tls_options
+            .as_ref()
+            .map(|tls| tls.accept_invalid_certs)
+            .unwrap_or(false)
+        {
+            let mut config = ClientConfig::new();
+            config
+                .dangerous()
+                .set_certificate_verifier(Arc::new(NoCertificateVerification {}));
+
+            Some(async_tls::TlsConnector::from(Arc::new(config)))
+        } else {
+            Some(async_tls::TlsConnector::new())
+        }
+    }
+}
+
+#[cfg(feature = "tokio-runtime")]
+mod tls {
+
+    use crate::connection::ConnectionOptions;
+    use tokio_tls::TlsConnector;
+
+    pub fn connector(opts: &ConnectionOptions) -> Option<TlsConnector> {
+        opts.tls_options
+            .as_ref()
+            .and_then(|tls| tls.tls_connector().map(TlsConnector::from).ok())
+    }
+}
 impl Conn {
     pub async fn connect<T>(options: T) -> GremlinResult<Conn>
     where
@@ -80,7 +132,11 @@ impl Conn {
     {
         let opts = options.into();
         let url = url::Url::parse(&opts.websocket_url()).expect("failed to pars url");
-        let (client, _) = connect_async(url).await?;
+
+        #[cfg(feature = "async-std-runtime")]
+        let (client, _) = { connect_async_with_tls_connector(url, tls::connector(&opts)).await? };
+        #[cfg(feature = "tokio-runtime")]
+        let (client, _) = { connect_async_with_tls_connector(url, tls::connector(&opts)).await? };
 
         let (sink, stream) = client.split();
         let (sender, receiver) = channel(20);
