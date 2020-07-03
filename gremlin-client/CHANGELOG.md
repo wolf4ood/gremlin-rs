@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.6.0] - 2020-07-03
+
+### Added
+
+- [#50](https://github.com/wolf4ood/gremlin-rs/issues/50) First impl of derive from GResult/Map
+
+### Fixed
+
+- [#86](https://github.com/wolf4ood/gremlin-rs/issues/86) Fixed option accept_invalid_certs with async
+
 ## [0.5.1] - 2020-06-05
 
 ### Added
