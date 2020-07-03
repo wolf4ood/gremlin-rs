@@ -8,7 +8,6 @@ description= "Proc macro for gremlin-rs™"
 repository = "https://github.com/wolf4ood/gremlin-rs"
 keywords = ["database", "graphs","tinkerpop"]
 categories = ["database"]
-readme = "README.md"
 
 
 [lib]
