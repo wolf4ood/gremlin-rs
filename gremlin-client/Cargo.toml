@@ -62,7 +62,7 @@ tokio = { version = "0.2", optional=true, features = ["full"] }
 
 
 [dependencies.websocket]
-version="0.24"
+version="0.26"
 default-features = false 
 features = ["sync","sync-ssl"]
 
