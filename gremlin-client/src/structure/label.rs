@@ -3,7 +3,7 @@ use crate::structure::T;
 pub enum LabelType {
     Str(String),
     Bool(bool),
-    T(T)
+    T(T),
 }
 
 pub struct Labels(pub(crate) Vec<LabelType>);
