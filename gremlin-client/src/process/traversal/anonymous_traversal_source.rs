@@ -76,6 +76,42 @@ impl AnonymousTraversalSource {
         self.traversal.clone().out_e(labels)
     }
 
+    pub fn in_<L>(&self, labels: L) -> TraversalBuilder
+        where
+        L: Into<Labels>,
+    {
+        self.traversal.clone().in_(labels)
+    }
+
+    pub fn in_e<L>(&self, labels: L) -> TraversalBuilder
+        where
+        L: Into<Labels>,
+    {
+        self.traversal.clone().in_e(labels)
+    }
+
+    pub fn both<L>(&self, labels: L) -> TraversalBuilder
+        where
+        L: Into<Labels>,
+    {
+        self.traversal.clone().both(labels)
+    }
+
+    pub fn both_e<L>(&self, labels: L) -> TraversalBuilder
+        where
+        L: Into<Labels>,
+    {
+        self.traversal.clone().both_e(labels)
+    }
+
+    pub fn other(&self) -> TraversalBuilder {
+        self.traversal.clone().other()
+    }
+
+    pub fn other_v(&self) -> TraversalBuilder {
+        self.traversal.clone().other_v()
+    }
+
     pub fn values<L>(&self, labels: L) -> TraversalBuilder
     where
         L: Into<Labels>,

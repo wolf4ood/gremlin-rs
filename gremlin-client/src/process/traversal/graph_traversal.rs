@@ -242,6 +242,44 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         GraphTraversal::new(self.terminator, self.builder)
     }
 
+    pub fn both<A>(mut self, labels: A) -> GraphTraversal<S, Vertex, T>
+    where
+        A: Into<Labels>,
+        T: Terminator<Vertex>,
+    {
+        self.builder = self.builder.both(labels);
+
+        GraphTraversal::new(self.terminator, self.builder)
+    }
+
+    pub fn both_e<A>(mut self, labels: A) -> GraphTraversal<S, Edge, T>
+    where
+        A: Into<Labels>,
+        T: Terminator<Edge>,
+    {
+        self.builder = self.builder.both_e(labels);
+
+        GraphTraversal::new(self.terminator, self.builder)
+    }
+
+    pub fn other(mut self) -> GraphTraversal<S, Vertex, T>
+    where
+        T: Terminator<Vertex>,
+    {
+        self.builder = self.builder.other();
+
+        GraphTraversal::new(self.terminator, self.builder)
+    }
+
+    pub fn other_v(mut self) -> GraphTraversal<S, Vertex, T>
+    where
+        T: Terminator<Vertex>,
+    {
+        self.builder = self.builder.other_v();
+
+        GraphTraversal::new(self.terminator, self.builder)
+    }
+
     pub fn label(mut self) -> GraphTraversal<S, String, T>
     where
         T: Terminator<String>,

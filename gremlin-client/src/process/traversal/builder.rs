@@ -209,6 +209,43 @@ impl TraversalBuilder {
         self
     }
 
+    pub fn both<A>(mut self, labels: A) -> Self
+    where
+        A: Into<Labels>,
+    {
+        self.bytecode.add_step(
+            String::from("both"),
+            labels.into().0.into_iter().map(GValue::from).collect(),
+        );
+
+        self
+    }
+
+    pub fn both_e<A>(mut self, labels: A) -> Self
+    where
+        A: Into<Labels>,
+    {
+        self.bytecode.add_step(
+            String::from("bothE"),
+            labels.into().0.into_iter().map(GValue::from).collect(),
+        );
+
+        self
+    }
+
+    pub fn other(mut self) -> Self {
+        self.bytecode.add_step(String::from("other"), vec![]);
+
+        self
+    }
+    
+    pub fn other_v(mut self) -> Self
+    {
+        self.bytecode.add_step(String::from("otherV"), vec![]);
+
+        self
+    }
+
     pub fn label(mut self) -> Self {
         self.bytecode.add_step(String::from("label"), vec![]);
 

@@ -202,8 +202,10 @@ fn test_traversal() {
 
     let v = create_vertex(&client, "Traversal");
     let v1 = create_vertex(&client, "Traversal");
+    let v2 = create_vertex(&client, "Traversal");
 
     let _e = create_edge(&client, &v, &v1, "test_vertex_out_traversal");
+    let _e2 = create_edge(&client, &v2, &v, "test_vertex_out_traversal");
 
     let g = traversal().with_remote(client);
 
@@ -294,6 +296,41 @@ fn test_traversal() {
     assert_eq!(1, results.len());
 
     assert_eq!(v.id(), results[0].id());
+
+    let results = g.v(v1.id()).in_("fake").to_list().unwrap();
+
+    assert_eq!(0, results.len());
+
+    // BOTH
+
+    let results = g
+        .v(v.id())
+        .both("test_vertex_out_traversal")
+        .to_list()
+        .unwrap();
+
+    assert_eq!(2, results.len());
+
+    assert_eq!(v1.id(), results[0].id());
+    assert_eq!(v2.id(), results[1].id());
+
+    let results = g.v(v1.id()).in_("fake").to_list().unwrap();
+
+    assert_eq!(0, results.len());
+
+    // BOTH_E -> OTHER_V
+
+    let results = g
+        .v(v.id())
+        .both_e("test_vertex_out_traversal")
+        .other_v()
+        .to_list()
+        .unwrap();
+
+    assert_eq!(2, results.len());
+
+    assert_eq!(v1.id(), results[0].id());
+    assert_eq!(v2.id(), results[1].id());
 
     let results = g.v(v1.id()).in_("fake").to_list().unwrap();
 
