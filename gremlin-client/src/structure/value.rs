@@ -272,6 +272,7 @@ impl From<LabelType> for GValue {
         match val {
             LabelType::Str(val) => val.into(),
             LabelType::Bool(val) => val.into(),
+            LabelType::T(val) => val.into(),
         }
     }
 }

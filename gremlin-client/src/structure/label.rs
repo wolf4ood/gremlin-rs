@@ -1,6 +1,9 @@
+use crate::structure::T;
+
 pub enum LabelType {
     Str(String),
     Bool(bool),
+    T(T),
 }
 
 pub struct Labels(pub(crate) Vec<LabelType>);
@@ -14,6 +17,12 @@ impl From<&str> for Labels {
 impl From<String> for Labels {
     fn from(param: String) -> Labels {
         Labels(vec![LabelType::Str(param)])
+    }
+}
+
+impl From<T> for Labels {
+    fn from(param: T) -> Labels {
+        Labels(vec![LabelType::T(param)])
     }
 }
 
@@ -52,6 +61,23 @@ impl From<bool> for Labels {
 impl From<(bool, Vec<&str>)> for Labels {
     fn from(param: (bool, Vec<&str>)) -> Labels {
         let mut out: Vec<LabelType> = vec![LabelType::Bool(param.0)];
+        out.append(&mut Into::<Labels>::into(param.1).0.drain(..).collect());
+        Labels(out)
+    }
+}
+
+impl From<(bool, T, Vec<&str>)> for Labels {
+    fn from(param: (bool, T, Vec<&str>)) -> Labels {
+        let mut out: Vec<LabelType> = vec![LabelType::Bool(param.0)];
+        out.append(&mut Into::<Labels>::into(param.1).0.drain(..).collect());
+        out.append(&mut Into::<Labels>::into(param.2).0.drain(..).collect());
+        Labels(out)
+    }
+}
+
+impl From<(T, Vec<&str>)> for Labels {
+    fn from(param: (T, Vec<&str>)) -> Labels {
+        let mut out: Vec<LabelType> = vec![LabelType::T(param.0)];
         out.append(&mut Into::<Labels>::into(param.1).0.drain(..).collect());
         Labels(out)
     }
