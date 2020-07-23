@@ -238,9 +238,8 @@ impl TraversalBuilder {
 
         self
     }
-    
-    pub fn other_v(mut self) -> Self
-    {
+
+    pub fn other_v(mut self) -> Self {
         self.bytecode.add_step(String::from("otherV"), vec![]);
 
         self
