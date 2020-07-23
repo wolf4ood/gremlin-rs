@@ -43,12 +43,7 @@ impl From<Vec<&str>> for Labels {
 }
 impl From<Vec<String>> for Labels {
     fn from(param: Vec<String>) -> Labels {
-        Labels(
-            param
-                .into_iter()
-                .map(|val| LabelType::Str(String::from(val)))
-                .collect(),
-        )
+        Labels(param.into_iter().map(LabelType::Str).collect())
     }
 }
 

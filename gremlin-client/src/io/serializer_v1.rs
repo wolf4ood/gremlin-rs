@@ -10,9 +10,9 @@ use crate::GremlinResult;
 use serde_json::Value;
 use std::collections::HashMap;
 
-static G_METRICS: &'static str = "g:Metrics";
-static G_TRAVERSAL_EXPLANATION: &'static str = "g:TraversalExplanation";
-static G_TRAVERSAL_METRICS: &'static str = "g:TraversalMetrics";
+static G_METRICS: &str = "g:Metrics";
+static G_TRAVERSAL_EXPLANATION: &str = "g:TraversalExplanation";
+static G_TRAVERSAL_METRICS: &str = "g:TraversalMetrics";
 
 // Deserialize a JSON value to a GID
 pub fn deserialize_id<T>(reader: &T, val: &Value) -> GremlinResult<GID>
@@ -275,7 +275,7 @@ where
 
 // deserialzer v1
 pub fn deserializer_v1(val: &Value) -> GremlinResult<GValue> {
-    let retval = match val {
+    match val {
         Value::Null => Err(GremlinError::Json(format!("Val {:#?} not supported.", val))),
         Value::Bool(b) => Ok(GValue::Bool(*b)),
         Value::Number(_n) => deserialize_number(&deserializer_v1, val),
@@ -307,9 +307,7 @@ pub fn deserializer_v1(val: &Value) -> GremlinResult<GValue> {
                 deserialize_map(&deserializer_v1, val)
             }
         }
-    };
-
-    retval
+    }
 }
 
 /*

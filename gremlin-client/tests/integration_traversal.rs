@@ -1,4 +1,4 @@
-use gremlin_client::process::traversal::{traversal, Bytecode, Order, TraversalBuilder, __};
+use gremlin_client::process::traversal::{traversal, Order, __};
 use gremlin_client::structure::{Cardinality, List, Map, Pop, TextP, Vertex, VertexProperty, P, T};
 use gremlin_client::utils;
 

@@ -13,9 +13,9 @@ use chrono::Utc;
 use serde_json::Value;
 use std::collections::HashMap;
 
-static G_METRICS: &'static str = "g:Metrics";
-static G_TRAVERSAL_EXPLANATION: &'static str = "g:TraversalExplanation";
-static G_TRAVERSAL_METRICS: &'static str = "g:TraversalMetrics";
+static G_METRICS: &str = "g:Metrics";
+static G_TRAVERSAL_EXPLANATION: &str = "g:TraversalExplanation";
+static G_TRAVERSAL_METRICS: &str = "g:TraversalMetrics";
 
 // Deserialize a JSON value to a GID
 pub fn deserialize_id<T>(reader: &T, val: &Value) -> GremlinResult<GID>

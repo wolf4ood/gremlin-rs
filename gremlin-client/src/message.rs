@@ -83,9 +83,9 @@ pub fn message_with_args_and_uuid_v1<T>(
 ) -> Message<T> {
     Message::V1 {
         request_id: id,
-        op: op,
-        processor: processor,
-        args: args,
+        op,
+        processor,
+        args,
     }
 }
 
@@ -100,9 +100,9 @@ pub fn message_with_args_and_uuid_v2<T>(
             id_type: "g:UUID".to_string(),
             value: id,
         },
-        op: op,
-        processor: processor,
-        args: args,
+        op,
+        processor,
+        args,
     }
 }
 

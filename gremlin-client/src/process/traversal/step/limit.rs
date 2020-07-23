@@ -20,7 +20,7 @@ impl From<LimitStep> for Vec<GValue> {
                 Scope::Global => vec![String::from("Global").into()],
                 Scope::Local => vec![String::from("Local").into()],
             })
-            .unwrap_or_else(|| vec![]);
+            .unwrap_or_else(Vec::new);
 
         params.push(step.limit);
         params

@@ -7,7 +7,6 @@ use crate::structure::{
 };
 use crate::structure::{Pop, TextP, P, T};
 use crate::{GremlinError, GremlinResult};
-use chrono;
 use std::collections::{BTreeMap, HashMap, VecDeque};
 pub type Date = chrono::DateTime<chrono::offset::Utc>;
 use std::convert::TryInto;
@@ -370,7 +369,9 @@ where
 
     match vec.len() {
         1 => vec.pop().unwrap().try_into(),
-        _ => Err(GremlinError::Cast(format!("Cannot cast a List to String"))),
+        _ => Err(GremlinError::Cast(String::from(
+            "Cannot cast a List to String",
+        ))),
     }
 }
 

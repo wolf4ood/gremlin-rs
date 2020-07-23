@@ -16,16 +16,20 @@ impl List {
         self.0.iter()
     }
 
-    pub fn into_iter(self) -> impl Iterator<Item = GValue> {
-        self.0.into_iter()
-    }
-
     pub fn len(&self) -> usize {
         self.0.len()
     }
 
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
+    }
+}
+
+impl std::iter::IntoIterator for List {
+    type Item = GValue;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
     }
 }
 
