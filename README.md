@@ -194,6 +194,85 @@ async fn main() -> Result<(), Box<std::error::Error>> {
 ```
 
 
+### Additional Features
+
+#### `derive` feature
+
+By including the `derive` feature in your Cargo.toml
+
+```
+[dependencies]
+gremlin_client = { version = "*", features = ["derive"] }
+```
+
+two derive macros are available 
+
+- FromGMap
+- FromGValue
+
+which you can use to derive the mapping from GMap and GValue (only Map currently) into structs.
+
+
+with `GValue`
+
+```rust
+use gremlin_client::derive::{FromGMap, FromGValue};
+use gremlin_client::process::traversal::traversal;
+use gremlin_client::GremlinClient;
+use std::convert::TryFrom;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = GremlinClient::connect("localhost")?;
+
+    #[derive(Debug, PartialEq, FromGValue, FromGMap)]
+    struct Person {
+        name: String,
+    }
+
+    let results = client
+        .execute("g.V(param).valueMap()", &[("param", &1)])?
+        .filter_map(Result::ok)
+        .map(|f| Person::try_from(f))
+        .collect::<Result<Vec<Person>, _>>()?;
+
+    println!("Person {:?}", results[0);
+    Ok(())
+}
+
+```
+
+with `GMap`
+
+```rust
+use gremlin_client::derive::FromGMap;
+use gremlin_client::process::traversal::traversal;
+use gremlin_client::GremlinClient;
+use std::convert::TryFrom;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = GremlinClient::connect("localhost")?;
+
+    #[derive(Debug, PartialEq, FromGMap)]
+    struct Person {
+        name: String,
+    }
+
+    let g = traversal().with_remote(client);
+
+    let results = g
+        .v(1)
+        .value_map(())
+        .iter()?
+        .filter_map(Result::ok)
+        .map(Person::try_from)
+        .collect::<Result<Vec<Person>, _>>()?;
+
+    println!("Person {:?}", results[0);
+
+    Ok(())
+}
+```
+
 
 ### Development
 
