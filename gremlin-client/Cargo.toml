@@ -80,3 +80,7 @@ required-features = ["async_gremlin"]
 [[example]]
 name = "vertex_async"
 required-features = ["async_gremlin"]
+
+[[example]]
+name = "derive"
+required-features = ["derive"]
