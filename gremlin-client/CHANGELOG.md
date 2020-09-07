@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [#97](https://github.com/wolf4ood/gremlin-rs/issues/97) Fixed issue on boolean deserialization
+
 ## [0.6.0] - 2020-07-03
 
 ### Added
