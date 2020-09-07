@@ -3,6 +3,8 @@ macro_rules! g_serializer {
         pub fn $name(val: &Value) -> GremlinResult<GValue> {
             if let Value::String(ref s) = val {
                 Ok(s.clone().into())
+            } else if let Value::Bool(b) = val {
+                Ok((*b).into())
             } else {
                 let _type = &val["@type"];
                 let _type = get_value!(_type,serde_json::Value::String)?.as_str();
