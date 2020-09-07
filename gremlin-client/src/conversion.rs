@@ -9,7 +9,7 @@ use crate::structure::Traverser;
 
 use std::collections::HashMap;
 
-pub trait ToGValue {
+pub trait ToGValue: Send + Sync {
     fn to_gvalue(&self) -> GValue;
 }
 
