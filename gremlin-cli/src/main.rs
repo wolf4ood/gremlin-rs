@@ -35,7 +35,7 @@ fn main() {
                         let commands = router.action(&args[0]).handle(
                             &ctx,
                             line.clone(),
-                            args[0..args.len()].to_vec(),
+                            args[1..args.len()].to_vec(),
                         );
 
                         for command in commands {

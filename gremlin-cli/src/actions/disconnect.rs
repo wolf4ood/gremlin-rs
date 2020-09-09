@@ -1,16 +1,10 @@
 use crate::{actions::Action, command::Command, context::GremlinContext};
-use clap::{App, AppSettings};
 
-pub struct DisconnectAction(App<'static, 'static>);
+pub struct DisconnectAction;
 
 impl DisconnectAction {
     pub fn new() -> DisconnectAction {
-        DisconnectAction(
-            App::new("disconnect")
-                .setting(AppSettings::NoBinaryName)
-                .setting(AppSettings::DisableVersion)
-                .setting(AppSettings::ColoredHelp),
-        )
+        DisconnectAction
     }
 }
 

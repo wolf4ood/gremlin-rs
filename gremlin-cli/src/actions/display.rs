@@ -1,18 +1,12 @@
 use crate::print;
 use crate::{actions::Action, command::Command, context::GremlinContext};
-use clap::{App, AppSettings};
 use gremlin_client::GValue;
 use std::fmt::Write;
-pub struct DisplayAction(App<'static, 'static>);
+pub struct DisplayAction;
 
 impl DisplayAction {
     pub fn new() -> DisplayAction {
-        DisplayAction(
-            App::new("display")
-                .setting(AppSettings::NoBinaryName)
-                .setting(AppSettings::DisableVersion)
-                .setting(AppSettings::ColoredHelp),
-        )
+        DisplayAction
     }
 }
 
