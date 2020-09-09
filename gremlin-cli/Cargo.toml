@@ -10,12 +10,12 @@ edition = "2018"
 gremlin-client = { path = "../gremlin-client", version = "0.6.0", features = ["async-std-runtime"] }
 rustyline = "6.2.0"
 smol = "0.4.3"
-clap = "2.33.3"
 shellwords = "1.1.0"
 futures = "0.3.5"
 async-std = "1.6.3"
 uuid = "0.8.1"
 chrono = "0.4.15"
+structopt = { version = "0.3", default-features = false }
 
 
 
