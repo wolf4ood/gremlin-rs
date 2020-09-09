@@ -1,6 +1,6 @@
 use crate::{actions::Action, command::Command, context::GremlinContext};
 use futures::FutureExt;
-use gremlin_client::aio::GremlinClient;
+use gremlin_client::{aio::GremlinClient, ConnectionOptions, TlsOptions};
 
 use structopt::StructOpt;
 
@@ -15,6 +15,17 @@ struct Connect {
     host: String,
     #[structopt(short, long, default_value = "8182")]
     port: u16,
+    #[structopt(long)]
+    ssl: bool,
+
+    #[structopt(long)]
+    insecure: bool,
+
+    #[structopt(long)]
+    user: Option<String>,
+
+    #[structopt(long)]
+    password: Option<String>,
 }
 
 impl ConnectAction {
@@ -38,7 +49,18 @@ impl Action for ConnectAction {
             Ok(connect) => {
                 let task = |_ctx: &GremlinContext| {
                     let future = async move {
-                        match GremlinClient::connect((connect.host.as_str(), connect.port)).await {
+                        let mut options_builder = ConnectionOptions::builder()
+                            .host(connect.host.as_str())
+                            .port(connect.port)
+                            .ssl(connect.ssl)
+                            .tls_options(TlsOptions {
+                                accept_invalid_certs: connect.insecure,
+                            });
+
+                        if let (Some(username), Some(password)) = (connect.user, connect.password) {
+                            options_builder = options_builder.credentials(&username, &password);
+                        }
+                        match GremlinClient::connect(options_builder.build()).await {
                             Ok(client) => vec![
                                 Command::Update(Box::new(move |ctx| GremlinContext {
                                     client: Some(client.clone()),
