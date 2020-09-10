@@ -1,13 +1,14 @@
 use context::GremlinContext;
 
 use smol;
-
+use structopt::StructOpt;
 mod actions;
 mod command;
 mod context;
 pub(crate) mod print;
 mod reader;
 mod router;
+use std::path::PathBuf;
 
 use reader::Reader;
 
@@ -21,8 +22,10 @@ const WELCOME: &str = r#"
 
 "#;
 fn main() {
+    let opt = GremlinOpt::from_args();
+
     smol::block_on(async {
-        let mut reader = Reader::new();
+        let mut reader = Reader::new(opt);
         let mut ctx = GremlinContext::builder().build();
         let mut router = router::init();
 
@@ -49,5 +52,14 @@ fn main() {
                 }
             }
         }
+        reader.save_history();
     })
+}
+
+#[derive(Debug, StructOpt)]
+#[structopt(name = "gremlin-cli", about = "A Rusty gremlin cli")]
+pub struct GremlinOpt {
+    /// Command history file
+    #[structopt(long, parse(from_os_str))]
+    history: Option<PathBuf>,
 }
