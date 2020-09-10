@@ -1,12 +1,13 @@
 use crate::context::GremlinContext;
 use futures::future::BoxFuture;
 use futures::FutureExt;
-
+use prettytable::Table;
 pub enum Command {
     Quit(Option<String>),
     Print(Option<String>),
     Exec(Box<dyn FnOnce(&GremlinContext) -> BoxFuture<'static, Vec<Command>> + Send>),
     Update(Box<dyn FnOnce(GremlinContext) -> GremlinContext + Send>),
+    PrintTable(Table),
 }
 
 impl Command {
@@ -30,6 +31,10 @@ impl Command {
                 execute_commands(ctx, commands).await
             }
             Command::Update(update) => update(ctx),
+            Command::PrintTable(table) => {
+                table.printstd();
+                ctx
+            }
         }
     }
 }
