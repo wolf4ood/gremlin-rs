@@ -19,9 +19,12 @@ impl Action for DisconnectAction {
         _: String,
         _: Vec<String>,
     ) -> Vec<Command> {
-        vec![Command::Update(Box::new(|ctx| GremlinContext {
-            client: None,
-            ..ctx
-        }))]
+        vec![
+            Command::Update(Box::new(|ctx| GremlinContext {
+                client: None,
+                ..ctx
+            })),
+            Command::Print(Some("Disconnected!".into())),
+        ]
     }
 }

@@ -1,7 +1,11 @@
 use crate::print;
 use crate::{actions::Action, command::Command, context::GremlinContext};
 use gremlin_client::GValue;
-use std::fmt::Write;
+use prettytable::{
+    cell,
+    format::{FormatBuilder, LinePosition, LineSeparator},
+    row, Table,
+};
 pub struct DisplayAction;
 
 impl DisplayAction {
@@ -21,10 +25,22 @@ impl Action for DisplayAction {
 }
 
 pub fn display_results(results: &Vec<GValue>) -> Command {
-    let mut buffer = String::new();
+    let mut table = Table::new();
 
+    let format = FormatBuilder::new()
+        .column_separator('|')
+        .borders('|')
+        .separator(LinePosition::Bottom, LineSeparator::new('-', '+', '+', '+'))
+        .separator(LinePosition::Top, LineSeparator::new('-', '+', '+', '+'))
+        .padding(1, 1)
+        .build();
+    table.set_format(format);
+
+    let mut idx = 1;
     for result in results {
-        writeln!(buffer, "==> {}", print::fmt(result)).expect("Failed to write");
+        table.add_row(row![idx, print::fmt(result).as_str()]);
+        idx += 1;
     }
-    Command::Print(Some(buffer))
+
+    Command::PrintTable(table)
 }
