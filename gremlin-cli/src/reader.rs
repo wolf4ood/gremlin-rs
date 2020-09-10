@@ -1,14 +1,20 @@
 use rustyline::Editor;
 
+use crate::GremlinOpt;
+
 pub struct Reader {
     editor: Editor<()>,
+    opt: GremlinOpt,
 }
 
 impl Reader {
-    pub fn new() -> Reader {
-        Reader {
-            editor: Editor::new(),
+    pub fn new(opt: GremlinOpt) -> Reader {
+        let mut editor = Editor::new();
+
+        if let Some(path) = opt.history.as_ref() {
+            editor.load_history(&path);
         }
+        Reader { editor, opt }
     }
     pub fn next(&mut self, prompt: &str) -> Option<(String, Vec<String>)> {
         match self.editor.readline(prompt) {
@@ -23,5 +29,11 @@ impl Reader {
 
     pub fn update_history(&mut self, line: &str) -> bool {
         self.editor.add_history_entry(line)
+    }
+
+    pub fn save_history(&mut self) {
+        if let Some(path) = self.opt.history.as_ref() {
+            self.editor.save_history(&path);
+        }
     }
 }
