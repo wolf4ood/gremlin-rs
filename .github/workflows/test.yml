@@ -37,7 +37,6 @@ jobs:
           args: --manifest-path gremlin-client/Cargo.toml  --features=tokio-runtime
       - name: Run cargo test with async-std
         uses: actions-rs/cargo@v1
-        working-directory: gremlin-client
         with:
           command: test
           args: --manifest-path gremlin-client/Cargo.toml --features=async-std-runtime
