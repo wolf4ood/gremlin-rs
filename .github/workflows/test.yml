@@ -16,13 +16,16 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         rust: [nightly, stable]
+        gremlin-server: [3.4.8]
     steps:
 
       - uses: actions/checkout@v2
       - name: Starting Gremlin Servers
         run: |
           docker-compose -f ./docker-compose/docker-compose.yaml up -d 
-        
+        env: 
+          GREMLIN_SERVER: ${{ matrix.gremlin-server }}
+
       - uses: actions/checkout@v2
       - name: Install latest ${{ matrix.rust }}
         uses: actions-rs/toolchain@v1
