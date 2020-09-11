@@ -20,7 +20,7 @@
     alt="Coverage status" />
   </a>
   <a href="https://crates.io/crates/gremlin-client">
-    <img src="https://img.shields.io/crates/d/gremlin-rs.svg?style=flat-square"
+    <img src="https://img.shields.io/crates/d/gremlin-client.svg?style=flat-square"
       alt="Download" />
   </a>
   <a href="https://docs.rs/gremlin-rs">
