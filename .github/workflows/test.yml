@@ -17,6 +17,12 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         rust: [nightly, stable]
     steps:
+
+      - name: Starting Gremlin Servers
+        working-directory: ./docker-compose
+        run: |
+          docker-compose up -d
+        
       - uses: actions/checkout@v2
       - name: Install latest ${{ matrix.rust }}
         uses: actions-rs/toolchain@v1
