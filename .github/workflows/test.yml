@@ -20,7 +20,7 @@ jobs:
 
       - name: Starting Gremlin Servers
         run: |
-          docker-compose --version
+          docker-compose up -d -f ./docker-compose/docker-compose.yaml
         
       - uses: actions/checkout@v2
       - name: Install latest ${{ matrix.rust }}
