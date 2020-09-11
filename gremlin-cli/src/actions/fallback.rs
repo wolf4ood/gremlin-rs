@@ -13,11 +13,14 @@ pub struct FallbackAction;
 
 impl Action for FallbackAction {
     fn name(&self) -> &str {
-        "fallback"
+        "g."
     }
 
+    fn description(&self) -> &str {
+        "Execute a gremlin query."
+    }
     fn handle(
-        &mut self,
+        &self,
         ctx: &crate::context::GremlinContext,
         cmd: String,
         _: Vec<String>,

@@ -39,8 +39,12 @@ impl Action for ConnectAction {
         "connect"
     }
 
+    fn description(&self) -> &str {
+        "Connect to the Gremlin Server."
+    }
+
     fn handle(
-        &mut self,
+        &self,
         _: &crate::context::GremlinContext,
         _: String,
         args: Vec<String>,

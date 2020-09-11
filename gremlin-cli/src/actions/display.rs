@@ -19,7 +19,11 @@ impl Action for DisplayAction {
         "display"
     }
 
-    fn handle(&mut self, ctx: &GremlinContext, _: String, _: Vec<String>) -> Vec<Command> {
+    fn description(&self) -> &str {
+        "Display the last result."
+    }
+
+    fn handle(&self, ctx: &GremlinContext, _: String, _: Vec<String>) -> Vec<Command> {
         vec![display_results(&ctx.last_results)]
     }
 }

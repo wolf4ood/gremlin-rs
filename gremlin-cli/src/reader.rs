@@ -12,7 +12,9 @@ impl Reader {
         let mut editor = Editor::new();
 
         if let Some(path) = opt.history.as_ref() {
-            editor.load_history(&path);
+            if editor.load_history(&path).is_err() {
+                println!("WARN: Failled to load history file at : {:?}", path)
+            }
         }
         Reader { editor, opt }
     }
@@ -33,7 +35,9 @@ impl Reader {
 
     pub fn save_history(&mut self) {
         if let Some(path) = self.opt.history.as_ref() {
-            self.editor.save_history(&path);
+            if self.editor.save_history(&path).is_err() {
+                println!("WARN: Failed save history to file : {:?}", path);
+            }
         }
     }
 }

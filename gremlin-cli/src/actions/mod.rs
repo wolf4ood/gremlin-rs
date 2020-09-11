@@ -13,5 +13,7 @@ pub use quit::QuitAction;
 pub trait Action {
     fn name(&self) -> &str;
 
-    fn handle(&mut self, ctx: &GremlinContext, cmd: String, args: Vec<String>) -> Vec<Command>;
+    fn description(&self) -> &str;
+
+    fn handle(&self, ctx: &GremlinContext, cmd: String, args: Vec<String>) -> Vec<Command>;
 }

@@ -7,12 +7,19 @@ impl Action for QuitAction {
         "quit"
     }
 
+    fn description(&self) -> &str {
+        "Exit the gremlin-cli."
+    }
+
     fn handle(
-        &mut self,
+        &self,
         _: &crate::context::GremlinContext,
         _: String,
         _: Vec<String>,
     ) -> Vec<Command> {
-        vec![Command::Quit(None)]
+        vec![
+            Command::Print(Some(String::from("Bye!"))),
+            Command::Quit(None),
+        ]
     }
 }

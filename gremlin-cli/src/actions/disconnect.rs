@@ -13,8 +13,11 @@ impl Action for DisconnectAction {
         "disconnect"
     }
 
+    fn description(&self) -> &str {
+        "Disconnect from the Gremlin Server."
+    }
     fn handle(
-        &mut self,
+        &self,
         _: &crate::context::GremlinContext,
         _: String,
         _: Vec<String>,

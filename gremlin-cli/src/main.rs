@@ -27,11 +27,15 @@ fn main() {
     smol::block_on(async {
         let mut reader = Reader::new(opt);
         let mut ctx = GremlinContext::builder().build();
-        let mut router = router::init();
+        let router = router::init();
 
         println!("{}", WELCOME);
+        let mut should_quit = false;
 
         loop {
+            if should_quit {
+                break;
+            }
             match reader.next(&ctx.prompt) {
                 Some((line, args)) => {
                     if !args.is_empty() {
@@ -40,9 +44,10 @@ fn main() {
                             line.clone(),
                             args[1..args.len()].to_vec(),
                         );
-
                         for command in commands {
-                            ctx = command.exec(ctx).await;
+                            let cmd_result = command.exec(ctx).await;
+                            ctx = cmd_result.0;
+                            should_quit = cmd_result.1;
                         }
                         reader.update_history(&line);
                     }
