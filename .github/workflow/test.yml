@@ -1,0 +1,49 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build_and_test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        rust: [nightly, stable]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install latest ${{ matrix.rust }}
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          profile: minimal
+          override: true
+
+      - name: Run cargo check
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --all --benches --bins --examples --tests --all-features
+
+      - name: Run cargo fmt
+        uses: actions-rs/cargo@v1
+        with:
+        command: fmt --all -- --check
+
+      - name: Run cargo test with tokio
+        uses: actions-rs/cargo@v1
+        working-directory: ./gremlin-client
+        with:
+          command: test --features=tokio-runtime
+
+      - name: Run cargo test with async-std
+        uses: actions-rs/cargo@v1
+        working-directory: ./gremlin-client
+        with:
+        command: test --features=async-std-runtime
