@@ -1,16 +1,46 @@
-# gremlin-rs
 
 
+<h1 align="center">Gremlin-rs</h1>
+<div align="center">
+  <strong>
+    Rust driver and tools for Apache TinkerPop™.
+  </strong>
+</div>
+
+<br />
+
+<div align="center">
+  <a href="https://github.com/wolf4ood/gremlin-rs/actions?query=workflow%3ATests">
+    <img src="https://github.com/wolf4ood/gremlin-rs/workflows/Tests/badge.svg"
+    alt="Tests status" />
+  </a>
+  
+  <a href="https://coveralls.io/github/wolf4ood/gremlin-rs?branch=master">
+    <img src="https://coveralls.io/repos/github/wolf4ood/gremlin-rs/badge.svg?branch=master"
+    alt="Coverage status" />
+  </a>
+  <a href="https://crates.io/crates/gremlin-rs">
+    <img src="https://img.shields.io/crates/d/gremlin-rs.svg?style=flat-square"
+      alt="Download" />
+  </a>
+  <a href="https://docs.rs/gremlin-rs">
+    <img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square"
+      alt="docs.rs docs" />
+  </a>
+
+   <a href="https://opensource.org/licenses/Apache-2.0">
+    <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"
+      alt="license" />
+  </a>
+
+   <a href="https://deps.rs/repo/github/wolf4ood/gremlin-rs">
+    <img src="https://deps.rs/repo/github/wolf4ood/gremlin-rs/status.svg"
+      alt="license" />
+  </a>
 
 
-[![Build Status](https://travis-ci.org/wolf4ood/gremlin-rs.svg?branch=master)](https://travis-ci.org/wolf4ood/gremlin-rs)
-[![Codecov Status](https://codecov.io/gh/wolf4ood/gremlin-rs/branch/master/graph/badge.svg)](https://codecov.io/gh/wolf4ood/gremlin-rs)
-[![Crates.io](https://img.shields.io/crates/v/gremlin-client.svg)](https://crates.io/crates/gremlin-client)
-[![Crates.io Download](https://img.shields.io/crates/d/gremlin-client.svg)](https://crates.io/crates/gremlin-client)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Docs](https://docs.rs/gremlin-client/badge.svg)](https://docs.rs/gremlin-client)
-[![dependency status](https://deps.rs/repo/github/wolf4ood/gremlin-rs/status.svg)](https://deps.rs/repo/github/wolf4ood/gremlin-rs)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e29ea9b1c90a47f797d259de04eb595b)](https://www.codacy.com/app/wolf4ood/gremlin-rs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wolf4ood/gremlin-rs&amp;utm_campaign=Badge_Grade)
+  
+</div>
 
 
 
