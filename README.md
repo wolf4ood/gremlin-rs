@@ -19,7 +19,7 @@
     <img src="https://coveralls.io/repos/github/wolf4ood/gremlin-rs/badge.svg?branch=master"
     alt="Coverage status" />
   </a>
-  <a href="https://crates.io/crates/gremlin-rs">
+  <a href="https://crates.io/crates/gremlin-client">
     <img src="https://img.shields.io/crates/d/gremlin-rs.svg?style=flat-square"
       alt="Download" />
   </a>
