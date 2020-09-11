@@ -1,0 +1,78 @@
+name: Coverage
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+        - master
+
+jobs:
+  grcov:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        rust: [nightly]
+        gremlin-server: [3.4.8]
+    steps:
+
+
+      - uses: actions/checkout@v2
+      - name: Starting Gremlin Servers
+        run: |
+          docker-compose -f ./docker-compose/docker-compose.yaml up -d 
+        env: 
+          GREMLIN_SERVER: ${{ matrix.gremlin-server }}
+          
+      - uses: actions/checkout@v2
+      - name: Install latest ${{ matrix.rust }}
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: ${{ matrix.rust }}
+            profile: minimal
+            override: true
+
+
+      - name: Run cargo clean 
+        uses: actions-rs/cargo@v1
+        with:
+          command: clean       
+
+      - name: Run cargo test with tokio
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --manifest-path gremlin-client/Cargo.toml --features=tokio-runtime 
+        env:
+          CARGO_INCREMENTAL: '0'
+          RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off'
+      - name: Run cargo test with async-std
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --manifest-path gremlin-client/Cargo.toml --features=async-std-runtime 
+        env:
+          CARGO_INCREMENTAL: '0'
+          RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off'    
+      - name: Run grcov
+        id: coverage
+        uses: actions-rs/grcov@v0.1
+      - name: Coveralls upload
+        uses: coverallsapp/github-action@v1.1.1
+        with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            path-to-lcov: ${{ steps.coverage.outputs.report }}
+            flag-name: test-${{ matrix.os }}
+            parallel: true    
+  grcov_finalize:
+    runs-on: ubuntu-latest
+    needs: grcov
+    steps:
+      - name: Finalize Coveralls upload
+        uses: coverallsapp/github-action@v1.1.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true

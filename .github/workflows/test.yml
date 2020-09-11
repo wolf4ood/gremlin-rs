@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        rust: [nightly, stable]
+        rust: [stable]
         gremlin-server: [3.4.8]
     steps:
 
