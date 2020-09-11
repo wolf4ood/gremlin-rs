@@ -19,9 +19,8 @@ jobs:
     steps:
 
       - name: Starting Gremlin Servers
-        working-directory: docker-compose
         run: |
-          docker-compose up -d
+          docker-compose up -d -f docker-compose/docker-compose.yaml
         
       - uses: actions/checkout@v2
       - name: Install latest ${{ matrix.rust }}
