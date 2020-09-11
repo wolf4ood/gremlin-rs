@@ -3,7 +3,7 @@ name: Tests
 on:
   push:
     branches:
-      - '*'
+      - "*"
   pull_request:
     branches:
       - master
@@ -25,24 +25,19 @@ jobs:
           profile: minimal
           override: true
 
-      - name: Run cargo check
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --all --benches --bins --examples --tests --all-features
-
       - name: Run cargo fmt
         uses: actions-rs/cargo@v1
         with:
-          command: fmt 
-          args:  --all -- --check
+          command: fmt
+          args: --all -- --check
       - name: Run cargo test with tokio
         uses: actions-rs/cargo@v1
         with:
-          command: test 
-          args:  --features=tokio-runtime
+          command: test
+          args: --manifest-path gremlin-client/Cargo.toml  --features=tokio-runtime
       - name: Run cargo test with async-std
         uses: actions-rs/cargo@v1
+        working-directory: gremlin-client
         with:
-          command: test 
-          args: --features=async-std-runtime
+          command: test
+          args: --manifest-path gremlin-client/Cargo.toml --features=async-std-runtime
