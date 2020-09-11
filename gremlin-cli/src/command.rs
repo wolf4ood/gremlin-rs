@@ -11,29 +11,29 @@ pub enum Command {
 }
 
 impl Command {
-    pub async fn exec(self, ctx: GremlinContext) -> GremlinContext {
+    pub async fn exec(self, ctx: GremlinContext) -> (GremlinContext, bool) {
         match self {
             Command::Quit(msg) => {
                 if let Some(message) = msg {
                     println!("{}", message);
                 }
-                std::process::exit(0);
+                (ctx, true)
             }
             Command::Print(msg) => {
                 if let Some(message) = msg {
                     print!("{}", message);
                 }
-                ctx
+                (ctx, false)
             }
             Command::Exec(cb) => {
                 let future = cb(&ctx);
                 let commands = future.await;
                 execute_commands(ctx, commands).await
             }
-            Command::Update(update) => update(ctx),
+            Command::Update(update) => (update(ctx), false),
             Command::PrintTable(table) => {
                 table.printstd();
-                ctx
+                (ctx, false)
             }
         }
     }
@@ -42,12 +42,13 @@ impl Command {
 fn execute_commands(
     mut ctx: GremlinContext,
     commands: Vec<Command>,
-) -> BoxFuture<'static, GremlinContext> {
+) -> BoxFuture<'static, (GremlinContext, bool)> {
     let future = async move {
         for command in commands {
-            ctx = command.exec(ctx).await;
+            let cmd_result = command.exec(ctx).await;
+            ctx = cmd_result.0;
         }
-        ctx
+        (ctx, false)
     };
     future.boxed()
 }
