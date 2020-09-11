@@ -18,6 +18,7 @@ jobs:
         rust: [nightly, stable]
     steps:
 
+      - uses: actions/checkout@v2
       - name: Starting Gremlin Servers
         run: |
           docker-compose -f ./docker-compose/docker-compose.yaml up -d 
