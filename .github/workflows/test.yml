@@ -19,7 +19,7 @@ jobs:
     steps:
 
       - name: Starting Gremlin Servers
-        working-directory: ./docker-compose
+        working-directory: docker-compose
         run: |
           docker-compose up -d
         
