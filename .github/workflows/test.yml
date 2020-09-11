@@ -38,13 +38,13 @@ jobs:
           args:  --all -- --check
       - name: Run cargo test with tokio
         uses: actions-rs/cargo@v1
-        working-directory: ./gremlin-client
+        working-directory: gremlin-client
         with:
           command: test 
           args:  --features=tokio-runtime
       - name: Run cargo test with async-std
         uses: actions-rs/cargo@v1
-        working-directory: ./gremlin-client
+        working-directory: gremlin-client
         with:
           command: test 
           args: --features=async-std-runtime
