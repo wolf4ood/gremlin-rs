@@ -77,38 +77,3 @@ pub fn init() -> ActionRouter<actions::FallbackAction> {
         .add(Box::new(DisconnectAction::new()))
         .add(Box::new(DisplayAction::new()))
 }
-
-#[cfg(test)]
-mod tests {
-
-    // struct MockFallbackAction {}
-
-    // use crate::{command::Command, context::GremlinContext};
-
-    // impl super::Action for MockFallbackAction {
-    //     fn name(&self) -> &str {
-    //         "quit"
-    //     }
-
-    //     fn handle(
-    //         &self,
-    //         _ctx: &crate::context::GremlinContext,
-    //         _action: &str,
-    //     ) -> Vec<crate::command::Command> {
-    //         vec![Command::Quit(None)]
-    //     }
-    // }
-
-    // #[test]
-    // fn fallback_test() {
-    //     let router = super::ActionRouter::new(MockFallbackAction {});
-
-    //     let action = router.action("fake");
-
-    //     let ctx = GremlinContext::builder().build();
-    //     assert_eq!("quit", action.name());
-
-    //     matches
-    //     assert_eq!(vec![Command::Quit(None)], action.handle(&ctx, "quit"));
-    // }
-}
