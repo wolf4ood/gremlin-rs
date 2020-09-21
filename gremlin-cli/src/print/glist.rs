@@ -1,11 +1,14 @@
 use crate::print;
 use gremlin_client::List;
-pub fn fmt(list: &List) -> String {
-    format!(
+
+use anyhow::Result;
+
+pub fn fmt(list: &List) -> Result<String> {
+    Ok(format!(
         "[{}]",
         list.iter()
-            .map(|value| format!("{}", print::fmt(value)))
-            .collect::<Vec<String>>()
+            .map(|value|  print::fmt(value))
+            .collect::<Result<Vec<String>>>()?
             .join(",")
-    )
+    ))
 }

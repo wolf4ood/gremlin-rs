@@ -67,7 +67,7 @@ impl Action for ConnectAction {
                         match GremlinClient::connect(options_builder.build()).await {
                             Ok(client) => vec![
                                 Command::Update(Box::new(move |ctx| GremlinContext {
-                                    client: Some(client.clone()),
+                                    client: Some(client),
                                     ..ctx
                                 })),
                                 Command::Print(Some("Connected!".into())),

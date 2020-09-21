@@ -1,6 +1,5 @@
 use context::GremlinContext;
 
-use smol;
 use structopt::StructOpt;
 mod actions;
 mod command;
@@ -8,9 +7,9 @@ mod context;
 pub(crate) mod print;
 mod reader;
 mod router;
-use std::path::PathBuf;
-
+use anyhow::Result;
 use reader::Reader;
+use std::path::PathBuf;
 
 const WELCOME: &str = r#"
   ________                      .__  .__
@@ -21,7 +20,7 @@ const WELCOME: &str = r#"
         \/            \/      \/             \/                      \/
 
 "#;
-fn main() {
+fn main() -> Result<()> {
     let opt = GremlinOpt::from_args();
 
     smol::block_on(async {
@@ -58,7 +57,9 @@ fn main() {
             }
         }
         reader.save_history();
-    })
+    });
+
+    Ok(())
 }
 
 #[derive(Debug, StructOpt)]

@@ -6,8 +6,8 @@ pub fn fmt(edge: &Edge) -> String {
     format!(
         "e[{}][{}-{}->{}]",
         gid::fmt(edge.id()),
-        vertex::fmt(edge.in_v()),
+        vertex::fmt(edge.out_v()),
         edge.label(),
-        vertex::fmt(edge.out_v())
+        vertex::fmt(edge.in_v())
     )
 }

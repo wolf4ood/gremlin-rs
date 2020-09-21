@@ -4,9 +4,10 @@ use gremlin_client::GValue;
 use prettytable::{
     cell,
     format::{FormatBuilder, LinePosition, LineSeparator},
-    row, Table,
+    row, Row, Table,
 };
 pub struct DisplayAction;
+use anyhow::Result;
 
 impl DisplayAction {
     pub fn new() -> DisplayAction {
@@ -28,7 +29,7 @@ impl Action for DisplayAction {
     }
 }
 
-pub fn display_results(results: &Vec<GValue>) -> Command {
+pub fn display_results(results: &[GValue]) -> Command {
     let mut table = Table::new();
 
     let format = FormatBuilder::new()
@@ -40,11 +41,19 @@ pub fn display_results(results: &Vec<GValue>) -> Command {
         .build();
     table.set_format(format);
 
-    let mut idx = 1;
-    for result in results {
-        table.add_row(row![idx, print::fmt(result).as_str()]);
-        idx += 1;
-    }
+    let collected: Result<Vec<Row>> = results
+        .iter()
+        .enumerate()
+        .map(|(idx, item)| Ok(row![idx, print::fmt(item)?.as_str()]))
+        .collect();
 
-    Command::PrintTable(table)
+    match collected {
+        Ok(rows) => {
+            rows.into_iter().for_each(|item| {
+                table.add_row(item);
+            });
+            Command::PrintTable(table)
+        }
+        Err(e) => Command::Print(Some(e.to_string())),
+    }
 }

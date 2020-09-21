@@ -29,7 +29,7 @@ impl Action for FallbackAction {
             match ctx.client {
                 Some(ref client) => vec![Command::Exec(Box::new(execute_query(
                     client.clone(),
-                    cmd.clone(),
+                    cmd,
                 )))],
                 None => vec![Command::Print(Some(String::from("Not connected!")))],
             }

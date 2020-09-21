@@ -44,7 +44,7 @@ impl<T: Action> Action for ActionRouter<T> {
     ) -> Vec<crate::command::Command> {
         let mut output = String::new();
         writeln!(output, "Available Commands: ").unwrap();
-        writeln!(output, "").expect("Failed to write a line");
+        writeln!(output).expect("Failed to write a line");
         let mut names: Vec<(&str, &str)> = self
             .actions
             .iter()
@@ -58,7 +58,7 @@ impl<T: Action> Action for ActionRouter<T> {
             acc
         });
 
-        writeln!(output, "").expect("Failed to write a line");
+        writeln!(output).expect("Failed to write a line");
         writeln!(output, "For help on a specific command type:").unwrap();
         writeln!(output, "{:5}command --help", "").unwrap();
 
