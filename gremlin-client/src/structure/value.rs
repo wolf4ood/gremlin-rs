@@ -361,6 +361,20 @@ impl std::convert::TryFrom<GValue> for Date {
     }
 }
 
+impl std::convert::TryFrom<GValue> for bool {
+    type Error = crate::GremlinError;
+
+    fn try_from(value: GValue) -> GremlinResult<Self> {
+        match value {
+            GValue::Bool(val) => Ok(val),
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot cast {:?} to bool",
+                value
+            ))),
+        }
+    }
+}
+
 fn from_list<T>(glist: List) -> GremlinResult<T>
 where
     T: std::convert::TryFrom<GValue, Error = GremlinError>,
