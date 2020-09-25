@@ -7,7 +7,7 @@ pub fn fmt(list: &List) -> Result<String> {
     Ok(format!(
         "[{}]",
         list.iter()
-            .map(|value|  print::fmt(value))
+            .map(|value| print::fmt(value))
             .collect::<Result<Vec<String>>>()?
             .join(",")
     ))
