@@ -7,7 +7,7 @@ license = "Apache-2.0"
 description= "A minimal Rust CLI for Apache TinkerPop™"
 repository = "https://github.com/wolf4ood/gremlin-rs"
 keywords = ["database", "graphs","tinkerpop","cli"]
-categories = ["database","cli"]
+categories = ["database","command-line-utilities"]
 readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
