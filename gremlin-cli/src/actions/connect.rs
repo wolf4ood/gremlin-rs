@@ -24,7 +24,7 @@ impl FromStr for Serializer {
             "graphson_v1" => Ok(Serializer::GraphSONV1),
             "graphson_v2" => Ok(Serializer::GraphSONV2),
             "graphson_v3" => Ok(Serializer::GraphSONV3),
-            _ => Err(anyhow!("Serializer {} not valid", s)),
+            _ => Err(anyhow!("Serializer {} not valid, possible values [graphson_v1, graphson_v2, graphson_v3]", s)),
         }
     }
 }
