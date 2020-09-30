@@ -12,7 +12,7 @@ pub fn fmt(value: &GValue) -> Result<String> {
     let result = match value {
         GValue::Vertex(v) => vertex::fmt(v),
         GValue::Edge(e) => edge::fmt(e),
-        GValue::Map(map) =>  map::fmt(map)?,
+        GValue::Map(map) => map::fmt(map)?,
         GValue::List(list) => glist::fmt(list)?,
         GValue::Int32(n) => n.to_string(),
         GValue::Int64(n) => n.to_string(),
