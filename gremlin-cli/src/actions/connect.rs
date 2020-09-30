@@ -1,13 +1,43 @@
 use crate::{actions::Action, command::Command, context::GremlinContext};
 use futures::FutureExt;
-use gremlin_client::{aio::GremlinClient, ConnectionOptions, TlsOptions};
-
+use gremlin_client::{aio::GremlinClient, ConnectionOptions, GraphSON, TlsOptions};
+use std::str::FromStr;
 use structopt::StructOpt;
 
+use anyhow::{anyhow, Error};
 use structopt::clap::AppSettings;
 
 pub struct ConnectAction;
 
+#[derive(Debug)]
+pub enum Serializer {
+    GraphSONV1,
+    GraphSONV2,
+    GraphSONV3,
+}
+
+impl FromStr for Serializer {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "graphson_v1" => Ok(Serializer::GraphSONV1),
+            "graphson_v2" => Ok(Serializer::GraphSONV2),
+            "graphson_v3" => Ok(Serializer::GraphSONV3),
+            _ => Err(anyhow!("Serializer {} not valid", s)),
+        }
+    }
+}
+
+impl From<Serializer> for GraphSON {
+    fn from(serializer: Serializer) -> Self {
+        match serializer {
+            Serializer::GraphSONV1 => GraphSON::V1,
+            Serializer::GraphSONV2 => GraphSON::V2,
+            Serializer::GraphSONV3 => GraphSON::V3,
+        }
+    }
+}
 #[derive(Debug, StructOpt)]
 #[structopt(name = "connect", no_version, global_settings = &[AppSettings::DisableVersion, AppSettings::NoBinaryName, AppSettings::ColoredHelp])]
 struct Connect {
@@ -26,6 +56,9 @@ struct Connect {
 
     #[structopt(long)]
     password: Option<String>,
+
+    #[structopt(long, default_value = "graphson_v3")]
+    serializer: Serializer,
 }
 
 impl ConnectAction {
@@ -57,6 +90,7 @@ impl Action for ConnectAction {
                             .host(connect.host.as_str())
                             .port(connect.port)
                             .ssl(connect.ssl)
+                            .serializer(connect.serializer.into())
                             .tls_options(TlsOptions {
                                 accept_invalid_certs: connect.insecure,
                             });
