@@ -18,8 +18,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Edge with id: [{}] and label: [{}] from: [{}] to: [{}]",
         first.id().get::<i32>()?,
         first.label(),
-        first.in_v().id().get::<i64>()?,
-        first.out_v().id().get::<i64>()?
+        first.out_v().id().get::<i64>()?,
+        first.in_v().id().get::<i64>()?
     );
 
     Ok(())
