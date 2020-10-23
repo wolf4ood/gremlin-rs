@@ -683,4 +683,9 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self.builder = self.builder.constant(value);
         self
     }
+
+    pub fn emit(mut self) -> Self {
+        self.builder = self.builder.emit();
+        self
+    }
 }
