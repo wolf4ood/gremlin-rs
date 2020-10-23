@@ -644,4 +644,9 @@ impl TraversalBuilder {
             .add_step(String::from("constant"), vec![value.into()]);
         self
     }
+
+    pub fn emit(mut self) -> Self {
+        self.bytecode.add_step(String::from("emit"), vec![]);
+        self
+    }
 }
