@@ -130,7 +130,7 @@ impl GremlinClient {
         Ok(GResultSet::new(self.clone(), results, response, conn))
     }
 
-    pub(crate) fn submit_traversal(&self, bytecode: &Bytecode) -> GremlinResult<GResultSet> {
+    pub fn generate_message(&self, bytecode: &Bytecode) -> GremlinResult<Message<serde_json::Value>> {
         let mut args = HashMap::new();
 
         args.insert(String::from("gremlin"), GValue::Bytecode(bytecode.clone()));
@@ -150,12 +150,17 @@ impl GremlinClient {
 
         let args = self.options.serializer.write(&GValue::from(args))?;
 
-        let message = message_with_args(String::from("bytecode"), String::from("traversal"), args);
+        Ok(message_with_args(String::from("bytecode"), String::from("traversal"), args))
+    }
+
+    pub(crate) fn submit_traversal(&self, bytecode: &Bytecode) -> GremlinResult<GResultSet> {
+        let message = self.generate_message(bytecode)?;
 
         let conn = self.pool.get()?;
 
         self.send_message(conn, message)
     }
+
     pub(crate) fn read_response(
         &self,
         conn: &mut r2d2::PooledConnection<GremlinConnectionManager>,
