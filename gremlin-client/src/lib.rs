@@ -126,6 +126,7 @@ pub use connection::{ConnectionOptions, TlsOptions};
 pub use conversion::{BorrowFromGValue, FromGValue, ToGValue};
 pub use error::GremlinError;
 pub use io::GraphSON;
+pub use message::Message;
 
 pub type GremlinResult<T> = Result<T, error::GremlinError>;
 
