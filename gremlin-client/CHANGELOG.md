@@ -10,6 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.6.2] - 2020-11-16
+
+### Added
+
+- [#109](https://github.com/wolf4ood/gremlin-rs/pull/109) Added repeat, until, emit steps
+- [#102](https://github.com/wolf4ood/gremlin-rs/pull/102) Added property many 
+
+### Fixed
+
 ## [0.6.1] - 2020-09-7
 
 ### Added
