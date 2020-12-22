@@ -26,6 +26,22 @@ fn test_empty_query() {
 }
 
 #[test]
+fn test_session_empty_query() {
+    let mut graph = graph();
+    graph
+        .create_session("test-session".to_string())
+        .expect("It should create a session.");
+    assert_eq!(
+        0,
+        graph
+            .execute("g.V().hasLabel('Not Found')", &[])
+            .expect("It should execute a traversal")
+            .count()
+    );
+    graph.close_session();
+}
+
+#[test]
 fn test_ok_credentials() {
     let client = GremlinClient::connect(
         ConnectionOptions::builder()
