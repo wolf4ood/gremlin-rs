@@ -14,8 +14,15 @@ use serde::Serialize;
 use std::collections::{HashMap, VecDeque};
 
 #[derive(Clone, Debug)]
+pub struct Session {
+    pool: Pool<GremlinConnectionManager>,
+    name: String,
+}
+
+#[derive(Clone, Debug)]
 pub struct GremlinClient {
     pool: Pool<GremlinConnectionManager>,
+    session: Option<Session>,
     alias: Option<String>,
     options: ConnectionOptions,
 }
@@ -33,9 +40,21 @@ impl GremlinClient {
 
         Ok(GremlinClient {
             pool,
+            session: None,
             alias: None,
             options: opts,
         })
+    }
+
+    pub fn create_session(&mut self, name: String) -> GremlinResult<()> {
+        let manager = GremlinConnectionManager::new(self.options.clone());
+        let pool = Pool::builder().max_size(1).build(manager)?;
+        self.session = Some(Session { pool, name });
+        Ok(())
+    }
+
+    pub fn close_session(&mut self) {
+        self.session = None
     }
 
     /// Return a cloned client with the provided alias
@@ -83,15 +102,29 @@ impl GremlinClient {
 
         args.insert(String::from("bindings"), GValue::from(bindings));
 
+        if let Some(session) = &self.session {
+            args.insert(String::from("session"), GValue::from(session.name.clone()));
+        }
+
         let args = self.options.serializer.write(&GValue::from(args))?;
 
-        let message = match self.options.serializer {
-            GraphSON::V1 => message_with_args_v1(String::from("eval"), String::default(), args),
-            GraphSON::V2 => message_with_args_v2(String::from("eval"), String::default(), args),
-            GraphSON::V3 => message_with_args(String::from("eval"), String::default(), args),
+        let processor = if self.session.is_some() {
+            "session".to_string()
+        } else {
+            String::default()
         };
 
-        let conn = self.pool.get()?;
+        let message = match self.options.serializer {
+            GraphSON::V1 => message_with_args_v1(String::from("eval"), processor, args),
+            GraphSON::V2 => message_with_args_v2(String::from("eval"), processor, args),
+            GraphSON::V3 => message_with_args(String::from("eval"), processor, args),
+        };
+
+        let conn = if let Some(session) = &self.session {
+            session.pool.get()?
+        } else {
+            self.pool.get()?
+        };
 
         self.send_message(conn, message)
     }
