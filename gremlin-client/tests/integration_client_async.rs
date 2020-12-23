@@ -63,6 +63,7 @@ mod aio {
         let mut graph = connect().await;
         graph
             .create_session("test-session".to_string())
+            .await
             .expect("It should create a session");
 
         assert_eq!(
