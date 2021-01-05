@@ -15,16 +15,12 @@ use mobc::{Connection, Pool};
 use serde::Serialize;
 use std::collections::{HashMap, VecDeque};
 
-#[derive(Clone)]
-pub struct Session {
-    pool: Pool<GremlinConnectionManager>,
-    name: String,
-}
+pub type SessionedClient = GremlinClient;
 
 #[derive(Clone)]
 pub struct GremlinClient {
     pool: Pool<GremlinConnectionManager>,
-    session: Option<Session>,
+    session: Option<String>,
     alias: Option<String>,
     pub(crate) options: ConnectionOptions,
 }
@@ -48,15 +44,14 @@ impl GremlinClient {
         })
     }
 
-    pub async fn create_session(&mut self, name: String) -> GremlinResult<()> {
+    pub async fn create_session(&mut self, name: String) -> GremlinResult<SessionedClient> {
         let manager = GremlinConnectionManager::new(self.options.clone());
-        let pool = Pool::builder().max_open(1).build(manager);
-        self.session = Some(Session { pool, name });
-        Ok(())
-    }
-
-    pub fn close_session(&mut self) {
-        self.session = None
+        Ok(SessionedClient {
+            pool: Pool::builder().max_open(1).build(manager),
+            session: Some(name),
+            alias: None,
+            options: self.options.clone(),
+        })
     }
 
     /// Return a cloned client with the provided alias
@@ -104,8 +99,8 @@ impl GremlinClient {
 
         args.insert(String::from("bindings"), GValue::from(bindings));
 
-        if let Some(session) = &self.session {
-            args.insert(String::from("session"), GValue::from(session.name.clone()));
+        if let Some(session_name) = &self.session {
+            args.insert(String::from("session"), GValue::from(session_name.clone()));
         }
 
         let args = self.options.serializer.write(&GValue::from(args))?;
@@ -122,11 +117,7 @@ impl GremlinClient {
             GraphSON::V3 => message_with_args(String::from("eval"), processor, args),
         };
 
-        let conn = if let Some(session) = &self.session {
-            session.pool.get().await?
-        } else {
-            self.pool.get().await?
-        };
+        let conn = self.pool.get().await?;
 
         self.send_message_new(conn, message).await
     }

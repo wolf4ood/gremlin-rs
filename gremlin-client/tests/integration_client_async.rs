@@ -61,23 +61,22 @@ mod aio {
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
     async fn test_session_empty_query() {
         let mut graph = connect().await;
-        graph
+        let sessioned_graph = graph
             .create_session("test-session".to_string())
             .await
             .expect("It should create a session");
 
         assert_eq!(
             0,
-            graph
+            sessioned_graph
                 .execute("g.V().hasLabel('NotFound')", &[])
                 .await
                 .expect("It should execute a traversal")
                 .count()
                 .await
         );
-
-        graph.close_session();
     }
+
     #[cfg(feature = "async-std-runtime")]
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
     async fn test_keep_alive_query() {
