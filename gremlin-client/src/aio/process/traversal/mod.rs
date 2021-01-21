@@ -11,6 +11,8 @@ use std::pin::Pin;
 
 use pin_project_lite::pin_project;
 
+pub use remote::AsyncTerminator;
+
 pin_project! {
     pub struct RemoteTraversalStream<T> {
         phantom: PhantomData<T>,
