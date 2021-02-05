@@ -100,7 +100,7 @@ pub mod aio {
     use async_std::prelude::*;
 
     #[cfg(feature = "tokio-runtime")]
-    use tokio::stream::StreamExt;
+    use tokio_stream::StreamExt;
 
     pub async fn connect() -> GremlinClient {
         GremlinClient::connect(("localhost", 8182))

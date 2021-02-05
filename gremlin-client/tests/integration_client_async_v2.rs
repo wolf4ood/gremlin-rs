@@ -12,7 +12,7 @@ mod aio {
     use async_std::prelude::*;
 
     #[cfg(feature = "tokio-runtime")]
-    use tokio::stream::StreamExt;
+    use tokio_stream::StreamExt;
 
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
     #[cfg_attr(feature = "tokio-runtime", tokio::test)]

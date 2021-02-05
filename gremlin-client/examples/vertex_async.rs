@@ -4,7 +4,7 @@ use gremlin_client::{aio::GremlinClient, Vertex};
 use async_std::prelude::*;
 
 #[cfg(feature = "tokio-runtime")]
-use tokio::stream::StreamExt;
+use tokio_stream::StreamExt;
 
 #[cfg_attr(feature = "async-std-runtime", async_std::main)]
 #[cfg_attr(feature = "tokio-runtime", tokio::main)]

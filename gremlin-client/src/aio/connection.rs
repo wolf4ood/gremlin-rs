@@ -18,7 +18,7 @@ use async_std_use::*;
 mod tokio_use {
     pub use tokio::net::TcpStream;
     pub use tokio::task;
-    pub use tokio_tls::TlsStream;
+    pub use tokio_native_tls::TlsStream;
 }
 
 #[cfg(feature = "tokio-runtime")]
@@ -52,7 +52,7 @@ type WSStream = WebSocketStream<stream::Stream<TcpStream, TlsStream<TcpStream>>>
 type WSStream = WebSocketStream<
     stream::Stream<
         TokioAdapter<TcpStream>,
-        TokioAdapter<TlsStream<TokioAdapter<TokioAdapter<TcpStream>>>>,
+        TokioAdapter<TlsStream<TcpStream>>,
     >,
 >;
 
@@ -117,7 +117,7 @@ mod tls {
 mod tls {
 
     use crate::connection::ConnectionOptions;
-    use tokio_tls::TlsConnector;
+    use tokio_native_tls::TlsConnector;
 
     pub fn connector(opts: &ConnectionOptions) -> Option<TlsConnector> {
         opts.tls_options

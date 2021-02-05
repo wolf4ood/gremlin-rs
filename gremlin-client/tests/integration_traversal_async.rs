@@ -10,7 +10,7 @@ mod aio {
     use async_std::prelude::*;
 
     #[cfg(feature = "tokio-runtime")]
-    use tokio::stream::StreamExt;
+    use tokio_stream::StreamExt;
 
     use gremlin_client::Vertex;
 

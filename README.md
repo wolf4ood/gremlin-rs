@@ -140,7 +140,7 @@ activate the feature `tokio-runtime`
 ```rust
      
 use gremlin_client::{aio::GremlinClient, Vertex};
-use tokio::stream::StreamExt;
+use tokio_stream::StreamExt;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<std::error::Error>> {
@@ -207,7 +207,7 @@ With [tokio](https://tokio.rs/)
 
 ```rust
 use gremlin_client::{aio::GremlinClient, Vertex, process::traversal::traversal};
-use tokio::stream::StreamExt;
+use tokio_stream::StreamExt;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<std::error::Error>> {
