@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.7.0] - 2021-02-05
+
+### Added
+
+- [#122](https://github.com/wolf4ood/gremlin-rs/issues/122) Exposed AsyncTerminator
+- Updated to Tokio v1
+### Fixed
+
 ## [0.6.2] - 2020-11-16
 
 ### Added
