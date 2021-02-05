@@ -49,12 +49,8 @@ use uuid::Uuid;
 type WSStream = WebSocketStream<stream::Stream<TcpStream, TlsStream<TcpStream>>>;
 
 #[cfg(feature = "tokio-runtime")]
-type WSStream = WebSocketStream<
-    stream::Stream<
-        TokioAdapter<TcpStream>,
-        TokioAdapter<TlsStream<TcpStream>>,
-    >,
->;
+type WSStream =
+    WebSocketStream<stream::Stream<TokioAdapter<TcpStream>, TokioAdapter<TlsStream<TcpStream>>>>;
 
 #[derive(Debug)]
 #[allow(dead_code)]
