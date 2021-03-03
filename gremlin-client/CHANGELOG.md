@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.7.1] - 2021-03-03
+
+### Added
+
+- [#116](https://github.com/wolf4ood/gremlin-rs/pull/116) Added support for Session
+### Fixed
+
 ## [0.7.0] - 2021-02-05
 
 ### Added
