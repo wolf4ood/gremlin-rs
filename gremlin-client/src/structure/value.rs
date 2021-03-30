@@ -339,6 +339,7 @@ impl std::convert::TryFrom<GValue> for uuid::Uuid {
     fn try_from(value: GValue) -> GremlinResult<Self> {
         match value {
             GValue::Uuid(uid) => Ok(uid),
+            GValue::List(s) => from_list(s),
             _ => Err(GremlinError::Cast(format!(
                 "Cannot cast {:?} to Uuid",
                 value
@@ -353,6 +354,7 @@ impl std::convert::TryFrom<GValue> for Date {
     fn try_from(value: GValue) -> GremlinResult<Self> {
         match value {
             GValue::Date(date) => Ok(date),
+            GValue::List(s) => from_list(s),
             _ => Err(GremlinError::Cast(format!(
                 "Cannot cast {:?} to DateTime<Utc>",
                 value
@@ -367,8 +369,39 @@ impl std::convert::TryFrom<GValue> for bool {
     fn try_from(value: GValue) -> GremlinResult<Self> {
         match value {
             GValue::Bool(val) => Ok(val),
+            GValue::List(s) => from_list(s),
             _ => Err(GremlinError::Cast(format!(
                 "Cannot cast {:?} to bool",
+                value
+            ))),
+        }
+    }
+}
+
+impl std::convert::TryFrom<GValue> for f32 {
+    type Error = crate::GremlinError;
+
+    fn try_from(value: GValue) -> GremlinResult<Self> {
+        match value {
+            GValue::Float(x) => Ok(x),
+            GValue::List(s) => from_list(s),
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot cast {:?} to f32",
+                value
+            ))),
+        }
+    }
+}
+
+impl std::convert::TryFrom<GValue> for f64 {
+    type Error = crate::GremlinError;
+
+    fn try_from(value: GValue) -> GremlinResult<Self> {
+        match value {
+            GValue::Double(x) => Ok(x),
+            GValue::List(s) => from_list(s),
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot cast {:?} to f64",
                 value
             ))),
         }
@@ -400,11 +433,18 @@ macro_rules! impl_try_from_option {
                 if let GValue::Null = value {
                     return Ok(None);
                 }
-                let res = value.try_into()?;
-                Ok(res)
+                let res: $t = value.try_into()?;
+                Ok(Some(res))
             }
         }
     };
 }
 
 impl_try_from_option!(String);
+impl_try_from_option!(i32);
+impl_try_from_option!(i64);
+impl_try_from_option!(f32);
+impl_try_from_option!(f64);
+impl_try_from_option!(Date);
+impl_try_from_option!(uuid::Uuid);
+impl_try_from_option!(bool);
