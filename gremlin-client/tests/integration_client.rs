@@ -1,6 +1,7 @@
 mod common;
 
 use chrono::offset::TimeZone;
+use chrono::Utc;
 use gremlin_client::{
     ConnectionOptions, GremlinClient, GremlinError, List, TlsOptions, ToGValue,
     TraversalExplanation, TraversalMetrics, VertexProperty,
@@ -160,6 +161,150 @@ fn test_vertex_creation() {
     assert_eq!(
         Some(&GValue::List(vec![String::from("mark").into()].into())),
         value_map[0].get("name")
+    );
+}
+
+#[test]
+fn test_complex_vertex_creation_with_option_none_properties() {
+    let graph = graph();
+    let properties = graph
+        .execute(r#"g.addV('person').valueMap()"#, &[])
+        .expect("it should execute addV")
+        .filter_map(Result::ok)
+        .map(|f| f.take::<Map>())
+        .next()
+        .expect("There should be 1 traversal element")
+        .expect("The traversal response should not have errored");
+
+    //No properties should be present
+    assert_eq!(0, properties.len());
+
+    //Now demonstrate retrieving Option of the various value types
+    //All responses should be Ok and be containing a None
+    assert!(properties
+        .try_get::<&str, Option<String>>("name")
+        .unwrap()
+        .is_none());
+    assert!(properties
+        .try_get::<&str, Option<i32>>("age")
+        .unwrap()
+        .is_none());
+    assert!(properties
+        .try_get::<&str, Option<i64>>("time")
+        .unwrap()
+        .is_none());
+    assert!(properties
+        .try_get::<&str, Option<f32>>("score")
+        .unwrap()
+        .is_none());
+    assert!(properties
+        .try_get::<&str, Option<f64>>("score2")
+        .unwrap()
+        .is_none());
+    assert!(properties
+        .try_get::<&str, Option<chrono::DateTime<chrono::offset::Utc>>>("date")
+        .unwrap()
+        .is_none());
+    assert!(properties
+        .try_get::<&str, Option<uuid::Uuid>>("uuid")
+        .unwrap()
+        .is_none());
+}
+
+#[test]
+fn test_complex_vertex_creation_with_option_some_properties() {
+    let graph = graph();
+    let q = r#"
+        g.addV('person')
+            .property('name',name)
+            .property('age',age)
+            .property('time',time)
+            .property('score',score)
+            .property('score2',score2)
+            .property('uuid',uuid)
+            .property('date',date)
+            .property('bool',true)
+            .valueMap()"#;
+
+    let uuid = uuid::Uuid::new_v4();
+    let now = Utc.timestamp(5, 0);
+    let params: &[(&str, &dyn ToGValue)] = &[
+        ("name", &"mark"),
+        ("age", &(22 as i32)),
+        ("time", &(23 as i64)),
+        ("score", &(3.2 as f32)),
+        ("score2", &(3.2 as f64)),
+        ("uuid", &uuid),
+        ("date", &now),
+    ];
+    let properties = graph
+        .execute(q, params)
+        .expect("it should execute addV")
+        .filter_map(Result::ok)
+        .map(|f| f.take::<Map>())
+        .next()
+        .expect("There should be 1 traversal element")
+        .expect("The traversal response should not have errored");
+
+    assert_eq!(8, properties.len());
+
+    //Now demonstrate retrieving Option of the various value types
+    //All responses should be Ok contain a Some value
+    assert_eq!(
+        "mark",
+        properties
+            .try_get::<&str, Option<String>>("name")
+            .unwrap()
+            .unwrap()
+    );
+    assert_eq!(
+        22,
+        properties
+            .try_get::<&str, Option<i32>>("age")
+            .unwrap()
+            .unwrap()
+    );
+    assert_eq!(
+        23,
+        properties
+            .try_get::<&str, Option<i64>>("time")
+            .unwrap()
+            .unwrap()
+    );
+    assert_eq!(
+        3.2 as f32,
+        properties
+            .try_get::<&str, Option<f32>>("score")
+            .unwrap()
+            .unwrap()
+    );
+    assert_eq!(
+        3.2 as f64,
+        properties
+            .try_get::<&str, Option<f64>>("score2")
+            .unwrap()
+            .unwrap()
+    );
+    assert_eq!(
+        now,
+        properties
+            .try_get::<&str, Option<chrono::DateTime<chrono::offset::Utc>>>("date")
+            .unwrap()
+            .unwrap()
+    );
+    assert_eq!(
+        uuid,
+        properties
+            .try_get::<&str, Option<uuid::Uuid>>("uuid")
+            .unwrap()
+            .unwrap()
+    );
+    assert_eq!(
+        true,
+        properties
+            .try_get::<&str, Option<bool>>("bool")
+            .unwrap()
+            .unwrap()
     );
 }
 
