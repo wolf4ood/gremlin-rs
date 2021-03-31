@@ -250,7 +250,7 @@ fn test_complex_vertex_creation_with_properties_v1() {
     );
 
     assert_eq!(
-        &1551825863,
+        &1551825863000,
         properties["dateTime"].get::<List>().unwrap()[0]
             .get::<VertexProperty>()
             .unwrap()

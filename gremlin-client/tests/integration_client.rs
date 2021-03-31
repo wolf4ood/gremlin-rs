@@ -220,7 +220,7 @@ fn test_complex_vertex_creation_with_properties() {
     );
 
     assert_eq!(
-        &chrono::Utc.timestamp(1551825863, 0),
+        &chrono::Utc.timestamp_millis(1551825863),
         properties["date"].get::<List>().unwrap()[0]
             .get::<VertexProperty>()
             .unwrap()
@@ -267,6 +267,41 @@ fn test_complex_vertex_creation_with_properties() {
             .get::<VertexProperty>()
             .unwrap()
             .get::<chrono::DateTime<chrono::Utc>>()
+            .unwrap()
+    );
+}
+
+#[test]
+fn test_inserting_date_with_milisecond_precision() {
+    use chrono::offset::TimeZone;
+    use chrono::DateTime;
+    use chrono::Utc;
+
+    let graph = graph();
+
+    let q = r#"g.addV('person').property('dateTime',dateTime).propertyMap()"#;
+
+    let expected = chrono::Utc.timestamp(1551825863, 0);
+    let params: &[(&str, &dyn ToGValue)] = &[("dateTime", &expected)];
+
+    let results = graph
+        .execute(q, params)
+        .expect("it should execute addV")
+        .filter_map(Result::ok)
+        .map(|f| f.take::<Map>())
+        .collect::<Result<Vec<Map>, _>>()
+        .expect("It should be ok");
+
+    let properties = &results[0];
+
+    assert_eq!(1, properties.len());
+
+    assert_eq!(
+        &expected,
+        properties["dateTime"].get::<List>().unwrap()[0]
+            .get::<VertexProperty>()
+            .unwrap()
+            .get::<DateTime<Utc>>()
             .unwrap()
     );
 }
