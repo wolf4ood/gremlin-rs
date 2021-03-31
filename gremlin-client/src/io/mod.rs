@@ -59,10 +59,10 @@ impl GraphSON {
                 "@type" : "g:UUID",
                 "@value" : s.to_string()
             })),
-            (GraphSON::V1, GValue::Date(d)) => Ok(json!(d.timestamp())),
+            (GraphSON::V1, GValue::Date(d)) => Ok(json!(d.timestamp_millis())),
             (_, GValue::Date(d)) => Ok(json!({
                 "@type" : "g:Date",
-                "@value" : d.timestamp()
+                "@value" : d.timestamp_millis()
             })),
             (GraphSON::V1, GValue::List(d)) => {
                 let elements: GremlinResult<Vec<Value>> = d.iter().map(|e| self.write(e)).collect();
