@@ -533,7 +533,10 @@ mod tests {
         });
 
         let result = deserializer_v3(&value).expect("Failed to deserialize Date");
-        assert_eq!(result, GValue::Date(chrono::Utc.timestamp_millis(1551825863)));
+        assert_eq!(
+            result,
+            GValue::Date(chrono::Utc.timestamp_millis(1551825863))
+        );
 
         // UUID
         let value = json!({
