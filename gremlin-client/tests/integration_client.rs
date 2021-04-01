@@ -1,6 +1,7 @@
 mod common;
 
-use std::{collections::HashSet, convert::TryInto};
+use std::collections::HashSet;
+use std::iter::FromIterator;
 
 use chrono::{offset::TimeZone, DateTime, Utc};
 use gremlin_client::{
@@ -594,33 +595,148 @@ fn test_list_cardinality() {
 fn test_set_cardinality() {
     let graph = graph();
 
-    let q = r#"
+    //split into 2 queries due to the bindings limit
+
+    let q1 = r#"
         g.addV('person')
-            .property(set, 'names','name1')
-            .property(set, 'names','name1')
-            .property(set, 'names','name2')
+            .property(set, 'name_set','name1')
+            .property(set, 'name_set','name2')
+            .property(set, 'name_set','name2')
+            .property(set, 'name_set','name3')
+            .property(set, 'num1_set', i32_1)
+            .property(set, 'num1_set', i32_2)
+            .property(set, 'num1_set', i32_3)
+            .property(set, 'num1_set', i32_4)
+            .property(set, 'num2_set', i64_1)
+            .property(set, 'num2_set', i64_2)
+            .property(set, 'num2_set', i64_3)
+            .property(set, 'num2_set', i64_4)
             .valueMap()"#;
 
-    let params: &[(&str, &dyn ToGValue)] = &[];
+    let q2 = r#"
+        g.addV('person')
+            .property(set, 'date1_set', date_1)
+            .property(set, 'date1_set', date_2)
+            .property(set, 'date1_set', date_3)
+            .property(set, 'date1_set', date_4)
+            .property(set, 'uuid1_set', uuid_1)
+            .property(set, 'uuid1_set', uuid_2)
+            .property(set, 'uuid1_set', uuid_3)
+            .property(set, 'uuid1_set', uuid_4)
+            .property(set, 'bool1_set', bool_1)
+            .property(set, 'bool1_set', bool_2)
+            .property(set, 'bool1_set', bool_3)
+            .property(set, 'bool1_set', bool_4)
+            .valueMap()"#;
 
-    let results = graph
-        .execute(q, params)
+    let date_1 = Utc.timestamp(1, 0);
+    let date_3 = Utc.timestamp(2, 0);
+    let date_4 = Utc.timestamp(3, 0);
+
+    let uuid_1 = uuid::Uuid::new_v4();
+    let uuid_2 = uuid::Uuid::new_v4();
+    let uuid_3 = uuid::Uuid::new_v4();
+
+    let params1: &[(&str, &dyn ToGValue)] = &[
+        ("i32_1", &(1 as i32)),
+        ("i32_2", &(1 as i32)),
+        ("i32_3", &(2 as i32)),
+        ("i32_4", &(3 as i32)),
+        ("i64_1", &(4 as i64)),
+        ("i64_2", &(4 as i64)),
+        ("i64_3", &(5 as i64)),
+        ("i64_4", &(6 as i64)),
+    ];
+
+    let params2: &[(&str, &dyn ToGValue)] = &[
+        ("date_1", &date_1),
+        ("date_2", &date_1),
+        ("date_3", &date_3),
+        ("date_4", &date_4),
+        ("uuid_1", &uuid_1),
+        ("uuid_2", &uuid_1),
+        ("uuid_3", &uuid_2),
+        ("uuid_4", &uuid_3),
+        ("bool_1", &false),
+        ("bool_2", &true),
+        ("bool_3", &false),
+        ("bool_4", &true),
+    ];
+
+    let results1 = graph
+        .execute(q1, params1)
         .expect("it should execute addV")
         .filter_map(Result::ok)
         .map(|f| f.take::<Map>())
         .collect::<Result<Vec<Map>, _>>()
         .expect("It should be ok");
 
-    let properties = &results[0];
+    let properties1 = &results1[0];
+    let string_set = properties1["name_set"]
+        .clone()
+        .take::<HashSet<String>>()
+        .unwrap();
+    assert_eq!(
+        string_set,
+        HashSet::from_iter(
+            vec![
+                "name1".to_string(),
+                "name2".to_string(),
+                "name3".to_string()
+            ]
+            .iter()
+            .cloned()
+        )
+    );
 
-    assert_eq!(1, properties.len());
-    let actual: HashSet<String> = properties["names"].clone().try_into().unwrap();
-    let expected: HashSet<String> = vec!["name1".to_string(), "name2".to_string()]
-        .iter()
-        .cloned()
-        .collect();
+    let i32_set = properties1["num1_set"]
+        .clone()
+        .take::<HashSet<i32>>()
+        .unwrap();
+    assert_eq!(i32_set, HashSet::from_iter(vec![1, 2, 3].iter().cloned()));
 
-    assert_eq!(actual, expected);
+    let i64_set = properties1["num2_set"]
+        .clone()
+        .take::<HashSet<i64>>()
+        .unwrap();
+    assert_eq!(i64_set, HashSet::from_iter(vec![4, 5, 6].iter().cloned()));
+
+    let results2 = graph
+        .execute(q2, params2)
+        .expect("it should execute addV")
+        .filter_map(Result::ok)
+        .map(|f| f.take::<Map>())
+        .collect::<Result<Vec<Map>, _>>()
+        .expect("It should be ok");
+
+    let properties2 = &results2[0];
+
+    let date_set = properties2["date1_set"]
+        .clone()
+        .take::<HashSet<DateTime<Utc>>>()
+        .unwrap();
+    assert_eq!(
+        date_set,
+        HashSet::from_iter(vec![date_1, date_3, date_4].iter().cloned())
+    );
+
+    let uuid_set = properties2["uuid1_set"]
+        .clone()
+        .take::<HashSet<uuid::Uuid>>()
+        .unwrap();
+    assert_eq!(
+        uuid_set,
+        HashSet::from_iter(vec![uuid_1, uuid_2, uuid_3].iter().cloned())
+    );
+
+    let boolean_set = properties2["bool1_set"]
+        .clone()
+        .take::<HashSet<bool>>()
+        .unwrap();
+    assert_eq!(
+        boolean_set,
+        HashSet::from_iter(vec![false, true].iter().cloned())
+    );
 }
 
 #[test]
