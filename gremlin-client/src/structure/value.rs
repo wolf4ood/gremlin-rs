@@ -7,9 +7,10 @@ use crate::structure::{
 };
 use crate::structure::{Pop, TextP, P, T};
 use crate::{GremlinError, GremlinResult};
-use std::collections::{BTreeMap, HashMap, VecDeque};
+use std::collections::{BTreeMap, HashMap, VecDeque, HashSet};
 pub type Date = chrono::DateTime<chrono::offset::Utc>;
 use std::convert::TryInto;
+use std::hash::Hash;
 /// Represent possible values coming from the [Gremlin Server](http://tinkerpop.apache.org/docs/3.4.0/dev/io/)
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, PartialEq, Clone)]
@@ -448,3 +449,121 @@ impl_try_from_option!(f64);
 impl_try_from_option!(Date);
 impl_try_from_option!(uuid::Uuid);
 impl_try_from_option!(bool);
+
+
+fn for_list<T>(glist: &List) -> GremlinResult<Vec<T>>
+where
+    T: std::convert::TryFrom<GValue, Error = GremlinError>,
+{
+    glist
+        .iter()
+        .map(|x| x.clone().try_into())
+        .collect::<GremlinResult<Vec<T>>>()
+}
+
+fn for_list_to_set<T>(glist: &List) -> GremlinResult<HashSet<T>>
+where
+    T: std::convert::TryFrom<GValue, Error = GremlinError> + Hash + Eq,
+{
+    glist
+        .iter()
+        .map(|x| x.clone().try_into())
+        .collect::<GremlinResult<HashSet<T>>>()
+}
+
+fn for_set<T>(gset: &Set) -> GremlinResult<HashSet<T>>
+where
+    T: std::convert::TryFrom<GValue, Error = GremlinError> + Hash + Eq,
+{
+    gset
+        .iter()
+        .map(|x| x.clone().try_into())
+        .collect::<GremlinResult<HashSet<T>>>()
+}
+
+
+macro_rules! impl_try_from_set {
+    ($t:ty) => {
+        impl std::convert::TryFrom<GValue> for HashSet<$t> {
+            type Error = crate::GremlinError;
+
+            fn try_from(value: GValue) -> GremlinResult<Self> {
+                match value {
+                    GValue::List(s) => for_list_to_set(&s),
+                    GValue::Set(s) => for_set(&s),
+                    _ => Err(GremlinError::Cast(format!(
+                        "Cannot cast {:?} to HashSet",
+                        value
+                    ))),
+                }
+            }
+        }
+
+        impl std::convert::TryFrom<&GValue> for HashSet<$t> {
+            type Error = crate::GremlinError;
+
+            fn try_from(value: &GValue) -> GremlinResult<Self> {
+                match value {
+                    GValue::List(s) => for_list_to_set(s),
+                    GValue::Set(s) => for_set(s),
+                    _ => Err(GremlinError::Cast(format!(
+                        "Cannot cast {:?} to HashSet",
+                        value
+                    ))),
+                }
+            }
+        }
+    };
+}
+
+impl_try_from_set!(String);
+// impl_try_from_set!(i32);
+// impl_try_from_set!(i64);
+// impl_try_from_set!(f32);
+// impl_try_from_set!(f64);
+// impl_try_from_set!(Date);
+// impl_try_from_set!(uuid::Uuid);
+// impl_try_from_set!(bool);
+
+macro_rules! impl_try_from_list {
+    ($t:ty) => {
+        impl std::convert::TryFrom<GValue> for Vec<$t> {
+            type Error = crate::GremlinError;
+
+            fn try_from(value: GValue) -> GremlinResult<Self> {
+                match value {
+                    GValue::List(s) => for_list(&s),
+                    GValue::String(s) => Ok(vec![s.into()]),
+                    _ => Err(GremlinError::Cast(format!(
+                        "Cannot cast {:?} to Vec",q
+                        value
+                    ))),
+                }
+            }
+        }
+
+        impl std::convert::TryFrom<&GValue> for Vec<$t> {
+            type Error = crate::GremlinError;
+
+            fn try_from(value: &GValue) -> GremlinResult<Self> {
+                match value {
+                    GValue::List(s) => for_list(s),
+                    GValue::String(s) => Ok(vec![s.into()]),
+                    _ => Err(GremlinError::Cast(format!(
+                        "Cannot cast {:?} to Vec",
+                        value
+                    ))),
+                }
+            }
+        }
+    };
+}
+
+impl_try_from_list!(String);
+// impl_try_from_list!(i32);
+// impl_try_from_list!(i64);
+// impl_try_from_list!(f32);
+// impl_try_from_list!(f64);
+// impl_try_from_list!(Date);
+// impl_try_from_list!(uuid::Uuid);
+// impl_try_from_list!(bool);

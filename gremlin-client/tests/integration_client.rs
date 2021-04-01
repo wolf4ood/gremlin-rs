@@ -1,5 +1,7 @@
 mod common;
 
+use std::{collections::HashSet, convert::TryInto};
+
 use chrono::offset::TimeZone;
 use chrono::Utc;
 use gremlin_client::{
@@ -449,6 +451,68 @@ fn test_inserting_date_with_milisecond_precision() {
             .get::<DateTime<Utc>>()
             .unwrap()
     );
+}
+
+fn test_list_cardinality() {
+    let graph = graph();
+
+    let q = r#"
+        g.addV('person')
+            .property(list, 'name','name1')
+            .property(list, 'name','name2')
+            .property(list, 'name','name2')
+            .property(list, 'name','name3')
+            .valueMap()"#;
+
+    let params: &[(&str, &dyn ToGValue)] = &[];
+
+    let results = graph
+        .execute(q, params)
+        .expect("it should execute addV")
+        .filter_map(Result::ok)
+        .map(|f| f.take::<Map>())
+        .collect::<Result<Vec<Map>, _>>()
+        .expect("It should be ok");
+
+    let properties = &results[0];
+
+    assert_eq!(1, properties.len());
+    let actual = properties["name"].clone().take::<Vec<String>>().unwrap();
+
+    assert_eq!(actual, vec!["name1", "name2", "name2", "name3"]);
+}
+
+#[test]
+fn test_set_cardinality() {
+    let graph = graph();
+
+    let q = r#"
+        g.addV('person')
+            .property(set, 'names','name1')
+            .property(set, 'names','name1')
+            .property(set, 'names','name2')
+            .valueMap()"#;
+
+    let params: &[(&str, &dyn ToGValue)] = &[];
+
+    let results = graph
+        .execute(q, params)
+        .expect("it should execute addV")
+        .filter_map(Result::ok)
+        .map(|f| f.take::<Map>())
+        .collect::<Result<Vec<Map>, _>>()
+        .expect("It should be ok");
+
+    let properties = &results[0];
+
+    assert_eq!(1, properties.len());
+    let actual: HashSet<String> = properties["names"].clone().try_into().unwrap();
+    let expected: HashSet<String> = vec!["name1".to_string(), "name2".to_string()]
+        .iter()
+        .cloned()
+        .collect();
+
+    assert_eq!(actual, expected);
 }
 
 #[test]
