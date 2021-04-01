@@ -2,8 +2,7 @@ mod common;
 
 use std::{collections::HashSet, convert::TryInto};
 
-use chrono::offset::TimeZone;
-use chrono::Utc;
+use chrono::{offset::TimeZone, DateTime, Utc};
 use gremlin_client::{
     ConnectionOptions, GremlinClient, GremlinError, List, TlsOptions, ToGValue,
     TraversalExplanation, TraversalMetrics, VertexProperty,
@@ -456,30 +455,139 @@ fn test_inserting_date_with_milisecond_precision() {
 fn test_list_cardinality() {
     let graph = graph();
 
-    let q = r#"
+    //split into 2 queries due to the bindings limit
+
+    let q1 = r#"
         g.addV('person')
             .property(list, 'name','name1')
             .property(list, 'name','name2')
             .property(list, 'name','name2')
             .property(list, 'name','name3')
+            .property(list, 'num1', i32_1)
+            .property(list, 'num1', i32_2)
+            .property(list, 'num1', i32_3)
+            .property(list, 'num1', i32_4)
+            .property(list, 'num2', i64_1)
+            .property(list, 'num2', i64_2)
+            .property(list, 'num2', i64_3)
+            .property(list, 'num2', i64_4)
+            .property(list, 'float1', f32_1)
+            .property(list, 'float1', f32_2)
+            .property(list, 'float1', f32_3)
+            .property(list, 'float1', f32_4)
             .valueMap()"#;
 
-    let params: &[(&str, &dyn ToGValue)] = &[];
+    let q2 = r#"
+        g.addV('person')
+            .property(list, 'double1', f64_1)
+            .property(list, 'double1', f64_2)
+            .property(list, 'double1', f64_3)
+            .property(list, 'double1', f64_4)
+            .property(list, 'date1', date_1)
+            .property(list, 'date1', date_2)
+            .property(list, 'date1', date_3)
+            .property(list, 'date1', date_4)
+            .property(list, 'uuid1', uuid_1)
+            .property(list, 'uuid1', uuid_2)
+            .property(list, 'uuid1', uuid_3)
+            .property(list, 'uuid1', uuid_4)
+            .property(list, 'bool1', bool_1)
+            .property(list, 'bool1', bool_2)
+            .property(list, 'bool1', bool_3)
+            .property(list, 'bool1', bool_4)
+            .valueMap()"#;
 
-    let results = graph
-        .execute(q, params)
+    let date_1 = Utc.timestamp(1, 0);
+    let date_2 = Utc.timestamp(1, 0);
+    let date_3 = Utc.timestamp(2, 0);
+    let date_4 = Utc.timestamp(3, 0);
+
+    let uuid_1 = uuid::Uuid::new_v4();
+    let uuid_2 = uuid::Uuid::new_v4();
+    let uuid_3 = uuid::Uuid::new_v4();
+
+    let params1: &[(&str, &dyn ToGValue)] = &[
+        ("i32_1", &(1 as i32)),
+        ("i32_2", &(1 as i32)),
+        ("i32_3", &(2 as i32)),
+        ("i32_4", &(3 as i32)),
+        ("i64_1", &(4 as i64)),
+        ("i64_2", &(4 as i64)),
+        ("i64_3", &(5 as i64)),
+        ("i64_4", &(6 as i64)),
+        ("f32_1", &(1.1 as f32)),
+        ("f32_2", &(1.1 as f32)),
+        ("f32_3", &(2.3 as f32)),
+        ("f32_4", &(3.4 as f32)),
+    ];
+
+    let params2: &[(&str, &dyn ToGValue)] = &[
+        ("f64_1", &(4.4 as f64)),
+        ("f64_2", &(4.4 as f64)),
+        ("f64_3", &(5.5 as f64)),
+        ("f64_4", &(6.6 as f64)),
+        ("date_1", &date_1),
+        ("date_2", &date_2),
+        ("date_3", &date_3),
+        ("date_4", &date_4),
+        ("uuid_1", &uuid_1),
+        ("uuid_2", &uuid_1),
+        ("uuid_3", &uuid_2),
+        ("uuid_4", &uuid_3),
+        ("bool_1", &false),
+        ("bool_2", &true),
+        ("bool_3", &false),
+        ("bool_4", &true),
+    ];
+
+    let results1 = graph
+        .execute(q1, params1)
         .expect("it should execute addV")
         .filter_map(Result::ok)
         .map(|f| f.take::<Map>())
         .collect::<Result<Vec<Map>, _>>()
         .expect("It should be ok");
 
-    let properties = &results[0];
+    let properties1 = &results1[0];
+    let string_list = properties1["name"].clone().take::<Vec<String>>().unwrap();
+    assert_eq!(string_list, vec!["name1", "name2", "name2", "name3"]);
 
-    assert_eq!(1, properties.len());
-    let actual = properties["name"].clone().take::<Vec<String>>().unwrap();
+    let i32_list = properties1["num1"].clone().take::<Vec<i32>>().unwrap();
+    assert_eq!(i32_list, vec![1, 1, 2, 3]);
 
-    assert_eq!(actual, vec!["name1", "name2", "name2", "name3"]);
+    let i64_list = properties1["num2"].clone().take::<Vec<i64>>().unwrap();
+    assert_eq!(i64_list, vec![4, 4, 5, 6]);
+
+    let f32_list = properties1["float1"].clone().take::<Vec<f32>>().unwrap();
+    assert_eq!(f32_list, vec![1.1, 1.1, 2.3, 3.4]);
+
+    let results2 = graph
+        .execute(q2, params2)
+        .expect("it should execute addV")
+        .filter_map(Result::ok)
+        .map(|f| f.take::<Map>())
+        .collect::<Result<Vec<Map>, _>>()
+        .expect("It should be ok");
+
+    let properties2 = &results2[0];
+
+    let f64_list = properties2["double1"].clone().take::<Vec<f64>>().unwrap();
+    assert_eq!(f64_list, vec![4.4, 4.4, 5.5, 6.6]);
+
+    let date_list = properties2["date1"]
+        .clone()
+        .take::<Vec<DateTime<Utc>>>()
+        .unwrap();
+    assert_eq!(date_list, vec![date_1, date_2, date_3, date_4]);
+
+    let uuid_list = properties2["uuid1"]
+        .clone()
+        .take::<Vec<uuid::Uuid>>()
+        .unwrap();
+    assert_eq!(uuid_list, vec![uuid_1, uuid_1, uuid_2, uuid_3]);
+
+    let boolean_list = properties2["bool1"].clone().take::<Vec<bool>>().unwrap();
+    assert_eq!(boolean_list, vec![false, true, false, true]);
 }
 
 #[test]
