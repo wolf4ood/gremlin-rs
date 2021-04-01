@@ -501,16 +501,6 @@ where
         .collect::<GremlinResult<HashSet<T>>>()
 }
 
-fn convert_gset_vec_to_set<T>(glist: &Set) -> GremlinResult<HashSet<T>>
-where
-    T: std::convert::TryFrom<GValue, Error = GremlinError> + Hash + Eq,
-{
-    glist
-        .iter()
-        .map(|x| x.clone().try_into())
-        .collect::<GremlinResult<HashSet<T>>>()
-}
-
 fn for_set<T>(gset: &Set) -> GremlinResult<HashSet<T>>
 where
     T: std::convert::TryFrom<GValue, Error = GremlinError> + Hash + Eq,
