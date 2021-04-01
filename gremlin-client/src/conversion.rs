@@ -5,6 +5,7 @@ use crate::{
     Property, Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
 };
 
+use crate::structure::Set;
 use crate::structure::Traverser;
 
 use std::collections::HashMap;
@@ -107,6 +108,7 @@ macro_rules! impl_from_gvalue {
 impl_from_gvalue!(VertexProperty, GValue::VertexProperty);
 impl_from_gvalue!(Property, GValue::Property);
 impl_from_gvalue!(Map, GValue::Map);
+impl_from_gvalue!(Set, GValue::Set);
 impl_from_gvalue!(List, GValue::List);
 impl_from_gvalue!(Token, GValue::Token);
 impl_from_gvalue!(Vertex, GValue::Vertex);
@@ -117,6 +119,7 @@ impl_from_gvalue!(f32, GValue::Float);
 impl_from_gvalue!(f64, GValue::Double);
 impl_from_gvalue!(i32, GValue::Int32);
 impl_from_gvalue!(i64, GValue::Int64);
+impl_from_gvalue!(bool, GValue::Bool);
 impl_from_gvalue!(uuid::Uuid, GValue::Uuid);
 impl_from_gvalue!(Metric, GValue::Metric);
 impl_from_gvalue!(TraversalMetrics, GValue::TraversalMetrics);
@@ -188,6 +191,7 @@ macro_rules! impl_borrow_from_gvalue {
 impl_borrow_from_gvalue!(VertexProperty, GValue::VertexProperty);
 impl_borrow_from_gvalue!(Property, GValue::Property);
 impl_borrow_from_gvalue!(Map, GValue::Map);
+impl_borrow_from_gvalue!(Set, GValue::Set);
 impl_borrow_from_gvalue!(List, GValue::List);
 impl_borrow_from_gvalue!(Vertex, GValue::Vertex);
 impl_borrow_from_gvalue!(Edge, GValue::Edge);

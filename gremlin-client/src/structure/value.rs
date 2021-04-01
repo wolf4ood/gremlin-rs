@@ -9,6 +9,7 @@ use crate::structure::{Pop, TextP, P, T};
 use crate::{GremlinError, GremlinResult};
 use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 pub type Date = chrono::DateTime<chrono::offset::Utc>;
+use std::borrow::Borrow;
 use std::convert::TryInto;
 use std::hash::Hash;
 /// Represent possible values coming from the [Gremlin Server](http://tinkerpop.apache.org/docs/3.4.0/dev/io/)
@@ -500,6 +501,16 @@ where
         .collect::<GremlinResult<HashSet<T>>>()
 }
 
+fn convert_gset_vec_to_set<T>(glist: &Set) -> GremlinResult<HashSet<T>>
+where
+    T: std::convert::TryFrom<GValue, Error = GremlinError> + Hash + Eq,
+{
+    glist
+        .iter()
+        .map(|x| x.clone().try_into())
+        .collect::<GremlinResult<HashSet<T>>>()
+}
+
 fn for_set<T>(gset: &Set) -> GremlinResult<HashSet<T>>
 where
     T: std::convert::TryFrom<GValue, Error = GremlinError> + Hash + Eq,
@@ -511,6 +522,21 @@ where
 
 macro_rules! impl_try_from_set {
     ($t:ty) => {
+        //Ideally this would be handled in conversion.rs but because the GValue::Set holds a Vec
+        //we handle converting it here
+        impl FromGValue for HashSet<$t> {
+            fn from_gvalue(value: GValue) -> GremlinResult<Self> {
+                match value {
+                    GValue::List(s) => for_list_to_set(&s),
+                    GValue::Set(s) => for_set(&s),
+                    _ => Err(GremlinError::Cast(format!(
+                        "Cannot cast {:?} to HashSet",
+                        value
+                    ))),
+                }
+            }
+        }
+
         impl std::convert::TryFrom<GValue> for HashSet<$t> {
             type Error = crate::GremlinError;
 
@@ -544,13 +570,14 @@ macro_rules! impl_try_from_set {
 }
 
 impl_try_from_set!(String);
-// impl_try_from_set!(i32);
-// impl_try_from_set!(i64);
+impl_try_from_set!(i32);
+impl_try_from_set!(i64);
+impl_try_from_set!(Date);
+impl_try_from_set!(uuid::Uuid);
+impl_try_from_set!(bool);
+//floats do not conform to the Eq or Hash traits
 // impl_try_from_set!(f32);
 // impl_try_from_set!(f64);
-// impl_try_from_set!(Date);
-// impl_try_from_set!(uuid::Uuid);
-// impl_try_from_set!(bool);
 
 macro_rules! impl_try_from_list {
     ($t:ty) => {
