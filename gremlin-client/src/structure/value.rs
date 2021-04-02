@@ -9,7 +9,6 @@ use crate::structure::{Pop, TextP, P, T};
 use crate::{GremlinError, GremlinResult};
 use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 pub type Date = chrono::DateTime<chrono::offset::Utc>;
-use std::borrow::Borrow;
 use std::convert::TryInto;
 use std::hash::Hash;
 /// Represent possible values coming from the [Gremlin Server](http://tinkerpop.apache.org/docs/3.4.0/dev/io/)
