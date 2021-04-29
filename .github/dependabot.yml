@@ -1,0 +1,27 @@
+version: 2
+updates:
+- package-ecosystem: cargo
+  directory: "/gremlin-client"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: tokio
+    versions:
+    - 1.1.0
+  - dependency-name: mobc
+    versions:
+    - 0.7.0
+  - dependency-name: pin-project-lite
+    versions:
+    - 0.2.4
+  - dependency-name: async-tls
+    versions:
+    - 0.11.0
+  - dependency-name: rustls
+    versions:
+    - 0.19.0
+  - dependency-name: async-tungstenite
+    versions:
+    - 0.5.0
