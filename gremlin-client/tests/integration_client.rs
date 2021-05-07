@@ -453,6 +453,7 @@ fn test_inserting_date_with_milisecond_precision() {
     );
 }
 
+#[test]
 fn test_list_cardinality() {
     let graph = graph();
 
