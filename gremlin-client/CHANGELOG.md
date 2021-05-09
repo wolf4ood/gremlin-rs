@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+
+## [0.8.0] - 2021-05-09
+
+### Added
+
+- [129](https://github.com/wolf4ood/gremlin-rs/pull/129) Added Option support for: String, i32, i64, f32, f64, uuid, date, and bool
+- [132](https://github.com/wolf4ood/gremlin-rs/pull/131) Added SET and LIST cardinality support 
+
+### Fixed
+
+### Changed
+
+- [#128](https://github.com/wolf4ood/gremlin-rs/issues/128) Fixed Date serialization precision
+
 ## [0.7.1] - 2021-03-03
 
 ### Added
