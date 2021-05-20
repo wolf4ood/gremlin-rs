@@ -23,6 +23,12 @@ impl Into<Params> for () {
     }
 }
 
+impl ToGValue for Vec<GValue> {
+    fn to_gvalue(&self) -> GValue {
+        GValue::List(List::new(self.clone()))
+    }
+}
+
 impl ToGValue for GID {
     fn to_gvalue(&self) -> GValue {
         match self {
@@ -205,3 +211,12 @@ impl_borrow_from_gvalue!(i64, GValue::Int64);
 impl_borrow_from_gvalue!(uuid::Uuid, GValue::Uuid);
 impl_borrow_from_gvalue!(chrono::DateTime<chrono::Utc>, GValue::Date);
 impl_borrow_from_gvalue!(bool, GValue::Bool);
+
+#[test]
+fn to_gvalue_for_vec_gvalue() {
+    let ids_from_somewhere = vec![1, 2, 3];
+    let converted_ids: Vec<GValue> = ids_from_somewhere.into_iter().map(|x| x.into()).collect();
+    let actual: GValue = converted_ids.clone().into();
+    let expected = GValue::List(List::new(converted_ids));
+    assert_eq!(actual, expected);
+}
