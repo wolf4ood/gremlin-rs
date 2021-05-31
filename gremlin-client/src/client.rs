@@ -15,6 +15,30 @@ use std::collections::{HashMap, VecDeque};
 
 type SessionedClient = GremlinClient;
 
+impl SessionedClient {
+    pub fn close_session(&mut self) -> GremlinResult<GResultSet> {
+        if let Some(session_name) = self.session.take() {
+            let mut args = HashMap::new();
+            args.insert(String::from("session"), GValue::from(session_name.clone()));
+            let args = self.options.serializer.write(&GValue::from(args))?;
+
+            let processor = "session".to_string();
+
+            let message = match self.options.serializer {
+                GraphSON::V1 => message_with_args_v1(String::from("close"), processor, args),
+                GraphSON::V2 => message_with_args_v2(String::from("close"), processor, args),
+                GraphSON::V3 => message_with_args(String::from("close"), processor, args),
+            };
+
+            let conn = self.pool.get()?;
+
+            self.send_message(conn, message)
+        } else {
+            Err(GremlinError::Generic("No session to close".to_string()))
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct GremlinClient {
     pool: Pool<GremlinConnectionManager>,
