@@ -75,8 +75,11 @@ mod aio {
                 .count()
                 .await
         );
-        
-        sessioned_graph.close_session().await.expect("It should close the session.");
+
+        sessioned_graph
+            .close_session()
+            .await
+            .expect("It should close the session.");
     }
 
     #[cfg(feature = "async-std-runtime")]

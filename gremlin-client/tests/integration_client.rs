@@ -41,7 +41,9 @@ fn test_session_empty_query() {
             .expect("It should execute a traversal")
             .count()
     );
-    sessioned_graph.close_session().expect("It should close the session.");
+    sessioned_graph
+        .close_session()
+        .expect("It should close the session.");
 }
 
 #[test]
