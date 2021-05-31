@@ -61,7 +61,7 @@ mod aio {
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
     async fn test_session_empty_query() {
         let mut graph = connect().await;
-        let sessioned_graph = graph
+        let mut sessioned_graph = graph
             .create_session("test-session".to_string())
             .await
             .expect("It should create a session");

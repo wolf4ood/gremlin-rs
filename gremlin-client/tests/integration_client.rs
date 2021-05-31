@@ -31,7 +31,7 @@ fn test_empty_query() {
 #[test]
 fn test_session_empty_query() {
     let mut graph = graph();
-    let sessioned_graph = graph
+    let mut sessioned_graph = graph
         .create_session("test-session".to_string())
         .expect("It should create a session.");
     assert_eq!(
