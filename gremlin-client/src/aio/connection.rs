@@ -62,7 +62,7 @@ pub enum Cmd {
 
 pub(crate) struct Conn {
     sender: Sender<Cmd>,
-    broken: bool,
+    valid: bool,
 }
 
 impl std::fmt::Debug for Conn {
@@ -145,7 +145,7 @@ impl Conn {
 
         Ok(Conn {
             sender,
-            broken: false,
+            valid: true,
         })
     }
 
@@ -160,7 +160,7 @@ impl Conn {
             .send(Cmd::Msg((sender, id, payload)))
             .await
             .map_err(|e| {
-                self.broken = true;
+                self.valid = false;
                 e
             })?;
 
@@ -172,7 +172,7 @@ impl Conn {
     }
 
     pub fn is_valid(&self) -> bool {
-        self.broken
+        self.valid
     }
 }
 
