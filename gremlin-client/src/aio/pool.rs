@@ -101,6 +101,10 @@ impl Manager for GremlinConnectionManager {
                     match response.status.code {
                         200 | 206 => Ok(conn),
                         204 => Ok(conn),
+                        401 => Ok(conn),
+                        // 401 is actually a username/password incorrect error, but if not
+                        // not returned as okay, the pool loops infinitely trying
+                        // to authenticate.
                         _ => Err(GremlinError::Request((
                             response.status.code,
                             response.status.message,
