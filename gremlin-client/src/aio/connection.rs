@@ -62,6 +62,7 @@ pub enum Cmd {
 
 pub(crate) struct Conn {
     sender: Sender<Cmd>,
+    broken: bool,
 }
 
 impl std::fmt::Debug for Conn {
@@ -142,7 +143,10 @@ impl Conn {
 
         receiver_loop(stream, requests.clone(), sender.clone());
 
-        Ok(Conn { sender })
+        Ok(Conn {
+            sender,
+            broken: false,
+        })
     }
 
     pub async fn send(
@@ -152,13 +156,23 @@ impl Conn {
     ) -> GremlinResult<(Response, Receiver<GremlinResult<Response>>)> {
         let (sender, mut receiver) = channel(1);
 
-        self.sender.send(Cmd::Msg((sender, id, payload))).await?;
+        self.sender
+            .send(Cmd::Msg((sender, id, payload)))
+            .await
+            .map_err(|e| {
+                self.broken = true;
+                e
+            })?;
 
         receiver
             .next()
             .await
             .expect("It should contain the response")
             .map(|r| (r, receiver))
+    }
+
+    pub fn is_valid(&self) -> bool {
+        self.broken
     }
 }
 
