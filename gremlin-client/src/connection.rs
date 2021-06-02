@@ -45,6 +45,7 @@ impl ConnectionStream {
 #[derive(Debug)]
 pub(crate) struct Connection {
     stream: ConnectionStream,
+    broken: bool,
 }
 
 impl Into<ConnectionOptions> for (&str, u16) {
@@ -176,15 +177,30 @@ impl Connection {
     {
         Ok(Connection {
             stream: ConnectionStream::connect(options.into())?,
+            broken: false,
         })
     }
 
     pub fn send(&mut self, payload: Vec<u8>) -> GremlinResult<()> {
-        self.stream.send(payload)
+        self.stream.send(payload).map_err(|e| {
+            if let GremlinError::WebSocket(_) = e {
+                self.broken = true;
+            }
+            e
+        })
     }
 
     pub fn recv(&mut self) -> GremlinResult<Vec<u8>> {
-        self.stream.recv()
+        self.stream.recv().map_err(|e| {
+            if let GremlinError::WebSocket(_) = e {
+                self.broken = true
+            }
+            e
+        })
+    }
+
+    pub fn is_broken(&self) -> bool {
+        self.broken
     }
 }
 
