@@ -7,3 +7,4 @@ mod error;
 pub(crate) mod process;
 pub use client::GremlinClient;
 pub use result::GResultSet;
+pub use process::traversal::AsyncTerminator;
