@@ -162,9 +162,10 @@ impl TryFrom<GKey> for String {
         if let GKey::String(s) = k {
             Ok(s)
         } else {
-            Err(GremlinError::Cast(String::from(
-                "Cannot cast from this GKey to String",
-            )))
+            Err(GremlinError::Cast(String::from(format!(
+                "Cannot cast from {:?} to String",
+                k
+            ))))
         }
     }
 }
