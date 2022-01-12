@@ -39,6 +39,12 @@ impl Into<List> for Vec<GValue> {
     }
 }
 
+impl From<List> for Vec<GValue> {
+    fn from(list: List) -> Self {
+        list.take()
+    }
+}
+
 impl std::ops::Index<usize> for List {
     type Output = GValue;
 

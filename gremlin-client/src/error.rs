@@ -22,7 +22,7 @@ pub enum GremlinError {
     Pool(#[from] r2d2::Error),
 
     #[error("Got wrong type {0:?}")]
-    WrontType(GValue),
+    WrongType(GValue),
 
     #[error("Cast error: {0}")]
     Cast(String),
