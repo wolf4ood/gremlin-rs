@@ -409,6 +409,51 @@ impl std::convert::TryFrom<GValue> for f64 {
     }
 }
 
+impl std::convert::TryFrom<GValue> for BTreeMap<String, GValue> {
+    type Error = crate::GremlinError;
+
+    fn try_from(value: GValue) -> GremlinResult<Self> {
+        if let GValue::Map(m) = value {
+            m.try_into()
+        } else {
+            Err(GremlinError::Cast(format!(
+                "Cannot cast {:?} to HashMap<GKey, GValue>",
+                value
+            )))
+        }
+    }
+}
+
+impl std::convert::TryFrom<GValue> for HashMap<GKey, GValue> {
+    type Error = crate::GremlinError;
+
+    fn try_from(value: GValue) -> GremlinResult<Self> {
+        if let GValue::Map(m) = value {
+            Ok(m.into())
+        } else {
+            Err(GremlinError::Cast(format!(
+                "Cannot cast {:?} to HashMap<GKey, GValue>",
+                value
+            )))
+        }
+    }
+}
+
+impl std::convert::TryFrom<GValue> for HashMap<String, GValue> {
+    type Error = crate::GremlinError;
+
+    fn try_from(value: GValue) -> GremlinResult<Self> {
+        if let GValue::Map(m) = value {
+            m.try_into()
+        } else {
+            Err(GremlinError::Cast(format!(
+                "Cannot cast {:?} to HashMap<GKey, GValue>",
+                value
+            )))
+        }
+    }
+}
+
 fn from_list<T>(glist: List) -> GremlinResult<T>
 where
     T: std::convert::TryFrom<GValue, Error = GremlinError>,

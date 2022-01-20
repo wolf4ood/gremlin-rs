@@ -22,6 +22,12 @@ impl Into<Set> for Vec<GValue> {
     }
 }
 
+impl From<Set> for Vec<GValue> {
+    fn from(set: Set) -> Self {
+        set.take()
+    }
+}
+
 impl IntoIterator for Set {
     type Item = GValue;
     type IntoIter = IntoIter<GValue>;

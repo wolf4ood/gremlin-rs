@@ -4,6 +4,7 @@ use crate::GremlinResult;
 use crate::Token;
 use std::collections::hash_map::IntoIter;
 use std::collections::{BTreeMap, HashMap};
+use std::convert::{TryFrom, TryInto};
 
 /// Represent a Map<[GKey](struct.GKey),[GValue](struct.GValue)> which has ability to allow for non-String keys.
 /// TinkerPop type [here](http://tinkerpop.apache.org/docs/current/dev/io/#_map)
@@ -22,6 +23,12 @@ impl From<HashMap<GKey, GValue>> for Map {
     }
 }
 
+impl From<Map> for HashMap<GKey, GValue> {
+    fn from(map: Map) -> Self {
+        map.0
+    }
+}
+
 impl From<HashMap<String, GValue>> for Map {
     fn from(val: HashMap<String, GValue>) -> Self {
         let map = val.into_iter().map(|(k, v)| (GKey::String(k), v)).collect();
@@ -29,10 +36,30 @@ impl From<HashMap<String, GValue>> for Map {
     }
 }
 
+impl TryFrom<Map> for HashMap<String, GValue> {
+    type Error = GremlinError;
+
+    fn try_from(map: Map) -> Result<Self, Self::Error> {
+        map.into_iter()
+            .map(|(k, v)| Ok((k.try_into()?, v)))
+            .collect()
+    }
+}
+
 impl From<BTreeMap<String, GValue>> for Map {
     fn from(val: BTreeMap<String, GValue>) -> Self {
         let map = val.into_iter().map(|(k, v)| (GKey::String(k), v)).collect();
         Map(map)
+    }
+}
+
+impl TryFrom<Map> for BTreeMap<String, GValue> {
+    type Error = GremlinError;
+
+    fn try_from(map: Map) -> Result<Self, Self::Error> {
+        map.into_iter()
+            .map(|(k, v)| Ok((k.try_into()?, v)))
+            .collect()
     }
 }
 
@@ -125,6 +152,21 @@ impl From<&str> for GKey {
 impl From<String> for GKey {
     fn from(val: String) -> Self {
         GKey::String(val)
+    }
+}
+
+impl TryFrom<GKey> for String {
+    type Error = GremlinError;
+
+    fn try_from(k: GKey) -> Result<Self, Self::Error> {
+        if let GKey::String(s) = k {
+            Ok(s)
+        } else {
+            Err(GremlinError::Cast(String::from(format!(
+                "Cannot cast from {:?} to String",
+                k
+            ))))
+        }
     }
 }
 
