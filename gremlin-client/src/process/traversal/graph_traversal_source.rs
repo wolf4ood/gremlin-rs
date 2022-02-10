@@ -559,6 +559,43 @@ mod tests {
     }
 
     #[test]
+    fn element_map_step_test() {
+        let g = empty();
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(String::from("elementMap"), vec![]);
+
+        assert_eq!(&code, g.v(()).element_map(()).bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(
+            String::from("elementMap"),
+            vec![String::from("name").into()],
+        );
+
+        assert_eq!(&code, g.v(()).element_map("name").bytecode());
+
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("V"), vec![]);
+        code.add_step(
+            String::from("elementMap"),
+            vec![String::from("name").into(), String::from("surname").into()],
+        );
+
+        assert_eq!(
+            &code,
+            g.v(()).element_map(vec!["name", "surname"]).bytecode()
+        );
+
+        assert_eq!(&code, g.v(()).element_map(["name", "surname"]).bytecode());
+    }
+
+    #[test]
     fn count_test() {
         let g = empty();
 

@@ -329,6 +329,17 @@ impl TraversalBuilder {
         self
     }
 
+    pub fn element_map<L>(mut self, labels: L) -> Self
+    where
+        L: Into<Labels>,
+    {
+        self.bytecode.add_step(
+            String::from("elementMap"),
+            labels.into().0.into_iter().map(GValue::from).collect(),
+        );
+        self
+    }
+
     pub fn count(mut self) -> Self {
         self.bytecode.add_step(String::from("count"), vec![]);
         self

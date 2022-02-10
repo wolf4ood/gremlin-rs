@@ -358,6 +358,15 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         GraphTraversal::new(self.terminator, self.builder)
     }
 
+    pub fn element_map<L>(mut self, labels: L) -> GraphTraversal<S, Map, T>
+    where
+        L: Into<Labels>,
+        T: Terminator<Map>,
+    {
+        self.builder = self.builder.element_map(labels);
+        GraphTraversal::new(self.terminator, self.builder)
+    }
+
     pub fn count(mut self) -> GraphTraversal<S, i64, T>
     where
         T: Terminator<i64>,
