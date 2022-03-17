@@ -714,7 +714,7 @@ fn test_value_map() {
 }
 
 #[test]
-fn test_uwnrap_map() {
+fn test_unwrap_map() {
     let client = graph();
 
     let g = traversal().with_remote(client);
@@ -741,6 +741,49 @@ fn test_uwnrap_map() {
     assert_eq!(id.unwrap(), v_id);
     assert_eq!(property.unwrap(), "test");
     assert_eq!(label.unwrap(), "test_value_map");
+}
+
+#[test]
+fn test_element_map() {
+    let client = graph();
+
+    let g = traversal().with_remote(client);
+
+    let vertices = g
+        .add_v("test_element_map")
+        .property("name", "test")
+        .to_list()
+        .unwrap();
+
+    let vertex = &vertices[0];
+
+    let results = g.v(vertex.id()).element_map(()).to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!("test", value["name"].get::<String>().unwrap());
+
+    let results = g.v(vertex.id()).element_map("name").to_list().unwrap();
+
+    assert_eq!(1, results.len());
+
+    let value = &results[0];
+
+    assert_eq!("test", value["name"].get::<String>().unwrap());
+
+    let results = g.v(vertex.id()).element_map("fake").to_list().unwrap();
+
+    assert_eq!(2, results[0].len());
+    assert_eq!(true, results[0].get("id").is_some());
+    assert_eq!(true, results[0].get("label").is_some());
+
+    let results = g.v(vertex.id()).element_map(()).to_list().unwrap();
+
+    assert_eq!(true, results[0].get("id").is_some());
+    assert_eq!(true, results[0].get("label").is_some());
+    assert_eq!(true, results[0].get("name").is_some());
 }
 
 #[test]

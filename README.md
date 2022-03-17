@@ -325,7 +325,7 @@ in order to specify the version of the Gremlin Server
 
 ```
 cd docker-compose
-export GREMLIN_SERVER=3.4.0
+export GREMLIN_SERVER=3.4.4
 docker-compose up -d
 cd ..
 cargo test --all-features
