@@ -97,8 +97,21 @@ impl GraphSON {
                         let mut instruction = vec![];
                         instruction.push(Value::String(m.operator().clone()));
 
-                        let arguments: GremlinResult<Vec<Value>> =
-                            m.args().iter().map(|a| self.write(a)).collect();
+                        let arguments: GremlinResult<Vec<Value>> = m.args().iter().map(|a| self.write(a)).collect();
+
+                        instruction.extend(arguments?);
+                        Ok(Value::Array(instruction))
+                    })
+                    .collect();
+
+                let sources: GremlinResult<Vec<Value>> = code
+                    .sources()
+                    .iter()
+                    .map(|m| {
+                        let mut instruction = vec![];
+                        instruction.push(Value::String(m.operator().clone()));
+
+                        let arguments: GremlinResult<Vec<Value>> = m.args().iter().map(|a| self.write(a)).collect();
 
                         instruction.extend(arguments?);
                         Ok(Value::Array(instruction))
@@ -107,7 +120,8 @@ impl GraphSON {
                 Ok(json!({
                     "@type" : "g:Bytecode",
                     "@value" : {
-                        "step" : steps?
+                        "step" : steps?,
+                        "source" : sources?
                     }
                 }))
             }
