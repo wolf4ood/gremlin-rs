@@ -70,7 +70,7 @@ macro_rules! get_value {
         match $value {
             $v(e) => Ok(e),
             _ => Err($crate::GremlinError::Json(String::from(stringify!($v)))),
-        };
+        }
     };
 }
 
@@ -79,7 +79,7 @@ macro_rules! expect_i32 {
         match $value.as_i64() {
             Some(v) => Ok(v),
             None => Err($crate::GremlinError::Json(String::from("Expected i32"))),
-        }? as i32;
+        }? as i32
     };
 }
 
@@ -88,7 +88,7 @@ macro_rules! expect_i64 {
         match $value.as_i64() {
             Some(v) => Ok(v),
             None => Err($crate::GremlinError::Json(String::from("Expected i64"))),
-        }?;
+        }?
     };
 }
 macro_rules! expect_float {
@@ -96,7 +96,7 @@ macro_rules! expect_float {
         match $value.as_f64() {
             Some(v) => Ok(v),
             None => Err($crate::GremlinError::Json(String::from("Expected float"))),
-        }? as f32;
+        }? as f32
     };
 }
 macro_rules! expect_double {
@@ -104,6 +104,6 @@ macro_rules! expect_double {
         match $value.as_f64() {
             Some(v) => Ok(v),
             None => Err($crate::GremlinError::Json(String::from("Expected double"))),
-        }?;
+        }?
     };
 }
