@@ -223,7 +223,7 @@ fn test_complex_vertex_creation_with_properties_v1() {
         .is_ok());
 
     assert_eq!(
-        &uuid.to_hyphenated().to_string(),
+        &uuid.hyphenated().to_string(),
         properties["uuid"].get::<List>().unwrap()[0]
             .get::<VertexProperty>()
             .unwrap()

@@ -2,7 +2,6 @@ use crate::conversion::{FromGValue, ToGValue};
 use crate::process::traversal::step::by::ByStep;
 use crate::process::traversal::step::choose::IntoChooseStep;
 use crate::process::traversal::step::coalesce::CoalesceStep;
-use crate::process::traversal::step::union::UnionStep;
 use crate::process::traversal::step::dedup::DedupStep;
 use crate::process::traversal::step::from::FromStep;
 use crate::process::traversal::step::has::HasStep;
@@ -121,7 +120,8 @@ impl TraversalBuilder {
     where
         A: Into<HasStep>,
     {
-        self.bytecode.add_step(String::from("has"), step.into().into());
+        self.bytecode
+            .add_step(String::from("has"), step.into().into());
         self
     }
 
@@ -129,7 +129,10 @@ impl TraversalBuilder {
     where
         A: Into<GValue> + FromGValue,
     {
-        self.bytecode.add_source(String::from("withSideEffect"), vec![step.0.into(), step.1.into()]);
+        self.bytecode.add_source(
+            String::from("withSideEffect"),
+            vec![step.0.into(), step.1.into()],
+        );
         self
     }
 
