@@ -62,7 +62,7 @@ fn test_ok_credentials() {
     .expect("Cannot connect");
 
     let result = client.execute("g.V().limit(1)", &[]);
-    assert!(result.is_ok(), format!("{:?}", result));
+    assert!(result.is_ok(), "{:?}", result);
 }
 
 #[test]
@@ -81,7 +81,7 @@ fn test_ko_credentials() {
     .expect("Cannot connect");
 
     let result = client.execute("g.V().limit(1)", &[]);
-    assert!(result.is_err(), format!("{:?}", result));
+    assert!(result.is_err(), "{:?}", result);
 }
 
 #[test]

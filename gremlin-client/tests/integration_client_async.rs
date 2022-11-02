@@ -38,7 +38,7 @@ mod aio {
         .expect("Cannot connect");
 
         let result = client.execute("g.V().limit(1)", &[]).await;
-        assert!(result.is_ok(), format!("{:?}", result));
+        assert!(result.is_ok(), "{:?}", result);
     }
 
     #[cfg(feature = "async-std-runtime")]
