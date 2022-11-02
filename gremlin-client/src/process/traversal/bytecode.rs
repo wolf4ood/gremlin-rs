@@ -20,10 +20,12 @@ impl Bytecode {
     }
 
     pub fn add_source(&mut self, source_name: String, args: Vec<GValue>) {
-        self.source_instructions.push(Instruction::new(source_name, args));
+        self.source_instructions
+            .push(Instruction::new(source_name, args));
     }
     pub fn add_step(&mut self, step_name: String, args: Vec<GValue>) {
-        self.step_instructions.push(Instruction::new(step_name, args));
+        self.step_instructions
+            .push(Instruction::new(step_name, args));
     }
 
     pub fn steps(&self) -> &Vec<Instruction> {
@@ -36,7 +38,8 @@ impl Bytecode {
 }
 
 lazy_static! {
-    pub static ref WRITE_OPERATORS: Vec<&'static str> = vec!["addV", "property", "addE", "from", "to", "drop"];
+    pub static ref WRITE_OPERATORS: Vec<&'static str> =
+        vec!["addV", "property", "addE", "from", "to", "drop"];
 }
 
 #[derive(Debug, PartialEq, Clone)]
