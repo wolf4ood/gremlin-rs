@@ -175,6 +175,15 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self
     }
 
+    pub fn with_side_effect<A>(mut self, step: (&'static str, A)) -> Self
+    where
+        A: Into<GValue> + FromGValue,
+    {
+        self.builder = self.builder.with_side_effect(step);
+
+        self
+    }
+
     pub fn add_e<A>(mut self, label: A) -> GraphTraversal<S, Edge, T>
     where
         A: Into<String>,
