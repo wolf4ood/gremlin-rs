@@ -182,7 +182,9 @@ impl Drop for Conn {
     }
 }
 
-fn send_shutdown(_conn: &mut Conn) {}
+fn send_shutdown(conn: &mut Conn) {
+    conn.sender.close_channel();
+}
 
 fn sender_loop(
     mut sink: SplitSink<WSStream, Message>,
@@ -215,9 +217,12 @@ fn sender_loop(
                         guard.clear();
                     }
                 },
-                None => {}
+                None => {
+                    break;
+                }
             }
         }
+        let _ = sink.close().await;
     });
 }
 
@@ -263,10 +268,14 @@ fn receiver_loop(
                             drop(guard);
                         }
                     }
-                    Message::Ping(data) => sender.send(Cmd::Pong(data)).await.unwrap(),
+                    Message::Ping(data) => {
+                        let _ = sender.send(Cmd::Pong(data)).await;
+                    }
                     _ => {}
                 },
-                None => {}
+                None => {
+                    break;
+                }
             }
         }
     });
