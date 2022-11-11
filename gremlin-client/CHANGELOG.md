@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.8.2] - 2021-05-09
+
+### Added
+
+### Fixed
+
+- Fix connection not closing properly
 
 ## [0.8.0] - 2021-05-09
 
