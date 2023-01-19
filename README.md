@@ -57,7 +57,7 @@ Install from [crates.io](https://crates.io/)
 
 ```toml
 [dependencies]
-gremlin_client = "0.4.0"
+gremlin-client = "0.8"
 ```
 
 
@@ -65,14 +65,14 @@ with [async-std](https://async.rs/) support
 
 ```toml
 [dependencies]
-gremlin_client = { version = "0.4.0", features = ["async-std-runtime"] }
+gremlin-client = { version = "0.8", features = ["async-std-runtime"] }
 ```
 
 with [tokio](https://tokio.rs/) support 
 
 ```toml
 [dependencies]
-gremlin_client = { version = "0.4.0", features = ["tokio-runtime"] }
+gremlin-client = { version = "0.4.0", features = ["tokio-runtime"] }
 ```
 
 ### Examples
@@ -232,7 +232,7 @@ By including the `derive` feature in your Cargo.toml
 
 ```
 [dependencies]
-gremlin_client = { version = "*", features = ["derive"] }
+gremlin-client = { version = "*", features = ["derive"] }
 ```
 
 two derive macros are available 

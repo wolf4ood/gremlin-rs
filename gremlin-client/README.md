@@ -11,7 +11,7 @@ Install from [crates.io](https://crates.io/)
 
 ```toml
 [dependencies]
-gremlin_client = "0.4.0"
+gremlin-client = "0.8"
 ```
 
 
@@ -19,7 +19,7 @@ with async support via [async-std](https://async.rs/)
 
 ```toml
 [dependencies]
-gremlin_client = { version = "0.4.0", features = ["async_std"] }
+gremlin-client = { version = "0.8", features = ["async_std"] }
 ```
 
 ### Examples
