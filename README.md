@@ -23,7 +23,7 @@
     <img src="https://img.shields.io/crates/d/gremlin-client.svg?style=flat-square"
       alt="Download" />
   </a>
-  <a href="https://docs.rs/gremlin-rs">
+  <a href="https://docs.rs/gremlin-client">
     <img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square"
       alt="docs.rs docs" />
   </a>
