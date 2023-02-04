@@ -28,7 +28,6 @@ impl ConnectionStream {
             _ => None,
         };
 
-        // TcpStream::connect(addr)
         let request = options
             .websocket_url()
             .into_client_request()
