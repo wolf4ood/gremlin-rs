@@ -1,8 +1,15 @@
+use std::net::TcpStream;
+
 use crate::{GraphSON, GremlinError, GremlinResult};
 use native_tls::TlsConnector;
-use websocket::{stream::sync::NetworkStream, sync::Client, ClientBuilder, OwnedMessage};
+use tungstenite::{
+    client::{uri_mode, IntoClientRequest},
+    client_tls_with_config,
+    stream::{MaybeTlsStream, Mode, NoDelay},
+    Connector, Message, WebSocket,
+};
 
-struct ConnectionStream(Client<Box<dyn NetworkStream + Send>>);
+struct ConnectionStream(WebSocket<MaybeTlsStream<TcpStream>>);
 
 impl std::fmt::Debug for ConnectionStream {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -13,30 +20,50 @@ impl std::fmt::Debug for ConnectionStream {
 impl ConnectionStream {
     fn connect(options: ConnectionOptions) -> GremlinResult<Self> {
         let connector = match options.tls_options.as_ref() {
-            Some(option) => Some(
+            Some(option) => Some(Connector::NativeTls(
                 option
                     .tls_connector()
                     .map_err(|e| GremlinError::Generic(e.to_string()))?,
-            ),
+            )),
             _ => None,
         };
 
-        let client = ClientBuilder::new(&options.websocket_url())
-            .map_err(|e| GremlinError::Generic(e.to_string()))?
-            .connect(connector)?;
+        // TcpStream::connect(addr)
+        let request = options
+            .websocket_url()
+            .into_client_request()
+            .map_err(|e| GremlinError::Generic(e.to_string()))?;
+        let uri = request.uri();
+        let mode = uri_mode(uri).map_err(|e| GremlinError::Generic(e.to_string()))?;
+        let host = request
+            .uri()
+            .host()
+            .ok_or_else(|| GremlinError::Generic("No Hostname".into()))?;
+        let port = uri.port_u16().unwrap_or(match mode {
+            Mode::Plain => 80,
+            Mode::Tls => 443,
+        });
+        let mut stream = TcpStream::connect((host, port))
+            .map_err(|e| GremlinError::Generic(format!("Unable to connect {e:?}")))?;
+        NoDelay::set_nodelay(&mut stream, true)
+            .map_err(|e| GremlinError::Generic(e.to_string()))?;
+
+        let (client, _response) =
+            client_tls_with_config(options.websocket_url(), stream, None, connector)
+                .map_err(|e| GremlinError::Generic(e.to_string()))?;
 
         Ok(ConnectionStream(client))
     }
 
     fn send(&mut self, payload: Vec<u8>) -> GremlinResult<()> {
         self.0
-            .send_message(&OwnedMessage::Binary(payload))
+            .write_message(Message::Binary(payload))
             .map_err(GremlinError::from)
     }
 
     fn recv(&mut self) -> GremlinResult<Vec<u8>> {
-        match self.0.recv_message()? {
-            OwnedMessage::Binary(binary) => Ok(binary),
+        match self.0.read_message()? {
+            Message::Binary(binary) => Ok(binary),
             _ => unimplemented!(),
         }
     }
