@@ -2,10 +2,6 @@ use crate::structure::GValue;
 
 use thiserror::Error;
 
-use websocket::WebSocketError;
-
-#[cfg(feature = "async_gremlin")]
-use async_tungstenite::tungstenite;
 #[cfg(feature = "async_gremlin")]
 use mobc;
 
@@ -16,7 +12,7 @@ pub enum GremlinError {
     Generic(String),
 
     #[error(transparent)]
-    WebSocket(#[from] WebSocketError),
+    WebSocket(#[from] tungstenite::error::Error),
 
     #[error(transparent)]
     Pool(#[from] r2d2::Error),
@@ -38,7 +34,7 @@ pub enum GremlinError {
 
     #[cfg(feature = "async_gremlin")]
     #[error(transparent)]
-    WebSocketAsync(#[from] tungstenite::error::Error),
+    WebSocketAsync(#[from] async_tungstenite::tungstenite::Error),
     #[cfg(feature = "async_gremlin")]
     #[error(transparent)]
     ChannelSend(#[from] futures::channel::mpsc::SendError),
