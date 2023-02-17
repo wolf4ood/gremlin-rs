@@ -167,10 +167,12 @@ impl TraversalBuilder {
 
     pub fn add_e<A>(mut self, label: A) -> Self
     where
-        A: Into<String>,
+        A: Into<Labels>,
     {
-        self.bytecode
-            .add_step(String::from("addE"), vec![label.into().into()]);
+        self.bytecode.add_step(
+            String::from("addE"),
+            label.into().0.into_iter().map(GValue::from).collect(),
+        );
 
         self
     }

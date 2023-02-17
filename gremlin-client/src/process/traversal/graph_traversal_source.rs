@@ -81,12 +81,15 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
 
     pub fn add_e<T>(&self, label: T) -> GraphTraversal<Edge, Edge, A>
     where
-        T: Into<String>,
+        T: Into<Labels>,
         A: Terminator<Edge>,
     {
         let mut code = Bytecode::new();
 
-        code.add_step(String::from("addE"), vec![label.into().into()]);
+        code.add_step(
+            String::from("addE"),
+            label.into().0.into_iter().map(GValue::from).collect(),
+        );
 
         GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
     }
