@@ -55,7 +55,7 @@ impl AnonymousTraversalSource {
 
     pub fn add_e<A>(&self, label: A) -> TraversalBuilder
     where
-        A: Into<String>,
+        A: Into<Labels>,
     {
         self.traversal.clone().add_e(label)
     }

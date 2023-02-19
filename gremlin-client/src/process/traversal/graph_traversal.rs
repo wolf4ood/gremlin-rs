@@ -186,7 +186,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn add_e<A>(mut self, label: A) -> GraphTraversal<S, Edge, T>
     where
-        A: Into<String>,
+        A: Into<Labels>,
         T: Terminator<Edge>,
     {
         self.builder = self.builder.add_e(label);
