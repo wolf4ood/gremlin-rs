@@ -3,9 +3,7 @@ use mobc::Manager;
 use crate::aio::connection::Conn;
 use crate::connection::ConnectionOptions;
 use crate::error::GremlinError;
-use crate::message::{
-    message_with_args, message_with_args_and_uuid, message_with_args_v1, message_with_args_v2,
-};
+use crate::message::{message_with_args, message_with_args_and_uuid, message_with_args_v2};
 use crate::{GValue, GraphSON};
 use async_trait::async_trait;
 use base64::encode;
@@ -45,7 +43,6 @@ impl Manager for GremlinConnectionManager {
         let args = self.options.serializer.write(&GValue::from(args))?;
 
         let message = match self.options.serializer {
-            GraphSON::V1 => message_with_args_v1(String::from("eval"), String::default(), args),
             GraphSON::V2 => message_with_args_v2(String::from("eval"), String::default(), args),
             GraphSON::V3 => message_with_args(String::from("eval"), String::default(), args),
         };
@@ -53,11 +50,8 @@ impl Manager for GremlinConnectionManager {
         let id = message.id().clone();
         let msg = serde_json::to_string(&message).map_err(GremlinError::from)?;
 
-        let content_type = match self.options.serializer {
-            GraphSON::V1 => "application/vnd.gremlin-v1.0+json",
-            GraphSON::V2 => "application/vnd.gremlin-v2.0+json",
-            GraphSON::V3 => "application/vnd.gremlin-v3.0+json",
-        };
+        let content_type = self.options.serializer.content_type();
+
         let payload = String::from("") + content_type + &msg;
         let mut binary = payload.into_bytes();
         binary.insert(0, content_type.len() as u8);
@@ -87,12 +81,9 @@ impl Manager for GremlinConnectionManager {
                     let id = message.id().clone();
                     let msg = serde_json::to_string(&message).map_err(GremlinError::from)?;
 
-                    let content_type = match self.options.serializer {
-                        GraphSON::V1 => "application/vnd.gremlin-v1.0+json",
-                        GraphSON::V2 => "application/vnd.gremlin-v2.0+json",
-                        GraphSON::V3 => "application/vnd.gremlin-v3.0+json",
-                    };
+                    let content_type = self.options.serializer.content_type();
                     let payload = String::from("") + content_type + &msg;
+
                     let mut binary = payload.into_bytes();
                     binary.insert(0, content_type.len() as u8);
 

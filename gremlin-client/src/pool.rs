@@ -4,8 +4,7 @@ use crate::connection::Connection;
 use crate::connection::ConnectionOptions;
 use crate::error::GremlinError;
 use crate::message::{
-    message_with_args, message_with_args_and_uuid, message_with_args_v1, message_with_args_v2,
-    Response,
+    message_with_args, message_with_args_and_uuid, message_with_args_v2, Response,
 };
 use crate::{GValue, GraphSON, GremlinResult};
 use base64::encode;
@@ -44,7 +43,6 @@ impl ManageConnection for GremlinConnectionManager {
         let args = self.options.serializer.write(&GValue::from(args))?;
 
         let message = match self.options.serializer {
-            GraphSON::V1 => message_with_args_v1(String::from("eval"), String::default(), args),
             GraphSON::V2 => message_with_args_v2(String::from("eval"), String::default(), args),
             GraphSON::V3 => message_with_args(String::from("eval"), String::default(), args),
         };
@@ -52,7 +50,6 @@ impl ManageConnection for GremlinConnectionManager {
         let msg = serde_json::to_string(&message).map_err(GremlinError::from)?;
 
         let content_type = match self.options.serializer {
-            GraphSON::V1 => "application/vnd.gremlin-v1.0+json",
             GraphSON::V2 => "application/vnd.gremlin-v2.0+json",
             GraphSON::V3 => "application/vnd.gremlin-v3.0+json",
         };
@@ -88,11 +85,7 @@ impl ManageConnection for GremlinConnectionManager {
 
                     let msg = serde_json::to_string(&message).map_err(GremlinError::from)?;
 
-                    let content_type = match self.options.serializer {
-                        GraphSON::V1 => "application/vnd.gremlin-v1.0+json",
-                        GraphSON::V2 => "application/vnd.gremlin-v2.0+json",
-                        GraphSON::V3 => "application/vnd.gremlin-v3.0+json",
-                    };
+                    let content_type = self.options.serializer.content_type();
                     let payload = String::from("") + content_type + &msg;
 
                     let mut binary = payload.into_bytes();
