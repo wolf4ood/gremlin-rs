@@ -8,8 +8,7 @@ pub mod io {
 
     pub fn connect_serializer(serializer: GraphSON) -> GremlinResult<GremlinClient> {
         let port = match serializer {
-            GraphSON::V1 => 8186,
-            GraphSON::V2 => 8184,
+            GraphSON::V2 => 8182,
             GraphSON::V3 => 8182,
         };
         GremlinClient::connect(
@@ -110,8 +109,7 @@ pub mod aio {
 
     pub async fn connect_serializer(serializer: GraphSON) -> GremlinClient {
         let port = match serializer {
-            GraphSON::V1 => 8186,
-            GraphSON::V2 => 8184,
+            GraphSON::V2 => 8182,
             GraphSON::V3 => 8182,
         };
         GremlinClient::connect(

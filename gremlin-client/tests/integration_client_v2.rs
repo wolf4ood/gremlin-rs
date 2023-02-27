@@ -29,7 +29,7 @@ fn test_ok_credentials_v2() {
     let client = GremlinClient::connect(
         ConnectionOptions::builder()
             .host("localhost")
-            .port(8185)
+            .port(8183)
             .credentials("stephen", "password")
             .ssl(true)
             .tls_options(TlsOptions {
@@ -49,7 +49,7 @@ fn test_ko_credentials_v2() {
     let client = GremlinClient::connect(
         ConnectionOptions::builder()
             .host("localhost")
-            .port(8185)
+            .port(8183)
             .credentials("stephen", "pwd")
             .ssl(true)
             .tls_options(TlsOptions {

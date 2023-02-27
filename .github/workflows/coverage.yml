@@ -16,7 +16,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         rust: [nightly]
-        gremlin-server: [3.4.8]
+        gremlin-server: [3.6.2]
     steps:
 
 

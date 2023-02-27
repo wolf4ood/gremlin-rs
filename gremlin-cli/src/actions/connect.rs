@@ -11,7 +11,6 @@ pub struct ConnectAction;
 
 #[derive(Debug)]
 pub enum Serializer {
-    GraphSONV1,
     GraphSONV2,
     GraphSONV3,
 }
@@ -21,7 +20,6 @@ impl FromStr for Serializer {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "graphson_v1" => Ok(Serializer::GraphSONV1),
             "graphson_v2" => Ok(Serializer::GraphSONV2),
             "graphson_v3" => Ok(Serializer::GraphSONV3),
             _ => Err(anyhow!(
@@ -35,7 +33,6 @@ impl FromStr for Serializer {
 impl From<Serializer> for GraphSON {
     fn from(serializer: Serializer) -> Self {
         match serializer {
-            Serializer::GraphSONV1 => GraphSON::V1,
             Serializer::GraphSONV2 => GraphSON::V2,
             Serializer::GraphSONV3 => GraphSON::V3,
         }

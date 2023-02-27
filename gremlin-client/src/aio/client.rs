@@ -2,8 +2,7 @@ use crate::aio::pool::GremlinConnectionManager;
 use crate::aio::GResultSet;
 use crate::io::GraphSON;
 use crate::message::{
-    message_with_args, message_with_args_and_uuid, message_with_args_v1, message_with_args_v2,
-    Message,
+    message_with_args, message_with_args_and_uuid, message_with_args_v2, Message,
 };
 use crate::process::traversal::Bytecode;
 use crate::GValue;
@@ -27,7 +26,6 @@ impl SessionedClient {
             let processor = "session".to_string();
 
             let message = match self.options.serializer {
-                GraphSON::V1 => message_with_args_v1(String::from("close"), processor, args),
                 GraphSON::V2 => message_with_args_v2(String::from("close"), processor, args),
                 GraphSON::V3 => message_with_args(String::from("close"), processor, args),
             };
@@ -136,7 +134,6 @@ impl GremlinClient {
         };
 
         let message = match self.options.serializer {
-            GraphSON::V1 => message_with_args_v1(String::from("eval"), processor, args),
             GraphSON::V2 => message_with_args_v2(String::from("eval"), processor, args),
             GraphSON::V3 => message_with_args(String::from("eval"), processor, args),
         };
@@ -155,11 +152,7 @@ impl GremlinClient {
         let message = self.build_message(msg).unwrap();
 
         async move {
-            let content_type = match self.options.serializer {
-                GraphSON::V1 => "application/vnd.gremlin-v1.0+json",
-                GraphSON::V2 => "application/vnd.gremlin-v2.0+json",
-                GraphSON::V3 => "application/vnd.gremlin-v3.0+json",
-            };
+            let content_type = self.options.serializer.content_type();
             let payload = String::from("") + content_type + &message;
             let mut binary = payload.into_bytes();
             binary.insert(0, content_type.len() as u8);
