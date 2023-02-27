@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Add Labels type in `add_e` [#174](https://github.com/wolf4ood/gremlin-rs/issues/174)
+
+### Changed
+
+- Removed `GraphSON` v1 [#177](https://github.com/wolf4ood/gremlin-rs/issues/177)
+
+## [0.8.3] - 2023-02-06
+
+### Added
+
+### Fixed
+
+- Remove Websocket & Time crates #172 
+
 ## [0.8.2] - 2021-05-09
 
 ### Added
