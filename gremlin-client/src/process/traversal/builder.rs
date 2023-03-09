@@ -53,6 +53,17 @@ impl TraversalBuilder {
         self
     }
 
+    pub fn e<T>(mut self, ids: T) -> TraversalBuilder
+    where
+        T: Into<GIDs>,
+    {
+        self.bytecode.add_step(
+            String::from("E"),
+            ids.into().0.iter().map(|id| id.to_gvalue()).collect(),
+        );
+        self
+    }
+
     pub fn has_label<L>(mut self, labels: L) -> Self
     where
         L: Into<Labels>,
