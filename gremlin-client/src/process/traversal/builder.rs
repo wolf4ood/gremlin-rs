@@ -13,6 +13,7 @@ use crate::process::traversal::step::not::NotStep;
 use crate::process::traversal::step::or::OrStep;
 use crate::process::traversal::step::repeat::RepeatStep;
 use crate::process::traversal::step::select::SelectStep;
+use crate::process::traversal::step::side_effect::IntoSideEffectStep;
 use crate::process::traversal::step::to::ToStep;
 use crate::process::traversal::step::until::UntilStep;
 use crate::process::traversal::step::where_step::WhereStep;
@@ -133,6 +134,15 @@ impl TraversalBuilder {
     {
         self.bytecode
             .add_step(String::from("has"), step.into().into());
+        self
+    }
+
+    pub fn side_effect<A>(mut self, step: A) -> Self
+    where
+        A: IntoSideEffectStep,
+    {
+        self.bytecode
+            .add_step(String::from("sideEffect"), step.into_step());
         self
     }
 
