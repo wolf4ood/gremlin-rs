@@ -2,7 +2,7 @@ use crate::structure::GValue;
 
 use thiserror::Error;
 
-#[cfg(feature = "async_gremlin")]
+#[cfg(feature = "async")]
 use mobc;
 
 #[allow(clippy::large_enum_variant)]
@@ -32,17 +32,17 @@ pub enum GremlinError {
     #[error(transparent)]
     Serde(#[from] serde_json::Error),
 
-    #[cfg(feature = "async_gremlin")]
+    #[cfg(feature = "async")]
     #[error(transparent)]
     WebSocketAsync(#[from] async_tungstenite::tungstenite::Error),
-    #[cfg(feature = "async_gremlin")]
+    #[cfg(feature = "async")]
     #[error(transparent)]
     ChannelSend(#[from] futures::channel::mpsc::SendError),
     #[error(transparent)]
     Uuid(#[from] uuid::Error),
 }
 
-#[cfg(feature = "async_gremlin")]
+#[cfg(feature = "async")]
 impl From<mobc::Error<GremlinError>> for GremlinError {
     fn from(e: mobc::Error<GremlinError>) -> GremlinError {
         match e {

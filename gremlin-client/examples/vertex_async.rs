@@ -1,13 +1,9 @@
 use gremlin_client::{aio::GremlinClient, Vertex};
 
-#[cfg(feature = "async-std-runtime")]
-use async_std::prelude::*;
-
-#[cfg(feature = "tokio-runtime")]
+#[cfg(feature = "async")]
 use tokio_stream::StreamExt;
 
-#[cfg_attr(feature = "async-std-runtime", async_std::main)]
-#[cfg_attr(feature = "tokio-runtime", tokio::main)]
+#[cfg_attr(feature = "async", tokio::main)]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = GremlinClient::connect("localhost").await?;
 

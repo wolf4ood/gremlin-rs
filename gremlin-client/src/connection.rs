@@ -1,12 +1,12 @@
 use std::net::TcpStream;
 
 use crate::{GraphSON, GremlinError, GremlinResult};
-use native_tls::TlsConnector;
+
 use tungstenite::{
     client::{uri_mode, IntoClientRequest},
-    client_tls_with_config,
+    client_tls,
     stream::{MaybeTlsStream, Mode, NoDelay},
-    Connector, Message, WebSocket,
+    Message, WebSocket,
 };
 
 struct ConnectionStream(WebSocket<MaybeTlsStream<TcpStream>>);
@@ -19,14 +19,14 @@ impl std::fmt::Debug for ConnectionStream {
 
 impl ConnectionStream {
     fn connect(options: ConnectionOptions) -> GremlinResult<Self> {
-        let connector = match options.tls_options.as_ref() {
-            Some(option) => Some(Connector::NativeTls(
-                option
-                    .tls_connector()
-                    .map_err(|e| GremlinError::Generic(e.to_string()))?,
-            )),
-            _ => None,
-        };
+        // let connector = match options.tls_options.as_ref() {
+        //     Some(option) => Some(Connector::Rustls(
+        //         option
+        //             .tls_connector()
+        //             .map_err(|e| GremlinError::Generic(e.to_string()))?,
+        //     )),
+        //     _ => None,
+        // };
 
         let request = options
             .websocket_url()
@@ -47,9 +47,10 @@ impl ConnectionStream {
         NoDelay::set_nodelay(&mut stream, true)
             .map_err(|e| GremlinError::Generic(e.to_string()))?;
 
-        let (client, _response) =
-            client_tls_with_config(options.websocket_url(), stream, None, connector)
-                .map_err(|e| GremlinError::Generic(e.to_string()))?;
+        let (client, _response) = client_tls(options.websocket_url(), stream)
+            .map_err(|e| GremlinError::Generic(e.to_string()))?;
+        // client_tls_with_config(options.websocket_url(), stream, None, connector)
+        //     .map_err(|e| GremlinError::Generic(e.to_string()))?;
 
         Ok(ConnectionStream(client))
     }
@@ -227,14 +228,6 @@ impl Connection {
 
     pub fn is_broken(&self) -> bool {
         self.broken
-    }
-}
-
-impl TlsOptions {
-    pub(crate) fn tls_connector(&self) -> native_tls::Result<TlsConnector> {
-        TlsConnector::builder()
-            .danger_accept_invalid_certs(self.accept_invalid_certs)
-            .build()
     }
 }
 

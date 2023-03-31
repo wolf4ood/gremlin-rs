@@ -1,43 +1,22 @@
 #[allow(dead_code)]
 mod common;
 
-#[cfg(feature = "async_gremlin")]
+#[cfg(feature = "async")]
 mod aio {
 
     use gremlin_client::GremlinError;
     use gremlin_client::{Edge, GValue, GraphSON, Map, Vertex};
 
     use super::common::aio::{connect_serializer, create_edge, create_vertex};
-    #[cfg(feature = "async-std-runtime")]
-    use async_std::prelude::*;
 
-    #[cfg(feature = "tokio-runtime")]
     use tokio_stream::StreamExt;
 
-    #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    #[cfg_attr(feature = "tokio-runtime", tokio::test)]
+    #[tokio::test]
     async fn test_client_connection_ok_v2() {
         connect_serializer(GraphSON::V2).await;
     }
 
-    #[cfg(feature = "async-std-runtime")]
-    #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    async fn test_empty_query_v2() {
-        let graph = connect_serializer(GraphSON::V2).await;
-
-        assert_eq!(
-            0,
-            graph
-                .execute("g.V().hasLabel('NotFound')", &[])
-                .await
-                .expect("It should execute a traversal")
-                .count()
-                .await
-        )
-    }
-
-    #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    #[cfg_attr(feature = "tokio-runtime", tokio::test)]
+    #[tokio::test]
     async fn test_wrong_query_v2() {
         let error = connect_serializer(GraphSON::V2)
             .await
@@ -54,8 +33,7 @@ mod aio {
         }
     }
 
-    #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    #[cfg_attr(feature = "tokio-runtime", tokio::test)]
+    #[tokio::test]
     async fn test_wrong_alias_v2() {
         let error = connect_serializer(GraphSON::V2)
             .await
@@ -73,9 +51,7 @@ mod aio {
         }
     }
 
-    #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    #[cfg_attr(feature = "tokio-runtime", tokio::test)]
-
+    #[tokio::test]
     async fn test_vertex_query_v2() {
         let graph = connect_serializer(GraphSON::V2).await;
 
@@ -95,8 +71,8 @@ mod aio {
 
         assert_eq!("person", vertices[0].label());
     }
-    #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    #[cfg_attr(feature = "tokio-runtime", tokio::test)]
+
+    #[tokio::test]
     async fn test_edge_query_v2() {
         let graph = connect_serializer(GraphSON::V2).await;
         let edges = graph
@@ -112,8 +88,7 @@ mod aio {
         assert_eq!("knows", edges[0].label());
     }
 
-    #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    #[cfg_attr(feature = "tokio-runtime", tokio::test)]
+    #[tokio::test]
     async fn test_vertex_creation_v2() {
         let graph = connect_serializer(GraphSON::V2).await;
         let mark = create_vertex(&graph, "mark").await;
@@ -138,8 +113,7 @@ mod aio {
         );
     }
 
-    #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    #[cfg_attr(feature = "tokio-runtime", tokio::test)]
+    #[tokio::test]
     async fn test_edge_creation_v2() {
         let graph = connect_serializer(GraphSON::V2).await;
         let mark = create_vertex(&graph, "mark").await;

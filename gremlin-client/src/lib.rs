@@ -135,7 +135,7 @@ pub use structure::{
     Property, Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty, GID,
 };
 
-#[cfg(feature = "async_gremlin")]
+#[cfg(feature = "async")]
 pub mod aio;
 
 pub mod process;

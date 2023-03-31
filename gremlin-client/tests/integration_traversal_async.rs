@@ -1,21 +1,16 @@
 mod common;
 
-#[cfg(feature = "async_gremlin")]
+#[cfg(feature = "async")]
 mod aio {
     use gremlin_client::process::traversal::traversal;
 
     use super::common::aio::{connect, create_vertex_with_label, drop_vertices};
 
-    #[cfg(feature = "async-std-runtime")]
-    use async_std::prelude::*;
-
-    #[cfg(feature = "tokio-runtime")]
     use tokio_stream::StreamExt;
 
     use gremlin_client::Vertex;
 
-    #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    #[cfg_attr(feature = "tokio-runtime", tokio::test)]
+    #[tokio::test]
     async fn test_simple_vertex_traversal_with_multiple_id() {
         let client = connect().await;
         drop_vertices(&client, "test_simple_vertex_traversal_async")

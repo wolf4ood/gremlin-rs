@@ -1,6 +1,6 @@
-use crate::actions::Action;
+use crate::actions::{display_results, Action};
 use crate::{command::Command, context::GremlinContext};
-use async_std::prelude::*;
+
 use futures::future::BoxFuture;
 use futures::FutureExt;
 use gremlin_client::{
@@ -8,7 +8,6 @@ use gremlin_client::{
     GValue,
 };
 
-use crate::actions::display_results;
 pub struct FallbackAction;
 
 impl Action for FallbackAction {

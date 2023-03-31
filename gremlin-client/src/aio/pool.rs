@@ -128,24 +128,10 @@ mod tests {
     use mobc::Pool;
     use std::time::Duration;
 
-    #[cfg(feature = "async-std-runtime")]
-    mod async_std_use {
-        pub use async_std::task;
-    }
+    #[cfg(feature = "async")]
+    use tokio::task;
 
-    #[cfg(feature = "async-std-runtime")]
-    use async_std_use::*;
-
-    #[cfg(feature = "tokio-runtime")]
-    mod tokio_use {
-        pub use tokio::task;
-    }
-
-    #[cfg(feature = "tokio-runtime")]
-    use tokio_use::*;
-
-    #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    #[cfg_attr(feature = "tokio-runtime", tokio::test)]
+    #[cfg_attr(feature = "async", tokio::test)]
     #[allow(unused_must_use)]
     async fn it_should_create_a_connection_pool() {
         let manager = GremlinConnectionManager::new(ConnectionOptions::default());
