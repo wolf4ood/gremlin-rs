@@ -333,7 +333,7 @@ impl std::convert::TryFrom<GValue> for i64 {
             GValue::VertexProperty(vp) => vp.take(),
             GValue::Property(p) => p.take(),
             _ => Err(GremlinError::Cast(format!(
-                "Cannot cast {:?} to i32",
+                "Cannot cast {:?} to i64",
                 value
             ))),
         }
@@ -433,7 +433,7 @@ impl std::convert::TryFrom<GValue> for BTreeMap<String, GValue> {
             m.try_into()
         } else {
             Err(GremlinError::Cast(format!(
-                "Cannot cast {:?} to HashMap<GKey, GValue>",
+                "Cannot cast {:?} to BTreeMap<String, GValue>",
                 value
             )))
         }
@@ -463,7 +463,7 @@ impl std::convert::TryFrom<GValue> for HashMap<String, GValue> {
             m.try_into()
         } else {
             Err(GremlinError::Cast(format!(
-                "Cannot cast {:?} to HashMap<GKey, GValue>",
+                "Cannot cast {:?} to HashMap<String, GValue>",
                 value
             )))
         }
@@ -478,8 +478,9 @@ where
 
     match vec.len() {
         1 => vec.pop().unwrap().try_into(),
-        _ => Err(GremlinError::Cast(String::from(
-            "Cannot cast a List to String",
+        _ => Err(GremlinError::Cast(format!(
+            "Cannot cast a List to {}",
+            std::any::type_name::<T>(),
         ))),
     }
 }
