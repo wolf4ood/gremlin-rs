@@ -296,6 +296,8 @@ impl std::convert::TryFrom<GValue> for String {
         match value {
             GValue::String(s) => Ok(s),
             GValue::List(s) => from_list(s),
+            GValue::VertexProperty(vp) => vp.take(),
+            GValue::Property(p) => p.take(),
             _ => Err(GremlinError::Cast(format!(
                 "Cannot cast {:?} to String",
                 value
@@ -311,6 +313,8 @@ impl std::convert::TryFrom<GValue> for i32 {
         match value {
             GValue::Int32(s) => Ok(s),
             GValue::List(s) => from_list(s),
+            GValue::VertexProperty(vp) => vp.take(),
+            GValue::Property(p) => p.take(),
             _ => Err(GremlinError::Cast(format!(
                 "Cannot cast {:?} to i32",
                 value
@@ -326,6 +330,8 @@ impl std::convert::TryFrom<GValue> for i64 {
         match value {
             GValue::Int64(s) => Ok(s),
             GValue::List(s) => from_list(s),
+            GValue::VertexProperty(vp) => vp.take(),
+            GValue::Property(p) => p.take(),
             _ => Err(GremlinError::Cast(format!(
                 "Cannot cast {:?} to i32",
                 value
@@ -341,6 +347,8 @@ impl std::convert::TryFrom<GValue> for uuid::Uuid {
         match value {
             GValue::Uuid(uid) => Ok(uid),
             GValue::List(s) => from_list(s),
+            GValue::VertexProperty(vp) => vp.take(),
+            GValue::Property(p) => p.take(),
             _ => Err(GremlinError::Cast(format!(
                 "Cannot cast {:?} to Uuid",
                 value
@@ -356,6 +364,8 @@ impl std::convert::TryFrom<GValue> for Date {
         match value {
             GValue::Date(date) => Ok(date),
             GValue::List(s) => from_list(s),
+            GValue::VertexProperty(vp) => vp.take(),
+            GValue::Property(p) => p.take(),
             _ => Err(GremlinError::Cast(format!(
                 "Cannot cast {:?} to DateTime<Utc>",
                 value
@@ -371,6 +381,8 @@ impl std::convert::TryFrom<GValue> for bool {
         match value {
             GValue::Bool(val) => Ok(val),
             GValue::List(s) => from_list(s),
+            GValue::VertexProperty(vp) => vp.take(),
+            GValue::Property(p) => p.take(),
             _ => Err(GremlinError::Cast(format!(
                 "Cannot cast {:?} to bool",
                 value
@@ -386,6 +398,8 @@ impl std::convert::TryFrom<GValue> for f32 {
         match value {
             GValue::Float(x) => Ok(x),
             GValue::List(s) => from_list(s),
+            GValue::VertexProperty(vp) => vp.take(),
+            GValue::Property(p) => p.take(),
             _ => Err(GremlinError::Cast(format!(
                 "Cannot cast {:?} to f32",
                 value
@@ -401,6 +415,8 @@ impl std::convert::TryFrom<GValue> for f64 {
         match value {
             GValue::Double(x) => Ok(x),
             GValue::List(s) => from_list(s),
+            GValue::VertexProperty(vp) => vp.take(),
+            GValue::Property(p) => p.take(),
             _ => Err(GremlinError::Cast(format!(
                 "Cannot cast {:?} to f64",
                 value
