@@ -12,6 +12,7 @@ pub mod not;
 pub mod or;
 pub mod repeat;
 pub mod select;
+pub mod side_effect;
 pub mod to;
 pub mod until;
 pub mod where_step;
