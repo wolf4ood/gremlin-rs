@@ -18,7 +18,7 @@ use async_std_use::*;
 mod tokio_use {
     pub use tokio::net::TcpStream;
     pub use tokio::task;
-    pub use tokio_native_tls::TlsStream;
+    pub use tokio_rustls::client::TlsStream;
 }
 
 #[cfg(feature = "tokio-runtime")]
@@ -102,13 +102,22 @@ mod tls {
 #[cfg(feature = "tokio-runtime")]
 mod tls {
 
-    use crate::connection::ConnectionOptions;
-    use tokio_native_tls::TlsConnector;
+    use std::sync::Arc;
+
+    use crate::{cert::NoCertificateVerification, connection::ConnectionOptions};
+    use rustls::ClientConfig;
+    use tokio_rustls::TlsConnector;
 
     pub fn connector(opts: &ConnectionOptions) -> Option<TlsConnector> {
-        opts.tls_options
-            .as_ref()
-            .and_then(|tls| tls.tls_connector().map(TlsConnector::from).ok())
+        Some(
+            Arc::new(
+                ClientConfig::builder()
+                    .with_safe_defaults()
+                    .with_custom_certificate_verifier(Arc::new(NoCertificateVerification))
+                    .with_no_client_auth(),
+            )
+            .into(),
+        )
     }
 }
 impl Conn {

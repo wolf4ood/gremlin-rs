@@ -13,10 +13,10 @@ readme = "README.md"
 
 [features]
 
-default = ["async-std-runtime"]
+default = []
 async_gremlin = ["futures", "mobc", "async-tungstenite", "async-trait", "url", "pin-project-lite"]
-tokio-runtime = ["async_gremlin", "tokio", "mobc/tokio", "async-tungstenite/tokio-runtime", "tokio-rustls", "tokio-stream", "tokio"]
-async-std-runtime = ["async_gremlin", "async-std", "async-tungstenite/async-std-runtime", "async-tungstenite/async-tls", "async-tls", "mobc/async-std", "rustls", "webpki"]
+tokio-runtime = ["async_gremlin", "tokio", "mobc/tokio", "async-tungstenite/tokio-runtime", "async-tungstenite/tokio-rustls-webpki-roots", "async-tls", "tokio-stream", "tokio-rustls"]
+async-std-runtime = ["async_gremlin", "async-std", "mobc/async-std", "async-tungstenite/async-std-runtime", "async-tungstenite/async-tls", "async-tls", "webpki"]
 derive = ["gremlin-derive"]
 
 [badges]
@@ -31,7 +31,7 @@ maintenance = {status = "actively-developed"}
 async-std = { version = "1.4.0", features = ["unstable","attributes"], optional = true }
 async-tls = { git = "https://github.com/mlemesle/async-tls", branch = "chore/bump-rustls", optional = true }
 async-trait = { version = "0.1.10", optional = true }
-async-tungstenite = { git = "https://github.com/mlemesle/async-tungstenite", branch = "chore/bump-async-tls", default-features = false, optional = true }
+async-tungstenite = { git = "https://github.com/mlemesle/async-tungstenite", rev = "2e1d4d8e1bb117ecd08f23d55d818ac45134b313", default-features = false, optional = true }
 base64 = "0.13.1"
 #Avoids bringing in time crate (https://github.com/time-rs/time/issues/293)
 chrono = { version = "0.4", default-features = false }
@@ -41,14 +41,13 @@ lazy_static = "1.3.0"
 mobc = { version = "0.7", default-features = false, features = ["unstable"], optional = true }
 pin-project-lite = { version = "0.2", optional = true }
 r2d2 = "0.8.3"
-rustls = { version = "0.21", features = ["dangerous_configuration"], optional = true }
+rustls = { version = "0.21", features = ["dangerous_configuration"] }
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
 thiserror = "1.0.20"
 tokio = { version = "1", features = ["full"], optional = true }
-tokio-native-tls = { version = "0.3.0", optional = true }
-tokio-rustls = { version = "0.23.4", features = ["dangerous_configuration"], optional = true }
+tokio-rustls = { version = "0.24", features = ["dangerous_configuration"], optional = true }
 tokio-stream = { version = "0.1.2", optional = true }
 # tungstenite = { version = "0.18", features = ["rustls-tls-webpki-roots"] }
 tungstenite = { git = "https://github.com/snapview/tungstenite-rs", features = ["rustls-tls-webpki-roots"] }
