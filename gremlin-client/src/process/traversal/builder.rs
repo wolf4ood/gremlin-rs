@@ -694,4 +694,9 @@ impl TraversalBuilder {
         self.bytecode.add_step(String::from("emit"), vec![]);
         self
     }
+
+    pub fn id(mut self) -> Self {
+        self.bytecode.add_step(String::from("id"), vec![]);
+        self
+    }
 }
