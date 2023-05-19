@@ -6,7 +6,7 @@ use tungstenite::{
     client::{uri_mode, IntoClientRequest},
     client_tls_with_config,
     stream::{MaybeTlsStream, Mode, NoDelay},
-    Connector, Message, WebSocket,
+    Connector, Message, WebSocket, protocol::WebSocketConfig,
 };
 
 struct ConnectionStream(WebSocket<MaybeTlsStream<TcpStream>>);
@@ -47,8 +47,10 @@ impl ConnectionStream {
         NoDelay::set_nodelay(&mut stream, true)
             .map_err(|e| GremlinError::Generic(e.to_string()))?;
 
+        let websocket_config = options.websocket_options.as_ref().map(WebSocketConfig::from);
+
         let (client, _response) =
-            client_tls_with_config(options.websocket_url(), stream, None, connector)
+            client_tls_with_config(options.websocket_url(), stream, websocket_config, connector)
                 .map_err(|e| GremlinError::Generic(e.to_string()))?;
 
         Ok(ConnectionStream(client))
@@ -136,6 +138,11 @@ impl ConnectionOptionsBuilder {
         self
     }
 
+    pub fn websocket_options(mut self, options: WebSocketOptions) -> Self {
+        self.0.websocket_options = Some(options);
+        self
+    }
+
     pub fn serializer(mut self, serializer: GraphSON) -> Self {
         self.0.serializer = serializer;
         self
@@ -157,6 +164,7 @@ pub struct ConnectionOptions {
     pub(crate) tls_options: Option<TlsOptions>,
     pub(crate) serializer: GraphSON,
     pub(crate) deserializer: GraphSON,
+    pub(crate) websocket_options: Option<WebSocketOptions>,
 }
 
 #[derive(Clone, Debug)]
@@ -170,6 +178,64 @@ pub struct TlsOptions {
     pub accept_invalid_certs: bool,
 }
 
+#[derive(Clone, Debug)]
+pub struct WebSocketOptions {
+    /// The maximum size of a message. `None` means no size limit. The default value is 64 MiB.
+    pub(crate) max_message_size: Option<usize>,
+    /// The maximum size of a single message frame. `None` means no size limit. The limit is for
+    /// frame payload NOT including the frame header. The default value is 16 MiB.
+    pub(crate) max_frame_size: Option<usize>,
+}
+
+impl WebSocketOptions {
+    pub fn builder() -> WebSocketOptionsBuilder {
+        WebSocketOptionsBuilder(Self::default())
+    }
+}
+
+impl Default for WebSocketOptions {
+    fn default() -> Self {
+        Self {
+            max_message_size: Some(64 << 20),
+            max_frame_size: Some(16 << 20),
+        }
+    }
+}
+
+
+impl From<WebSocketOptions> for tungstenite::protocol::WebSocketConfig {
+    fn from(value: WebSocketOptions) -> Self {
+        (&value).into()
+    }
+}
+
+impl From<&WebSocketOptions> for tungstenite::protocol::WebSocketConfig {
+    fn from(value: &WebSocketOptions) -> Self {
+        let mut config = tungstenite::protocol::WebSocketConfig::default();
+        config.max_message_size = value.max_message_size;
+        config.max_frame_size = value.max_frame_size;
+        config
+    }
+}
+
+pub struct WebSocketOptionsBuilder(WebSocketOptions);
+
+impl WebSocketOptionsBuilder {
+    pub fn build(self) -> WebSocketOptions {
+        self.0
+    }
+
+    pub fn max_message_size(mut self, max_message_size: Option<usize>) -> Self {
+        self.0.max_message_size = max_message_size;
+        self
+    }
+
+    pub fn max_frame_size(mut self, max_frame_size: Option<usize>) -> Self {
+        self.0.max_frame_size = max_frame_size;
+        self
+    }
+}
+
 impl Default for ConnectionOptions {
     fn default() -> ConnectionOptions {
         ConnectionOptions {
@@ -181,6 +247,7 @@ impl Default for ConnectionOptions {
             tls_options: None,
             serializer: GraphSON::V3,
             deserializer: GraphSON::V3,
+            websocket_options: None,
         }
     }
 }
