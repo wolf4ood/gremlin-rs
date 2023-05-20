@@ -148,9 +148,23 @@ impl Conn {
         let websocket_config = opts.websocket_options.as_ref().map(WebSocketConfig::from);
 
         #[cfg(feature = "async-std-runtime")]
-        let (client, _) = { connect_async_with_tls_connector_and_config(url, tls::connector(&opts), websocket_config).await? };
+        let (client, _) = {
+            connect_async_with_tls_connector_and_config(
+                url,
+                tls::connector(&opts),
+                websocket_config,
+            )
+            .await?
+        };
         #[cfg(feature = "tokio-runtime")]
-        let (client, _) = { connect_async_with_tls_connector_and_config(url, tls::connector(&opts), websocket_config).await? };
+        let (client, _) = {
+            connect_async_with_tls_connector_and_config(
+                url,
+                tls::connector(&opts),
+                websocket_config,
+            )
+            .await?
+        };
 
         let (sink, stream) = client.split();
         let (sender, receiver) = channel(20);

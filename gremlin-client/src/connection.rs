@@ -5,8 +5,9 @@ use native_tls::TlsConnector;
 use tungstenite::{
     client::{uri_mode, IntoClientRequest},
     client_tls_with_config,
+    protocol::WebSocketConfig,
     stream::{MaybeTlsStream, Mode, NoDelay},
-    Connector, Message, WebSocket, protocol::WebSocketConfig,
+    Connector, Message, WebSocket,
 };
 
 struct ConnectionStream(WebSocket<MaybeTlsStream<TcpStream>>);
@@ -47,7 +48,10 @@ impl ConnectionStream {
         NoDelay::set_nodelay(&mut stream, true)
             .map_err(|e| GremlinError::Generic(e.to_string()))?;
 
-        let websocket_config = options.websocket_options.as_ref().map(WebSocketConfig::from);
+        let websocket_config = options
+            .websocket_options
+            .as_ref()
+            .map(WebSocketConfig::from);
 
         let (client, _response) =
             client_tls_with_config(options.websocket_url(), stream, websocket_config, connector)
@@ -201,7 +205,6 @@ impl Default for WebSocketOptions {
         }
     }
 }
-
 
 impl From<WebSocketOptions> for tungstenite::protocol::WebSocketConfig {
     fn from(value: WebSocketOptions) -> Self {
