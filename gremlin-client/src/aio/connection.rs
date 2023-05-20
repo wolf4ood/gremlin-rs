@@ -1,4 +1,4 @@
-use crate::{GremlinError, GremlinResult};
+use crate::{GremlinError, GremlinResult, WebSocketOptions};
 
 use crate::connection::ConnectionOptions;
 
@@ -25,12 +25,12 @@ mod tokio_use {
 use tokio_use::*;
 
 #[cfg(feature = "async-std-runtime")]
-use async_tungstenite::async_std::connect_async_with_tls_connector;
+use async_tungstenite::async_std::connect_async_with_tls_connector_and_config;
 
 #[cfg(feature = "tokio-runtime")]
-use async_tungstenite::tokio::{connect_async_with_tls_connector, TokioAdapter};
+use async_tungstenite::tokio::{connect_async_with_tls_connector_and_config, TokioAdapter};
 
-use async_tungstenite::tungstenite::protocol::Message;
+use async_tungstenite::tungstenite::protocol::{Message, WebSocketConfig};
 use async_tungstenite::WebSocketStream;
 use async_tungstenite::{self, stream};
 use futures::{
@@ -110,6 +110,21 @@ mod tls {
     }
 }
 
+impl From<WebSocketOptions> for async_tungstenite::tungstenite::protocol::WebSocketConfig {
+    fn from(value: WebSocketOptions) -> Self {
+        (&value).into()
+    }
+}
+
+impl From<&WebSocketOptions> for async_tungstenite::tungstenite::protocol::WebSocketConfig {
+    fn from(value: &WebSocketOptions) -> Self {
+        let mut config = async_tungstenite::tungstenite::protocol::WebSocketConfig::default();
+        config.max_message_size = value.max_message_size;
+        config.max_frame_size = value.max_frame_size;
+        config
+    }
+}
+
 #[cfg(feature = "tokio-runtime")]
 mod tls {
 
@@ -128,12 +143,28 @@ impl Conn {
         T: Into<ConnectionOptions>,
     {
         let opts = options.into();
-        let url = url::Url::parse(&opts.websocket_url()).expect("failed to pars url");
+        let url = url::Url::parse(&opts.websocket_url()).expect("failed to parse url");
+
+        let websocket_config = opts.websocket_options.as_ref().map(WebSocketConfig::from);
 
         #[cfg(feature = "async-std-runtime")]
-        let (client, _) = { connect_async_with_tls_connector(url, tls::connector(&opts)).await? };
+        let (client, _) = {
+            connect_async_with_tls_connector_and_config(
+                url,
+                tls::connector(&opts),
+                websocket_config,
+            )
+            .await?
+        };
         #[cfg(feature = "tokio-runtime")]
-        let (client, _) = { connect_async_with_tls_connector(url, tls::connector(&opts)).await? };
+        let (client, _) = {
+            connect_async_with_tls_connector_and_config(
+                url,
+                tls::connector(&opts),
+                websocket_config,
+            )
+            .await?
+        };
 
         let (sink, stream) = client.split();
         let (sender, receiver) = channel(20);
