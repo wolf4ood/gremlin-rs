@@ -9,4 +9,10 @@ changelog_update = true
 
 [[package]]
 name = "gremlin-cli"
+publish = false
+changelog_update = false
+
+[[package]]
+name = "gremlin-derive"
+publish = true
 changelog_update = true
