@@ -1,0 +1,12 @@
+[workspace]
+publish = false
+changelog_update = false
+
+[[package]]
+name = "gremlin-client"
+publish = true
+changelog_update = true
+
+[[package]]
+name = "gremlin-cli"
+changelog_update = true
