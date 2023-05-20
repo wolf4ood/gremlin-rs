@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Changed
+
+
+## [0.8.4] - 2023-05-20
+
+### Added
+
+- [#188](https://github.com/wolf4ood/gremlin-rs/pull/188)
+- [#189](https://github.com/wolf4ood/gremlin-rs/pull/189)
+- [#182](https://github.com/wolf4ood/gremlin-rs/pull/182)
+- [#185](https://github.com/wolf4ood/gremlin-rs/pull/185) 
+
+### Fixed
+
 - Add Labels type in `add_e` [#174](https://github.com/wolf4ood/gremlin-rs/issues/174)
 
 ### Changed
