@@ -18,7 +18,7 @@ use async_std_use::*;
 mod tokio_use {
     pub use tokio::net::TcpStream;
     pub use tokio::task;
-    pub use tokio_native_tls::TlsStream;
+    pub use tokio_rustls::client::TlsStream;
 }
 
 #[cfg(feature = "tokio-runtime")]
@@ -74,23 +74,11 @@ impl std::fmt::Debug for Conn {
 #[cfg(feature = "async-std-runtime")]
 mod tls {
 
-    use crate::connection::ConnectionOptions;
-    pub struct NoCertificateVerification {}
+    use rustls::ClientConfig;
 
-    impl rustls::ServerCertVerifier for NoCertificateVerification {
-        fn verify_server_cert(
-            &self,
-            _roots: &rustls::RootCertStore,
-            _presented_certs: &[rustls::Certificate],
-            _dns_name: webpki::DNSNameRef<'_>,
-            _ocsp: &[u8],
-        ) -> Result<rustls::ServerCertVerified, rustls::TLSError> {
-            Ok(rustls::ServerCertVerified::assertion())
-        }
-    }
+    use crate::{cert::NoCertificateVerification, connection::ConnectionOptions};
 
     pub fn connector(opts: &ConnectionOptions) -> Option<async_tls::TlsConnector> {
-        use rustls::ClientConfig;
         use std::sync::Arc;
         if opts
             .tls_options
@@ -98,13 +86,14 @@ mod tls {
             .map(|tls| tls.accept_invalid_certs)
             .unwrap_or(false)
         {
-            let mut config = ClientConfig::new();
-            config
-                .dangerous()
-                .set_certificate_verifier(Arc::new(NoCertificateVerification {}));
+            let config = ClientConfig::builder()
+                .with_safe_defaults()
+                .with_custom_certificate_verifier(Arc::new(NoCertificateVerification))
+                .with_no_client_auth();
 
-            Some(async_tls::TlsConnector::from(Arc::new(config)))
+            Some(config.into())
         } else {
+            // let connector = async_tls::TlsConnector::new();
             Some(async_tls::TlsConnector::new())
         }
     }
@@ -128,13 +117,22 @@ impl From<&WebSocketOptions> for async_tungstenite::tungstenite::protocol::WebSo
 #[cfg(feature = "tokio-runtime")]
 mod tls {
 
-    use crate::connection::ConnectionOptions;
-    use tokio_native_tls::TlsConnector;
+    use std::sync::Arc;
+
+    use crate::{cert::NoCertificateVerification, connection::ConnectionOptions};
+    use rustls::ClientConfig;
+    use tokio_rustls::TlsConnector;
 
     pub fn connector(opts: &ConnectionOptions) -> Option<TlsConnector> {
-        opts.tls_options
-            .as_ref()
-            .and_then(|tls| tls.tls_connector().map(TlsConnector::from).ok())
+        Some(
+            Arc::new(
+                ClientConfig::builder()
+                    .with_safe_defaults()
+                    .with_custom_certificate_verifier(Arc::new(NoCertificateVerification))
+                    .with_no_client_auth(),
+            )
+            .into(),
+        )
     }
 }
 impl Conn {

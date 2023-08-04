@@ -1,7 +1,7 @@
-use std::net::TcpStream;
+use std::{net::TcpStream, sync::Arc};
 
-use crate::{GraphSON, GremlinError, GremlinResult};
-use native_tls::TlsConnector;
+use crate::{cert::NoCertificateVerification, GraphSON, GremlinError, GremlinResult};
+use rustls::ClientConfig;
 use tungstenite::{
     client::{uri_mode, IntoClientRequest},
     client_tls_with_config,
@@ -20,14 +20,13 @@ impl std::fmt::Debug for ConnectionStream {
 
 impl ConnectionStream {
     fn connect(options: ConnectionOptions) -> GremlinResult<Self> {
-        let connector = match options.tls_options.as_ref() {
-            Some(option) => Some(Connector::NativeTls(
-                option
-                    .tls_connector()
-                    .map_err(|e| GremlinError::Generic(e.to_string()))?,
-            )),
-            _ => None,
-        };
+        let connector = options.tls_options.as_ref().map(|_tls_options| {
+            let client_config = ClientConfig::builder()
+                .with_safe_defaults()
+                .with_custom_certificate_verifier(Arc::new(NoCertificateVerification))
+                .with_no_client_auth();
+            Connector::Rustls(Arc::new(client_config))
+        });
 
         let request = options
             .websocket_url()
@@ -297,14 +296,6 @@ impl Connection {
 
     pub fn is_broken(&self) -> bool {
         self.broken
-    }
-}
-
-impl TlsOptions {
-    pub(crate) fn tls_connector(&self) -> native_tls::Result<TlsConnector> {
-        TlsConnector::builder()
-            .danger_accept_invalid_certs(self.accept_invalid_certs)
-            .build()
     }
 }
 

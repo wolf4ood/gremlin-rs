@@ -110,9 +110,13 @@
 //!    })
 //!}
 //!
+#[cfg(all(feature = "tokio-runtime", feature = "async-std-runtime"))]
+compile_error!("features `tokio-runtime` and `async-std-runtime` are mutually exclusive");
+
 #[macro_use]
 extern crate lazy_static;
 
+mod cert;
 mod client;
 mod connection;
 mod conversion;
