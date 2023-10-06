@@ -2,7 +2,6 @@ use crate::print;
 use crate::{actions::Action, command::Command, context::GremlinContext};
 use gremlin_client::GValue;
 use prettytable::{
-    cell,
     format::{FormatBuilder, LinePosition, LineSeparator},
     row, Row, Table,
 };
