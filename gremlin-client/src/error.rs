@@ -12,7 +12,7 @@ pub enum GremlinError {
     Generic(String),
 
     #[error(transparent)]
-    WebSocket(#[from] tungstenite::error::Error),
+    WebSocket(tungstenite::error::Error),
 
     #[error(transparent)]
     Pool(#[from] r2d2::Error),

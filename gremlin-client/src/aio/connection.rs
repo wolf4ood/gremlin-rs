@@ -115,21 +115,6 @@ mod tls {
     }
 }
 
-impl From<WebSocketOptions> for async_tungstenite::tungstenite::protocol::WebSocketConfig {
-    fn from(value: WebSocketOptions) -> Self {
-        (&value).into()
-    }
-}
-
-impl From<&WebSocketOptions> for async_tungstenite::tungstenite::protocol::WebSocketConfig {
-    fn from(value: &WebSocketOptions) -> Self {
-        let mut config = async_tungstenite::tungstenite::protocol::WebSocketConfig::default();
-        config.max_message_size = value.max_message_size;
-        config.max_frame_size = value.max_frame_size;
-        config
-    }
-}
-
 #[cfg(feature = "tokio-runtime")]
 mod tls {
 
