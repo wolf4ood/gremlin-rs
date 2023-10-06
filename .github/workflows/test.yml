@@ -17,7 +17,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         rust: [stable]
-        gremlin-server: [3.5.5, 3.6.2]
+        gremlin-server: [3.5.7, 3.6.5]
     steps:
 
       - uses: actions/checkout@v2
