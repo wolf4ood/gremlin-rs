@@ -74,18 +74,23 @@ impl std::fmt::Debug for Conn {
 #[cfg(feature = "async-std-runtime")]
 mod tls {
 
+    use std::time::SystemTime;
+
     use crate::connection::ConnectionOptions;
+    use rustls::{Certificate, ServerName};
     pub struct NoCertificateVerification {}
 
-    impl rustls::ServerCertVerifier for NoCertificateVerification {
+    impl rustls::client::ServerCertVerifier for NoCertificateVerification {
         fn verify_server_cert(
             &self,
-            _roots: &rustls::RootCertStore,
-            _presented_certs: &[rustls::Certificate],
-            _dns_name: webpki::DNSNameRef<'_>,
-            _ocsp: &[u8],
-        ) -> Result<rustls::ServerCertVerified, rustls::TLSError> {
-            Ok(rustls::ServerCertVerified::assertion())
+            _end_entity: &Certificate,
+            _intermediates: &[Certificate],
+            _server_name: &ServerName,
+            _scts: &mut dyn Iterator<Item = &[u8]>,
+            _ocsp_response: &[u8],
+            _now: SystemTime,
+        ) -> Result<rustls::client::ServerCertVerified, rustls::TLSError> {
+            Ok(rustls::client::ServerCertVerified::assertion())
         }
     }
 
@@ -98,10 +103,10 @@ mod tls {
             .map(|tls| tls.accept_invalid_certs)
             .unwrap_or(false)
         {
-            let mut config = ClientConfig::new();
-            config
-                .dangerous()
-                .set_certificate_verifier(Arc::new(NoCertificateVerification {}));
+            let config = ClientConfig::builder()
+                .with_safe_defaults()
+                .with_custom_certificate_verifier(Arc::new(NoCertificateVerification {}))
+                .with_no_client_auth();
 
             Some(async_tls::TlsConnector::from(Arc::new(config)))
         } else {
