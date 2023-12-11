@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.6](https://github.com/wolf4ood/gremlin-rs/compare/gremlin-client-v0.8.5...gremlin-client-v0.8.6) - 2023-10-19
+
+### Fixed
+- fix from tungstenite error ([#198](https://github.com/wolf4ood/gremlin-rs/pull/198))
+- fix compilation issue
+
+### Other
+- update tungstenite
+- update webpki
+- Update rustls requirement from 0.19 to 0.20 in /gremlin-client ([#144](https://github.com/wolf4ood/gremlin-rs/pull/144))
+- Update base64 requirement from 0.13.1 to 0.21.4 in /gremlin-client ([#195](https://github.com/wolf4ood/gremlin-rs/pull/195))
+
 ### Added
 
 ### Fixed

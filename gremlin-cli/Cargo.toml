@@ -1,6 +1,6 @@
 [package]
 name = "gremlin-cli"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["wolf4ood <maggiolo00@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0"
@@ -13,7 +13,7 @@ readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-gremlin-client = { path = "../gremlin-client", version = "0.8.0", features = ["async-std-runtime"] }
+gremlin-client = { path = "../gremlin-client", version = "0.8.6", features = ["async-std-runtime"] }
 rustyline = "6.2.0"
 smol = "0.4.3"
 shellwords = "1.1.0"
