@@ -1,15 +1,18 @@
 [workspace]
 publish = false
+release = false
 changelog_update = false
 
 [[package]]
 name = "gremlin-client"
 publish = true
+release = true
 changelog_update = true
 
 [[package]]
 name = "gremlin-cli"
 publish = false
+release = false
 changelog_update = false
 
 [[package]]
