@@ -8,7 +8,7 @@ use mobc;
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 pub enum GremlinError {
-    #[error("data store disconnected")]
+    #[error("data store disconnected: {0}")]
     Generic(String),
 
     #[error(transparent)]
