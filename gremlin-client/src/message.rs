@@ -64,6 +64,8 @@ pub struct ResponseResult {
 #[derive(Debug, Deserialize)]
 pub struct ReponseStatus {
     pub code: i16,
+    //Sometimes the message is omitted, default to empty string rather than panic
+    #[serde(default)]
     pub message: String,
 }
 
