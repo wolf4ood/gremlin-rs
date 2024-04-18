@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.7](https://github.com/wolf4ood/gremlin-rs/compare/v0.8.6...v0.8.7) - 2024-04-18
+
+### Other
+- Include GermlinError::Generic's contained string in thisserror's message ([#204](https://github.com/wolf4ood/gremlin-rs/pull/204))
+
 ## [0.8.6](https://github.com/wolf4ood/gremlin-rs/compare/gremlin-client-v0.8.5...gremlin-client-v0.8.6) - 2023-10-19
 
 ### Fixed
