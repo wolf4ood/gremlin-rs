@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.8](https://github.com/wolf4ood/gremlin-rs/compare/v0.8.7...v0.8.8) - 2024-04-19
+
+### Other
+- Default message to empty string for ResponseStatus ([#207](https://github.com/wolf4ood/gremlin-rs/pull/207))
+
 ## [0.8.7](https://github.com/wolf4ood/gremlin-rs/compare/v0.8.6...v0.8.7) - 2024-04-18
 
 ### Other
