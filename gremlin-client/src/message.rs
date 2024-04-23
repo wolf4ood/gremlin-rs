@@ -1,4 +1,4 @@
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize as SerdeDeserialize, Deserializer};
 use serde_derive::{Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
@@ -73,7 +73,7 @@ pub struct ReponseStatus {
 fn map_null_to_default<'de, D, T>(de: D) -> Result<T, D::Error>
 where
     D: Deserializer<'de>,
-    T: Default + Deserialize<'de>,
+    T: Default + SerdeDeserialize<'de>,
 {
     Option::<T>::deserialize(de).map(Option::unwrap_or_default)
 }
