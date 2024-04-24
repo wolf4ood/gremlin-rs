@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.9](https://github.com/wolf4ood/gremlin-rs/compare/v0.8.8...v0.8.9) - 2024-04-24
+
+### Other
+- Map explicitly null response status message to empty string ([#210](https://github.com/wolf4ood/gremlin-rs/pull/210))
+
 ## [0.8.8](https://github.com/wolf4ood/gremlin-rs/compare/v0.8.7...v0.8.8) - 2024-04-19
 
 ### Other
