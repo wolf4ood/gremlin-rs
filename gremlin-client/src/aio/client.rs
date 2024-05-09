@@ -56,7 +56,10 @@ impl GremlinClient {
         let pool_size = opts.pool_size;
         let manager = GremlinConnectionManager::new(opts.clone());
 
-        let pool = Pool::builder().max_open(pool_size as u64).build(manager);
+        let pool = Pool::builder()
+            .get_timeout(opts.pool_get_connection_timeout)
+            .max_open(pool_size as u64)
+            .build(manager);
 
         Ok(GremlinClient {
             pool,

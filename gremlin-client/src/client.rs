@@ -54,10 +54,14 @@ impl GremlinClient {
         let pool_size = opts.pool_size;
         let manager = GremlinConnectionManager::new(opts.clone());
 
-        let pool = Pool::builder().max_size(pool_size).build(manager)?;
+        let mut pool_builder = Pool::builder().max_size(pool_size);
+
+        if let Some(get_connection_timeout) = opts.pool_get_connection_timeout {
+            pool_builder = pool_builder.connection_timeout(get_connection_timeout);
+        }
 
         Ok(GremlinClient {
-            pool,
+            pool: pool_builder.build(manager)?,
             session: None,
             alias: None,
             options: opts,
