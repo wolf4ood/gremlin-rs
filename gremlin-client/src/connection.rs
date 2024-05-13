@@ -1,4 +1,4 @@
-use std::net::TcpStream;
+use std::{net::TcpStream, time::Duration};
 
 use crate::{GraphSON, GremlinError, GremlinResult};
 use native_tls::TlsConnector;
@@ -120,6 +120,13 @@ impl ConnectionOptionsBuilder {
         self
     }
 
+    /// Both the sync and async pool providers use a default of 30 seconds,
+    /// Async pool interprets `None` as no timeout. Sync pool maps `None` to the default value
+    pub fn pool_connection_timeout(mut self, pool_connection_timeout: Option<Duration>) -> Self {
+        self.0.pool_get_connection_timeout = pool_connection_timeout;
+        self
+    }
+
     pub fn build(self) -> ConnectionOptions {
         self.0
     }
@@ -163,6 +170,7 @@ pub struct ConnectionOptions {
     pub(crate) host: String,
     pub(crate) port: u16,
     pub(crate) pool_size: u32,
+    pub(crate) pool_get_connection_timeout: Option<Duration>,
     pub(crate) credentials: Option<Credentials>,
     pub(crate) ssl: bool,
     pub(crate) tls_options: Option<TlsOptions>,
@@ -245,6 +253,7 @@ impl Default for ConnectionOptions {
             host: String::from("localhost"),
             port: 8182,
             pool_size: 10,
+            pool_get_connection_timeout: Some(Duration::from_secs(30)),
             credentials: None,
             ssl: false,
             tls_options: None,
