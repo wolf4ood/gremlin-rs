@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.10](https://github.com/wolf4ood/gremlin-rs/compare/v0.8.9...v0.8.10) - 2024-05-13
+
+### Other
+- Expose connection pool's get timeout via ConnectionOptionsBuilder ([#212](https://github.com/wolf4ood/gremlin-rs/pull/212))
+
 ## [0.8.9](https://github.com/wolf4ood/gremlin-rs/compare/v0.8.8...v0.8.9) - 2024-04-24
 
 ### Other
