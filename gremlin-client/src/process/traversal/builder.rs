@@ -22,6 +22,8 @@ use crate::process::traversal::{Bytecode, Scope};
 use crate::structure::{Cardinality, GIDs, IntoPredicate, Labels};
 use crate::GValue;
 
+use super::merge_vertex::MergeVertexStep;
+
 #[derive(Clone)]
 pub struct TraversalBuilder {
     pub(crate) bytecode: Bytecode,
@@ -649,6 +651,16 @@ impl TraversalBuilder {
     {
         self.bytecode
             .add_step(String::from("coalesce"), coalesce.into().into());
+
+        self
+    }
+
+    pub fn merge_v<A>(mut self, merge_v: A) -> Self
+    where
+        A: Into<MergeVertexStep>,
+    {
+        self.bytecode
+            .add_step(String::from("mergeV"), merge_v.into().into());
 
         self
     }

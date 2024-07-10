@@ -6,6 +6,8 @@ use std::collections::hash_map::IntoIter;
 use std::collections::{BTreeMap, HashMap};
 use std::convert::{TryFrom, TryInto};
 
+use super::T;
+
 /// Represent a Map<[GKey](struct.GKey),[GValue](struct.GValue)> which has ability to allow for non-String keys.
 /// TinkerPop type [here](http://tinkerpop.apache.org/docs/current/dev/io/#_map)
 #[derive(Debug, PartialEq, Clone)]
@@ -137,10 +139,17 @@ impl std::iter::FromIterator<(String, GValue)> for Map {
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, PartialEq, Clone, Eq, Hash)]
 pub enum GKey {
+    T(T),
     String(String),
     Token(Token),
     Vertex(Vertex),
     Edge(Edge),
+}
+
+impl From<T> for GKey {
+    fn from(val: T) -> Self {
+        GKey::T(val)
+    }
 }
 
 impl From<&str> for GKey {

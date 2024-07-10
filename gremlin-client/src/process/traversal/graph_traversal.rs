@@ -29,6 +29,8 @@ use crate::{
 };
 use std::marker::PhantomData;
 
+use super::merge_vertex::MergeVertexStep;
+
 #[derive(Clone)]
 pub struct GraphTraversal<S, E: FromGValue, T: Terminator<E>> {
     start: PhantomData<S>,
@@ -666,6 +668,15 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
     {
         self.builder = self.builder.coalesce(colaesce);
 
+        GraphTraversal::new(self.terminator, self.builder)
+    }
+
+    pub fn merge_v<A>(mut self, merge_v: A) -> GraphTraversal<Vertex, Vertex, T>
+    where
+        A: Into<MergeVertexStep>,
+        T: Terminator<Vertex>,
+    {
+        self.builder = self.builder.merge_v(merge_v);
         GraphTraversal::new(self.terminator, self.builder)
     }
 

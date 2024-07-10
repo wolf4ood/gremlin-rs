@@ -122,6 +122,21 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
         );
         GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
     }
+
+    pub fn inject<T>(&self, injection: T) -> GraphTraversal<GValue, GValue, A>
+    where
+        T: Into<GValue> + FromGValue,
+        A: Terminator<T>,
+    {
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("inject"), vec![injection.into()]);
+        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
+    }
+
+    //Need to add inject, mergeV, and mergeE here
+    //we'll then need to add all 3 to graph_traversal too because they're all mid traversal steps too (probably)
+    //Permit sending a GValue for the property key, not just &str
 }
 
 // TESTS
@@ -982,5 +997,25 @@ mod tests {
         );
     }
 
-    // g.V().hasLabel('person').coalesce(values('nickname'), values('name'))
+    #[test]
+    fn inject_test() {
+        let g = empty();
+
+        let mut code = Bytecode::new();
+
+        code.add_step(
+            String::from("inject"),
+            vec![GValue::List(vec!["foo".into(), "bar".into()].into())],
+        );
+        code.add_step(String::from("unfold"), vec![]);
+
+        assert_eq!(
+            &code,
+            g.inject(vec!["foo".into(), "bar".into()])
+                .unfold()
+                .bytecode()
+        );
+    }
+
+    //TODO add tests for mergeV, etc
 }

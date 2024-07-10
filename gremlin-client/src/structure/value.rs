@@ -229,6 +229,7 @@ impl From<GValue> for VecDeque<GValue> {
 impl From<GKey> for GValue {
     fn from(val: GKey) -> Self {
         match val {
+            GKey::T(t) => GValue::T(t),
             GKey::String(s) => GValue::String(s),
             GKey::Token(s) => GValue::String(s.value().clone()),
             GKey::Vertex(v) => GValue::Vertex(v),
