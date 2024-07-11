@@ -18,3 +18,12 @@ services:
     command : ["conf/gremlin-server-credentials.yaml"]
     ports:
       - "8183:8182"
+  janusgraph:
+    image: janusgraph/janusgraph:latest
+    environment:
+      - janusgraph.graph.set-vertex-id=true
+      - janusgraph.graph.allow-custom-vid-types=true
+      - JANUS_PROPS_TEMPLATE=inmemory
+    ports:
+      - "8184:8182"
+  
