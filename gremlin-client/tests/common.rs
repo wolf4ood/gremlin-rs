@@ -6,6 +6,10 @@ pub mod io {
         GremlinClient::connect(("localhost", 8182))
     }
 
+    fn connect_janusgraph_client() -> GremlinResult<GremlinClient> {
+        GremlinClient::connect(("localhost", 8184))
+    }
+
     pub fn connect_serializer(serializer: GraphSON) -> GremlinResult<GremlinClient> {
         let port = match serializer {
             GraphSON::V2 => 8182,
@@ -23,6 +27,10 @@ pub mod io {
 
     pub fn expect_client() -> GremlinClient {
         connect().expect("It should connect")
+    }
+
+    pub fn expect_janusgraph_client() -> GremlinClient {
+        connect_janusgraph_client().expect("It should connect")
     }
 
     pub fn expect_client_serializer(serializer: GraphSON) -> GremlinClient {
