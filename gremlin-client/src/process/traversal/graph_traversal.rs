@@ -91,9 +91,10 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         GraphTraversal::new(self.terminator, self.builder)
     }
 
-    pub fn property<A>(mut self, key: &str, value: A) -> Self
+    pub fn property<K, V>(mut self, key: K, value: V) -> Self
     where
-        A: Into<GValue>,
+        K: Into<GValue>,
+        V: Into<GValue>,
     {
         self.builder = self.builder.property(key, value);
         self

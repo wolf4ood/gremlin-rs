@@ -1,5 +1,5 @@
 use crate::conversion::{BorrowFromGValue, FromGValue};
-use crate::process::traversal::{Bytecode, Order, Scope};
+use crate::process::traversal::{Bytecode, Order, Scope, TraversalBuilder};
 use crate::structure::traverser::Traverser;
 use crate::structure::{
     label::LabelType, Cardinality, Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property,
@@ -287,6 +287,12 @@ impl From<Cardinality> for GValue {
 impl From<uuid::Uuid> for GValue {
     fn from(val: uuid::Uuid) -> GValue {
         GValue::Uuid(val)
+    }
+}
+
+impl From<TraversalBuilder> for GValue {
+    fn from(value: TraversalBuilder) -> Self {
+        value.bytecode.into()
     }
 }
 
