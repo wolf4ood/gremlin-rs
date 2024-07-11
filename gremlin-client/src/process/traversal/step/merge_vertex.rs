@@ -1,5 +1,8 @@
+use std::collections::HashMap;
+
 use crate::process::traversal::TraversalBuilder;
 use crate::structure::GValue;
+use crate::GKey;
 
 pub struct MergeVertexStep {
     params: Vec<GValue>,
@@ -11,8 +14,6 @@ impl MergeVertexStep {
     }
 }
 
-//todo need to handle (Map<Object,​Object> searchCreate)?
-//https://tinkerpop.apache.org/docs/current/dev/provider/#merge-v-step
 impl From<MergeVertexStep> for Vec<GValue> {
     fn from(step: MergeVertexStep) -> Self {
         step.params
@@ -22,5 +23,11 @@ impl From<MergeVertexStep> for Vec<GValue> {
 impl From<TraversalBuilder> for MergeVertexStep {
     fn from(param: TraversalBuilder) -> Self {
         MergeVertexStep::new(vec![param.bytecode.into()])
+    }
+}
+
+impl From<HashMap<GKey, GValue>> for MergeVertexStep {
+    fn from(value: HashMap<GKey, GValue>) -> Self {
+        MergeVertexStep::new(vec![value.into()])
     }
 }
