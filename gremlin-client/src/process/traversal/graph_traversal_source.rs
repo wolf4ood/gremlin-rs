@@ -15,6 +15,8 @@ use crate::structure::Labels;
 use crate::structure::{Edge, GValue, Vertex};
 use crate::GremlinClient;
 
+use super::merge_vertex::MergeVertexStep;
+
 #[derive(Clone)]
 pub struct GraphTraversalSource<A: Terminator<GValue>> {
     term: A,
@@ -134,9 +136,17 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
         GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
     }
 
-    //Need to add inject, mergeV, and mergeE here
-    //we'll then need to add all 3 to graph_traversal too because they're all mid traversal steps too (probably)
-    //Permit sending a GValue for the property key, not just &str
+    pub fn merge_v<V>(&self, merge_v: V) -> GraphTraversal<Vertex, Vertex, A>
+    where
+        V: Into<MergeVertexStep>,
+        A: Terminator<Vertex>,
+    {
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("mergeV"), merge_v.into().into());
+
+        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
+    }
 }
 
 // TESTS
