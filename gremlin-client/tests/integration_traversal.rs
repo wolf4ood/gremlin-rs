@@ -1,9 +1,7 @@
 use std::convert::TryInto;
 
 use gremlin_client::process::traversal::{traversal, Order, __};
-use gremlin_client::structure::{
-    Cardinality, List, Map, Pop, TextP, Vertex, VertexProperty, P, T,
-};
+use gremlin_client::structure::{Cardinality, List, Map, Pop, TextP, Vertex, VertexProperty, P, T};
 use gremlin_client::utils;
 
 mod common;
