@@ -59,8 +59,10 @@ mod merge_tests {
 
     #[test]
     fn test_merge_v_options() {
-        let g = traversal().with_remote(graph());
+        let client = graph();
         let expected_label = "test_merge_v_options";
+        drop_vertices(&client, expected_label).expect("Failed to drop vertices");
+        let g = traversal().with_remote(client);
         let mut start_step_map: HashMap<GKey, GValue> = HashMap::new();
         start_step_map.insert(T::Label.into(), expected_label.into());
         start_step_map.insert("identifing_prop".into(), "some_Value".into());
