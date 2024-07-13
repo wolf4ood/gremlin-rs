@@ -2,4 +2,6 @@
 pub enum Direction {
     Out,
     In,
+    From,
+    To,
 }

@@ -5,7 +5,7 @@ mod serializer_v3;
 
 use crate::conversion::ToGValue;
 use crate::process::traversal::{Order, Scope};
-use crate::structure::{Cardinality, GValue, T};
+use crate::structure::{Cardinality, Direction, GValue, Merge, T};
 use serde_json::{json, Map, Value};
 use std::string::ToString;
 
@@ -218,8 +218,10 @@ impl GraphSON {
             }
             (_, GValue::Merge(merge)) => {
                 let merge_option = match merge {
-                    crate::structure::Merge::OnCreate => "onCreate",
-                    crate::structure::Merge::OnMatch => "onMatch",
+                    Merge::OnCreate => "onCreate",
+                    Merge::OnMatch => "onMatch",
+                    Merge::OutV => "outV",
+                    Merge::InV => "inV",
                 };
                 Ok(json!({
                     "@type" : "g:Merge",
@@ -228,8 +230,8 @@ impl GraphSON {
             }
             (_, GValue::Direction(direction)) => {
                 let direction = match direction {
-                    crate::structure::Direction::Out => "OUT",
-                    crate::structure::Direction::In => "IN",
+                    Direction::Out | Direction::From => "OUT",
+                    Direction::In | Direction::To => "IN",
                 };
                 Ok(json!({
                     "@type" : "g:Direction",

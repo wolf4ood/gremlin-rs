@@ -438,6 +438,75 @@ mod merge_tests {
             .expect("Should have returned vertex id");
         assert_eq!(outgoing_vertex_id, &vertex_b.id().to_gvalue());
     }
+
+    #[test]
+    fn test_merge_v_into_merge_e() {
+        //Based on the reference doc's combo example
+        let client = graph();
+        let expected_vertex_label = "test_merge_v_into_merge_e_vertex";
+        let expected_edge_label = "test_merge_v_into_merge_e_edge";
+        drop_vertices(&client, &expected_vertex_label).expect("Failed to drop vertiecs");
+        let g = traversal().with_remote(client);
+
+        let expected_toby_id = 100_001i64;
+        let expected_brandy_id = 200_001i64;
+
+        let mut vertex_a_map: HashMap<GKey, GValue> = HashMap::new();
+        vertex_a_map.insert(T::Label.into(), expected_vertex_label.into());
+        vertex_a_map.insert(T::Id.into(), expected_toby_id.into());
+        vertex_a_map.insert("name".into(), "Toby".into());
+
+        let mut vertex_b_map: HashMap<GKey, GValue> = HashMap::new();
+        vertex_b_map.insert(T::Label.into(), expected_vertex_label.into());
+        vertex_b_map.insert(T::Id.into(), expected_brandy_id.into());
+        vertex_b_map.insert("name".into(), "Brandy".into());
+
+        let mut edge_map: HashMap<GKey, GValue> = HashMap::new();
+        edge_map.insert(T::Label.into(), expected_edge_label.into());
+        edge_map.insert("some_key".into(), "some_value".into());
+        edge_map.insert(Direction::From.into(), Merge::OutV.into());
+        edge_map.insert(Direction::To.into(), Merge::InV.into());
+
+        let combo_merge_edge_properties = g
+            .merge_v(vertex_a_map)
+            .as_("Toby")
+            .merge_v(vertex_b_map)
+            .as_("Brandy")
+            .merge_e(edge_map)
+            .option((Merge::OutV, __.select("Toby")))
+            .option((Merge::InV, __.select("Brandy")))
+            .element_map(())
+            .next()
+            .expect("Should get a response")
+            .expect("Should return a edge properties");
+
+        let brandy_vertex: &Map = combo_merge_edge_properties
+            .get(Direction::In)
+            .expect("Should have returned incoming vertex info")
+            .get()
+            .unwrap();
+        let brandy_vertex_id = brandy_vertex
+            .get("id")
+            .expect("Should have returned vertex id");
+        assert_eq!(*brandy_vertex_id, GValue::Int64(expected_brandy_id));
+
+        let toby_vertex: &Map = combo_merge_edge_properties
+            .get(Direction::Out)
+            .expect("Should have returned outgoing vertex info")
+            .get()
+            .unwrap();
+        let toby_vertex_id = toby_vertex
+            .get("id")
+            .expect("Should have returned vertex id");
+        assert_eq!(*toby_vertex_id, GValue::Int64(expected_toby_id));
+
+        let actual_edge_label: &String = combo_merge_edge_properties
+            .get("label")
+            .expect("Should have returned edge label")
+            .get()
+            .unwrap();
+        assert_eq!(actual_edge_label, expected_edge_label);
+    }
 }
 
 #[test]
