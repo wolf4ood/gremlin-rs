@@ -42,6 +42,10 @@ impl AnonymousTraversalSource {
         self.traversal.clone().add_v(label)
     }
 
+    pub fn identity(&self) -> TraversalBuilder {
+        self.traversal.clone().identity()
+    }
+
     pub fn merge_v<V>(&self, merge_v: V) -> TraversalBuilder
     where
         V: Into<MergeVertexStep>,

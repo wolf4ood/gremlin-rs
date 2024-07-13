@@ -3,7 +3,7 @@ use std::convert::TryInto;
 use gremlin_client::process::traversal::{traversal, Order, __};
 use gremlin_client::structure::{Cardinality, List, Map, Pop, TextP, Vertex, VertexProperty, P, T};
 
-use gremlin_client::utils;
+use gremlin_client::{utils, GValue};
 
 mod common;
 
@@ -2377,6 +2377,34 @@ fn test_choose() {
 
     let success_vertices = g.v(()).has_label("test_choose_success2").next().unwrap();
     assert_eq!(success_vertices.is_some(), true);
+}
+
+#[test]
+fn test_choose_by_literal_options() {
+    let client = graph();
+    let g = traversal().with_remote(client);
+
+    let choosen_literal_a = g
+        .inject(1)
+        .unfold()
+        .choose(__.identity())
+        .option((GValue::Int64(1), __.constant("option-a")))
+        .option((GValue::Int64(2), __.constant("option-b")))
+        .next()
+        .unwrap();
+
+    assert_eq!(choosen_literal_a, Some("option-a".into()));
+
+    let choosen_literal_b = g
+        .inject(2)
+        .unfold()
+        .choose(__.identity())
+        .option((GValue::Int64(1), __.constant("option-a")))
+        .option((GValue::Int64(2), __.constant("option-b")))
+        .next()
+        .unwrap();
+
+    assert_eq!(choosen_literal_b, Some("option-b".into()));
 }
 
 #[test]

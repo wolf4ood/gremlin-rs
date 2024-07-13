@@ -20,6 +20,12 @@ impl From<OptionStep> for Vec<GValue> {
     }
 }
 
+impl From<(GValue, TraversalBuilder)> for OptionStep {
+    fn from(value: (GValue, TraversalBuilder)) -> Self {
+        OptionStep::new(vec![value.0.into(), value.1.into()])
+    }
+}
+
 impl From<(Merge, TraversalBuilder)> for OptionStep {
     fn from(value: (Merge, TraversalBuilder)) -> Self {
         OptionStep::new(vec![value.0.into(), value.1.into()])
