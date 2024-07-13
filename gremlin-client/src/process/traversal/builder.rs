@@ -23,6 +23,7 @@ use crate::structure::{Cardinality, GIDs, IntoPredicate, Labels};
 use crate::GValue;
 
 use super::merge_vertex::MergeVertexStep;
+use super::option::OptionStep;
 
 #[derive(Clone)]
 pub struct TraversalBuilder {
@@ -661,6 +662,16 @@ impl TraversalBuilder {
     {
         self.bytecode
             .add_step(String::from("mergeV"), merge_v.into().into());
+
+        self
+    }
+
+    pub fn option<A>(mut self, option: A) -> Self
+    where
+        A: Into<OptionStep>,
+    {
+        self.bytecode
+            .add_step(String::from("option"), option.into().into());
 
         self
     }

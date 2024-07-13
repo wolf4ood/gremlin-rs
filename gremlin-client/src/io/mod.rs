@@ -216,7 +216,16 @@ impl GraphSON {
                     "@value" : v
                 }))
             }
-
+            (_, GValue::Merge(merge)) => {
+                let merge_option = match merge {
+                    crate::structure::Merge::OnCreate => "onCreate",
+                    crate::structure::Merge::OnMatch => "onMatch",
+                };
+                Ok(json!({
+                    "@type" : "g:Merge",
+                    "@value" : merge_option
+                }))
+            }
             (_, _) => panic!("Type {:?} not supported.", value),
         }
     }

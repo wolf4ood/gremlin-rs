@@ -10,6 +10,7 @@ pub mod loops;
 pub mod match_step;
 pub mod merge_vertex;
 pub mod not;
+pub mod option;
 pub mod or;
 pub mod repeat;
 pub mod select;

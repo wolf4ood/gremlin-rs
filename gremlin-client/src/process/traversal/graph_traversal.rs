@@ -30,6 +30,7 @@ use crate::{
 use std::marker::PhantomData;
 
 use super::merge_vertex::MergeVertexStep;
+use super::option::OptionStep;
 
 #[derive(Clone)]
 pub struct GraphTraversal<S, E: FromGValue, T: Terminator<E>> {
@@ -698,6 +699,14 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn barrier(mut self) -> Self {
         self.builder = self.builder.barrier();
+        self
+    }
+
+    pub fn option<A>(mut self, step: A) -> Self
+    where
+        A: Into<OptionStep>,
+    {
+        self.builder = self.builder.option(step);
         self
     }
 

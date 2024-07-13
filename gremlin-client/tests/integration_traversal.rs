@@ -1,6 +1,11 @@
+use std::collections::HashMap;
+use std::convert::TryInto;
+
 use gremlin_client::process::traversal::{traversal, Order, __};
-use gremlin_client::structure::{Cardinality, List, Map, Pop, TextP, Vertex, VertexProperty, P, T};
-use gremlin_client::utils;
+use gremlin_client::structure::{
+    Cardinality, List, Map, Merge, Pop, TextP, Vertex, VertexProperty, P, T,
+};
+use gremlin_client::{utils, GKey, GValue};
 
 mod common;
 
@@ -15,6 +20,150 @@ fn test_simple_vertex_traversal() {
     let results = g.v(()).to_list().unwrap();
 
     assert!(results.len() > 0);
+}
+
+#[test]
+fn test_merge_v_no_options() {
+    let g = traversal().with_remote(graph());
+    let expected_id = 1_000i64;
+    let mut map1: HashMap<GKey, GValue> = HashMap::new();
+    let mut lookup_map: HashMap<GKey, GValue> = HashMap::new();
+    lookup_map.insert(T::Id.into(), expected_id.into());
+    lookup_map.insert(T::Label.into(), "myvertexlabel".into());
+    let mut property_map: HashMap<GKey, GValue> = HashMap::new();
+    property_map.insert("propertyKey".into(), "propertyValue".into());
+    map1.insert("lookup".into(), lookup_map.into());
+    map1.insert("properties".into(), property_map.into());
+
+    let vertex_properties = g
+        .inject(vec![map1.into()])
+        .unfold()
+        .as_("payload")
+        .merge_v(__.select("lookup"))
+        .property(
+            "propertyKey",
+            __.select("payload")
+                .select("properties")
+                .select("propertyKey"),
+        )
+        .element_map(())
+        .next()
+        .expect("Should get response")
+        .expect("Should have returned a vertex");
+
+    let actual_id: &i64 = vertex_properties
+        .get("id")
+        .expect("Should have id")
+        .get()
+        .unwrap();
+    assert_eq!(expected_id, *actual_id);
+
+    let on_create_prop_value: &String = vertex_properties
+        .get("propertyKey")
+        .expect("Should have property")
+        .get()
+        .unwrap();
+    assert_eq!(on_create_prop_value, "propertyValue");
+}
+
+#[test]
+fn test_merge_v_options() {
+    let g = traversal().with_remote(graph());
+    let expected_label = "test_merge_v_options_label";
+    let mut start_step_map: HashMap<GKey, GValue> = HashMap::new();
+    start_step_map.insert(T::Label.into(), expected_label.into());
+    start_step_map.insert("identifing_prop".into(), "some_Value".into());
+
+    let prop_key = "some_prop";
+    let mut on_create_map: HashMap<GKey, GValue> = HashMap::new();
+    let expected_on_create_prop_value = "on_create_value";
+    on_create_map.insert(prop_key.into(), expected_on_create_prop_value.into());
+
+    let mut on_match_map: HashMap<GKey, GValue> = HashMap::new();
+    let expected_on_match_prop_value = "on_match_value";
+    on_match_map.insert(prop_key.into(), expected_on_match_prop_value.into());
+
+    let on_create_vertex_map = g
+        .merge_v(start_step_map.clone())
+        .option((Merge::OnCreate, on_create_map.clone()))
+        .option((Merge::OnMatch, on_match_map.clone()))
+        .element_map(())
+        .next()
+        .expect("Should get a response")
+        .expect("Should return a vertex");
+
+    let actual_label: &String = on_create_vertex_map
+        .get("label")
+        .expect("Should have id")
+        .get()
+        .unwrap();
+    assert_eq!(expected_label, actual_label);
+
+    let on_create_prop_value: &String = on_create_vertex_map
+        .get(prop_key)
+        .expect("Should have property")
+        .get()
+        .unwrap();
+    assert_eq!(on_create_prop_value, expected_on_create_prop_value);
+
+    //Now run the traversal again, and confirm the OnMatch applied this time
+    let on_match_vertex_map = g
+        .merge_v(start_step_map)
+        .option((Merge::OnCreate, on_create_map.clone()))
+        .option((Merge::OnMatch, on_match_map.clone()))
+        .element_map(())
+        .next()
+        .expect("Should get a response")
+        .expect("Should return a vertex");
+
+    let actual_label: &String = on_match_vertex_map
+        .get("label")
+        .expect("Should have id")
+        .get()
+        .unwrap();
+    assert_eq!(expected_label, actual_label);
+
+    let on_match_prop_value: &String = on_match_vertex_map
+        .get(prop_key)
+        .expect("Should have property")
+        .get()
+        .unwrap();
+    assert_eq!(on_match_prop_value, expected_on_match_prop_value);
+}
+
+#[test]
+fn test_merge_v_start_step() {
+    let g = traversal().with_remote(graph());
+    let expected_id = 10000i64;
+    let expected_label = "myvertexlabel";
+    let mut start_step_map: HashMap<GKey, GValue> = HashMap::new();
+    start_step_map.insert(T::Id.into(), expected_id.into());
+    start_step_map.insert(T::Label.into(), expected_label.into());
+    let actual_vertex = g
+        .merge_v(start_step_map)
+        .next()
+        .expect("Should get a response")
+        .expect("Should return a vertex");
+    match actual_vertex.id() {
+        gremlin_client::GID::Int64(actual) => assert_eq!(expected_id, *actual),
+        other => panic!("Didn't get expected id type {:?}", other),
+    }
+
+    assert_eq!(expected_label, actual_vertex.label())
+}
+
+#[test]
+fn test_inject() {
+    let g = traversal().with_remote(graph());
+    let expected_value = "foo";
+    let response: String = g
+        .inject(vec![expected_value.into()])
+        .next()
+        .expect("Should get response")
+        .expect("Should have gotten a Some")
+        .try_into()
+        .expect("Should be parsable into a String");
+    assert_eq!(expected_value, response);
 }
 
 #[test]

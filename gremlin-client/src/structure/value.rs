@@ -11,6 +11,8 @@ use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 pub type Date = chrono::DateTime<chrono::offset::Utc>;
 use std::convert::TryInto;
 use std::hash::Hash;
+
+use super::Merge;
 /// Represent possible values coming from the [Gremlin Server](http://tinkerpop.apache.org/docs/3.4.0/dev/io/)
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, PartialEq, Clone)]
@@ -46,6 +48,7 @@ pub enum GValue {
     TextP(TextP),
     Pop(Pop),
     Cardinality(Cardinality),
+    Merge(Merge),
 }
 
 impl GValue {
@@ -180,6 +183,13 @@ impl From<Order> for GValue {
         GValue::Order(val)
     }
 }
+
+impl From<Merge> for GValue {
+    fn from(value: Merge) -> Self {
+        GValue::Merge(value)
+    }
+}
+
 impl From<Token> for GValue {
     fn from(val: Token) -> Self {
         GValue::Token(val)
