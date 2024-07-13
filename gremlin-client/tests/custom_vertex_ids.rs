@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use common::io::expect_janusgraph_client;
+use common::io::{drop_vertices, expect_janusgraph_client};
 use gremlin_client::{
     process::traversal::{traversal, __},
     structure::T,
@@ -14,11 +14,11 @@ mod common;
 
 #[test]
 fn test_merge_v_custom_id() {
-    let g = traversal().with_remote(expect_janusgraph_client());
+    let client = expect_janusgraph_client();
+    let expected_label = "test_merge_v_custom_id";
+    drop_vertices(&client, expected_label).expect("Failed to drop vertices");
+    let g = traversal().with_remote(client);
     let expected_id = "test_merge_v_custom_id";
-    //Drop the vertex if the test was previously ran since we test on the difference between onCreate vs onMatch
-    g.v(expected_id).drop();
-    let expected_label = "myvertexlabel";
     let mut start_step_map: HashMap<GKey, GValue> = HashMap::new();
     start_step_map.insert(T::Id.into(), expected_id.into());
     start_step_map.insert(T::Label.into(), expected_label.into());
@@ -77,12 +77,13 @@ fn test_merge_v_custom_id() {
 
 #[test]
 fn test_add_v_custom_id() {
-    let g = traversal().with_remote(expect_janusgraph_client());
+    let client = expect_janusgraph_client();
     let expected_id = "test_add_v_custom_id";
-    //If the test is reran remove the previously inserted vertex
-    g.v(expected_id).drop().iter().unwrap();
+    let test_vertex_label = "test_add_v_custom_id";
+    drop_vertices(&client, test_vertex_label).expect("Failed to drop vertices");
+    let g = traversal().with_remote(client);
     let actual_vertex = g
-        .add_v("some_label")
+        .add_v(test_vertex_label)
         .property(T::Id, expected_id)
         .next()
         .expect("Should get a response")

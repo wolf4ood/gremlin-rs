@@ -19,12 +19,15 @@ mod merge_tests {
 
     #[test]
     fn test_merge_v_no_options() {
-        let g = traversal().with_remote(graph());
-        let expected_id = 1_000i64;
+        let client = graph();
+        let test_vertex_label = "test_merge_v_no_options";
+        drop_vertices(&client, test_vertex_label)
+            .expect("Failed to drop vertices in case of rerun");
+        let g = traversal().with_remote(client);
+
         let mut map1: HashMap<GKey, GValue> = HashMap::new();
         let mut lookup_map: HashMap<GKey, GValue> = HashMap::new();
-        lookup_map.insert(T::Id.into(), expected_id.into());
-        lookup_map.insert(T::Label.into(), "myvertexlabel".into());
+        lookup_map.insert(T::Label.into(), test_vertex_label.into());
         let mut property_map: HashMap<GKey, GValue> = HashMap::new();
         property_map.insert("propertyKey".into(), "propertyValue".into());
         map1.insert("lookup".into(), lookup_map.into());
@@ -46,13 +49,6 @@ mod merge_tests {
             .expect("Should get response")
             .expect("Should have returned a vertex");
 
-        let actual_id: &i64 = vertex_properties
-            .get("id")
-            .expect("Should have id")
-            .get()
-            .unwrap();
-        assert_eq!(expected_id, *actual_id);
-
         let on_create_prop_value: &String = vertex_properties
             .get("propertyKey")
             .expect("Should have property")
@@ -64,7 +60,7 @@ mod merge_tests {
     #[test]
     fn test_merge_v_options() {
         let g = traversal().with_remote(graph());
-        let expected_label = "test_merge_v_options_label";
+        let expected_label = "test_merge_v_options";
         let mut start_step_map: HashMap<GKey, GValue> = HashMap::new();
         start_step_map.insert(T::Label.into(), expected_label.into());
         start_step_map.insert("identifing_prop".into(), "some_Value".into());
@@ -128,21 +124,17 @@ mod merge_tests {
 
     #[test]
     fn test_merge_v_start_step() {
-        let g = traversal().with_remote(graph());
-        let expected_id = 10000i64;
-        let expected_label = "myvertexlabel";
+        let client = graph();
+        let expected_label = "test_merge_v_start_step";
+        drop_vertices(&client, &expected_label).expect("Failed to drop vertiecs");
+        let g = traversal().with_remote(client);
         let mut start_step_map: HashMap<GKey, GValue> = HashMap::new();
-        start_step_map.insert(T::Id.into(), expected_id.into());
         start_step_map.insert(T::Label.into(), expected_label.into());
         let actual_vertex = g
             .merge_v(start_step_map)
             .next()
             .expect("Should get a response")
             .expect("Should return a vertex");
-        match actual_vertex.id() {
-            gremlin_client::GID::Int64(actual) => assert_eq!(expected_id, *actual),
-            other => panic!("Didn't get expected id type {:?}", other),
-        }
 
         assert_eq!(expected_label, actual_vertex.label())
     }
