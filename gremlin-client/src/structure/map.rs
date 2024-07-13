@@ -6,7 +6,7 @@ use std::collections::hash_map::IntoIter;
 use std::collections::{BTreeMap, HashMap};
 use std::convert::{TryFrom, TryInto};
 
-use super::T;
+use super::{Direction, T};
 
 /// Represent a Map<[GKey](struct.GKey),[GValue](struct.GValue)> which has ability to allow for non-String keys.
 /// TinkerPop type [here](http://tinkerpop.apache.org/docs/current/dev/io/#_map)
@@ -144,11 +144,18 @@ pub enum GKey {
     Token(Token),
     Vertex(Vertex),
     Edge(Edge),
+    Direction(Direction),
 }
 
 impl From<T> for GKey {
     fn from(val: T) -> Self {
         GKey::T(val)
+    }
+}
+
+impl From<Direction> for GKey {
+    fn from(value: Direction) -> Self {
+        GKey::Direction(value)
     }
 }
 

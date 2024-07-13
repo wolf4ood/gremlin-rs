@@ -14,7 +14,11 @@ use common::io::{
 #[cfg(feature = "merge_tests")]
 mod merge_tests {
     use super::*;
-    use gremlin_client::{structure::Merge, GKey, GValue};
+    use gremlin_client::{
+        process::traversal::{GraphTraversalSource, SyncTerminator},
+        structure::{Direction, Merge},
+        Edge, GKey, GValue, ToGValue,
+    };
     use std::collections::HashMap;
 
     #[test]
@@ -25,16 +29,16 @@ mod merge_tests {
             .expect("Failed to drop vertices in case of rerun");
         let g = traversal().with_remote(client);
 
-        let mut map1: HashMap<GKey, GValue> = HashMap::new();
+        let mut injection_map: HashMap<GKey, GValue> = HashMap::new();
         let mut lookup_map: HashMap<GKey, GValue> = HashMap::new();
         lookup_map.insert(T::Label.into(), test_vertex_label.into());
         let mut property_map: HashMap<GKey, GValue> = HashMap::new();
         property_map.insert("propertyKey".into(), "propertyValue".into());
-        map1.insert("lookup".into(), lookup_map.into());
-        map1.insert("properties".into(), property_map.into());
+        injection_map.insert("lookup".into(), lookup_map.into());
+        injection_map.insert("properties".into(), property_map.into());
 
         let vertex_properties = g
-            .inject(vec![map1.into()])
+            .inject(vec![injection_map.into()])
             .unfold()
             .as_("payload")
             .merge_v(__.select("lookup"))
@@ -149,13 +153,290 @@ mod merge_tests {
         let g = traversal().with_remote(client);
         let mut start_step_map: HashMap<GKey, GValue> = HashMap::new();
         start_step_map.insert(T::Label.into(), expected_label.into());
-        let actual_vertex = g.inject(1)
+        let actual_vertex = g
+            .inject(1)
             .unfold()
             .coalesce::<Vertex, _>([__.merge_v(start_step_map)])
             .next()
             .expect("Should get a response")
             .expect("Should return a vertex");
         assert_eq!(expected_label, actual_vertex.label())
+    }
+
+    #[test]
+    fn test_merge_e_start_step() {
+        let client = graph();
+        let expected_vertex_label = "test_merge_e_start_step_vertex";
+        let expected_edge_label = "test_merge_e_start_step_edge";
+        let expected_edge_property_key = "test_merge_e_start_step_edge_prop";
+        let expected_edge_property_value = "test_merge_e_start_step_edge_value";
+        drop_vertices(&client, &expected_vertex_label).expect("Failed to drop vertiecs");
+        let g = traversal().with_remote(client);
+
+        let vertex_a = g
+            .add_v(expected_vertex_label)
+            .next()
+            .expect("Should get a response")
+            .expect("Should return a vertex");
+
+        let vertex_b = g
+            .add_v(expected_vertex_label)
+            .next()
+            .expect("Should get a response")
+            .expect("Should return a vertex");
+
+        let mut start_step_map: HashMap<GKey, GValue> = HashMap::new();
+        start_step_map.insert(Direction::In.into(), vertex_a.id().into());
+        start_step_map.insert(Direction::Out.into(), vertex_b.id().into());
+        start_step_map.insert(T::Label.into(), expected_edge_label.into());
+        start_step_map.insert(
+            expected_edge_property_key.into(),
+            expected_edge_property_value.into(),
+        );
+        let merged_edge_properties = g
+            .merge_e(start_step_map)
+            .element_map(())
+            .next()
+            .expect("Should get a response")
+            .expect("Should return a edge properties");
+
+        let actual_edge_label: &String = merged_edge_properties
+            .get("label")
+            .expect("Should have returned edge label")
+            .get()
+            .unwrap();
+        assert_eq!(actual_edge_label, expected_edge_label);
+
+        let actual_edge_property: &String = merged_edge_properties
+            .get(expected_edge_property_key)
+            .expect("Should have returned edge property")
+            .get()
+            .unwrap();
+        assert_eq!(actual_edge_property, expected_edge_property_value);
+
+        let incoming_vertex: &Map = merged_edge_properties
+            .get(Direction::In)
+            .expect("Should have returned incoming vertex info")
+            .get()
+            .unwrap();
+        let incoming_vertex_id = incoming_vertex
+            .get("id")
+            .expect("Should have returned vertex id");
+        assert_eq!(incoming_vertex_id, &vertex_a.id().to_gvalue());
+
+        let outgoing_vertex: &Map = merged_edge_properties
+            .get(Direction::Out)
+            .expect("Should have returned outgoing vertex info")
+            .get()
+            .unwrap();
+        let outgoing_vertex_id = outgoing_vertex
+            .get("id")
+            .expect("Should have returned vertex id");
+        assert_eq!(outgoing_vertex_id, &vertex_b.id().to_gvalue());
+    }
+
+    #[test]
+    fn test_merge_e_no_options() {
+        let client = graph();
+        let expected_vertex_label = "test_merge_e_no_options_vertex";
+        let expected_edge_label = "test_merge_e_no_options_edge";
+        let expected_edge_property_key = "test_merge_e_no_options_edge_prop";
+        let expected_edge_property_value = "test_merge_e_no_options_edge_value";
+        drop_vertices(&client, &expected_vertex_label).expect("Failed to drop vertiecs");
+        let g = traversal().with_remote(client);
+
+        let vertex_a = g
+            .add_v(expected_vertex_label)
+            .next()
+            .expect("Should get a response")
+            .expect("Should return a vertex");
+
+        let vertex_b = g
+            .add_v(expected_vertex_label)
+            .next()
+            .expect("Should get a response")
+            .expect("Should return a vertex");
+
+        let mut assignment_map: HashMap<GKey, GValue> = HashMap::new();
+        assignment_map.insert(Direction::In.into(), vertex_a.id().into());
+        assignment_map.insert(Direction::Out.into(), vertex_b.id().into());
+        assignment_map.insert(T::Label.into(), expected_edge_label.into());
+        assignment_map.insert(
+            expected_edge_property_key.into(),
+            expected_edge_property_value.into(),
+        );
+
+        let merged_edge_properties = g
+            .inject(vec![assignment_map.into()])
+            .unfold()
+            .as_("payload")
+            .merge_e(__.select("payload"))
+            .element_map(())
+            .next()
+            .expect("Should get a response")
+            .expect("Should return edge properties");
+
+        let actual_edge_label: &String = merged_edge_properties
+            .get("label")
+            .expect("Should have returned edge label")
+            .get()
+            .unwrap();
+        assert_eq!(actual_edge_label, expected_edge_label);
+
+        let actual_edge_property: &String = merged_edge_properties
+            .get(expected_edge_property_key)
+            .expect("Should have returned edge property")
+            .get()
+            .unwrap();
+        assert_eq!(actual_edge_property, expected_edge_property_value);
+
+        let incoming_vertex: &Map = merged_edge_properties
+            .get(Direction::In)
+            .expect("Should have returned incoming vertex info")
+            .get()
+            .unwrap();
+        let incoming_vertex_id = incoming_vertex
+            .get("id")
+            .expect("Should have returned vertex id");
+        assert_eq!(incoming_vertex_id, &vertex_a.id().to_gvalue());
+
+        let outgoing_vertex: &Map = merged_edge_properties
+            .get(Direction::Out)
+            .expect("Should have returned outgoing vertex info")
+            .get()
+            .unwrap();
+        let outgoing_vertex_id = outgoing_vertex
+            .get("id")
+            .expect("Should have returned vertex id");
+        assert_eq!(outgoing_vertex_id, &vertex_b.id().to_gvalue());
+    }
+
+    #[test]
+    fn test_merge_e_options() {
+        let client = graph();
+        let expected_vertex_label = "test_merge_e_options_vertex";
+        let expected_edge_label = "test_merge_e_options_edge";
+        let expected_edge_property_key = "test_merge_e_options_edge_prop";
+        drop_vertices(&client, &expected_vertex_label).expect("Failed to drop vertiecs");
+        let g = traversal().with_remote(client);
+
+        let vertex_a = g
+            .add_v(expected_vertex_label)
+            .next()
+            .expect("Should get a response")
+            .expect("Should return a vertex");
+
+        let vertex_b = g
+            .add_v(expected_vertex_label)
+            .next()
+            .expect("Should get a response")
+            .expect("Should return a vertex");
+
+        let mut assignment_map: HashMap<GKey, GValue> = HashMap::new();
+        assignment_map.insert(Direction::In.into(), vertex_a.id().into());
+        assignment_map.insert(Direction::Out.into(), vertex_b.id().into());
+        assignment_map.insert(T::Label.into(), expected_edge_label.into());
+
+        let mut on_create_map: HashMap<GKey, GValue> = HashMap::new();
+        on_create_map.insert(expected_edge_property_key.into(), "on_create".into());
+
+        let mut on_match_map: HashMap<GKey, GValue> = HashMap::new();
+        on_match_map.insert(expected_edge_property_key.into(), "on_match".into());
+
+        let mut injection_map: HashMap<GKey, GValue> = HashMap::new();
+        injection_map.insert("merge_params".into(), assignment_map.into());
+        injection_map.insert("create_params".into(), on_create_map.into());
+        injection_map.insert("match_params".into(), on_match_map.into());
+
+        let do_merge_edge = |g: GraphTraversalSource<SyncTerminator>| -> Map {
+            g.inject(vec![injection_map.clone().into()])
+                .unfold()
+                .as_("payload")
+                .merge_e(__.select("payload").select("merge_params"))
+                .option((
+                    Merge::OnCreate,
+                    __.select("payload").select("create_params"),
+                ))
+                .option((Merge::OnMatch, __.select("payload").select("match_params")))
+                .element_map(())
+                .next()
+                .expect("Should get a response")
+                .expect("Should return a edge properties")
+        };
+
+        let on_create_edge_properties = do_merge_edge(g.clone());
+
+        //Initially the edge should be the on create value
+        let actual_edge_property: &String = on_create_edge_properties
+            .get(expected_edge_property_key)
+            .expect("Should have returned edge property")
+            .get()
+            .unwrap();
+        assert_eq!(actual_edge_property, "on_create");
+
+        let on_match_edge_properties = do_merge_edge(g);
+
+        let actual_edge_property: &String = on_match_edge_properties
+            .get(expected_edge_property_key)
+            .expect("Should have returned edge property")
+            .get()
+            .unwrap();
+        assert_eq!(actual_edge_property, "on_match");
+    }
+
+    #[test]
+    fn test_merge_e_anonymous_traversal() {
+        let client = graph();
+        let expected_vertex_label = "test_merge_e_options_vertex";
+        let expected_edge_label = "test_merge_e_options_edge";
+        drop_vertices(&client, &expected_vertex_label).expect("Failed to drop vertiecs");
+        let g = traversal().with_remote(client);
+
+        let vertex_a = g
+            .add_v(expected_vertex_label)
+            .next()
+            .expect("Should get a response")
+            .expect("Should return a vertex");
+
+        let vertex_b = g
+            .add_v(expected_vertex_label)
+            .next()
+            .expect("Should get a response")
+            .expect("Should return a vertex");
+
+        let mut assignment_map: HashMap<GKey, GValue> = HashMap::new();
+        assignment_map.insert(Direction::In.into(), vertex_a.id().into());
+        assignment_map.insert(Direction::Out.into(), vertex_b.id().into());
+        assignment_map.insert(T::Label.into(), expected_edge_label.into());
+
+        let anonymous_merge_e_properties = g
+            .inject(1)
+            .unfold()
+            .coalesce::<Edge, _>([__.merge_e(assignment_map)])
+            .element_map(())
+            .next()
+            .expect("Should get a response")
+            .expect("Should return a edge properties");
+
+        let incoming_vertex: &Map = anonymous_merge_e_properties
+            .get(Direction::In)
+            .expect("Should have returned incoming vertex info")
+            .get()
+            .unwrap();
+        let incoming_vertex_id = incoming_vertex
+            .get("id")
+            .expect("Should have returned vertex id");
+        assert_eq!(incoming_vertex_id, &vertex_a.id().to_gvalue());
+
+        let outgoing_vertex: &Map = anonymous_merge_e_properties
+            .get(Direction::Out)
+            .expect("Should have returned outgoing vertex info")
+            .get()
+            .unwrap();
+        let outgoing_vertex_id = outgoing_vertex
+            .get("id")
+            .expect("Should have returned vertex id");
+        assert_eq!(outgoing_vertex_id, &vertex_b.id().to_gvalue());
     }
 }
 

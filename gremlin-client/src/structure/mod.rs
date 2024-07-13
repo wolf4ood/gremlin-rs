@@ -1,4 +1,5 @@
 mod cardinality;
+mod direction;
 mod edge;
 mod either;
 mod gid;
@@ -35,6 +36,7 @@ pub use self::value::GValue;
 pub use self::vertex::Vertex;
 pub use self::vertex_property::{GProperty, VertexProperty};
 pub use cardinality::Cardinality;
+pub use direction::Direction;
 pub use either::*;
 pub use label::Labels;
 pub use map::{GKey, Map};

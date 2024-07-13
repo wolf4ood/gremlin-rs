@@ -29,6 +29,7 @@ use crate::{
 };
 use std::marker::PhantomData;
 
+use super::merge_edge::MergeEdgeStep;
 use super::merge_vertex::MergeVertexStep;
 use super::option::OptionStep;
 
@@ -679,6 +680,15 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         T: Terminator<Vertex>,
     {
         self.builder = self.builder.merge_v(merge_v);
+        GraphTraversal::new(self.terminator, self.builder)
+    }
+
+    pub fn merge_e<A>(mut self, merge_e: A) -> GraphTraversal<Edge, Edge, T>
+    where
+        A: Into<MergeEdgeStep>,
+        T: Terminator<Edge>,
+    {
+        self.builder = self.builder.merge_e(merge_e);
         GraphTraversal::new(self.terminator, self.builder)
     }
 

@@ -226,6 +226,16 @@ impl GraphSON {
                     "@value" : merge_option
                 }))
             }
+            (_, GValue::Direction(direction)) => {
+                let direction = match direction {
+                    crate::structure::Direction::Out => "OUT",
+                    crate::structure::Direction::In => "IN",
+                };
+                Ok(json!({
+                    "@type" : "g:Direction",
+                    "@value" : direction,
+                }))
+            }
             (_, _) => panic!("Type {:?} not supported.", value),
         }
     }

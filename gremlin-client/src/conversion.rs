@@ -137,6 +137,7 @@ impl_from_gvalue!(Traverser, GValue::Traverser);
 impl FromGValue for GKey {
     fn from_gvalue(v: GValue) -> GremlinResult<GKey> {
         match v {
+            GValue::Direction(d) => Ok(GKey::Direction(d)),
             GValue::String(s) => Ok(GKey::String(s)),
             GValue::Token(s) => Ok(GKey::String(s.value().clone())),
             GValue::Vertex(s) => Ok(GKey::Vertex(s)),

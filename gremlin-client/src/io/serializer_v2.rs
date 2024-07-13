@@ -125,6 +125,20 @@ where
     Ok(GValue::Token(token))
 }
 
+pub fn deserialize_direction<T>(_: &T, val: &Value) -> GremlinResult<GValue>
+where
+    T: Fn(&Value) -> GremlinResult<GValue>,
+{
+    let val = get_value!(val, Value::String)?;
+    match val.as_str() {
+        "OUT" => Ok(GValue::Direction(crate::structure::Direction::Out)),
+        "IN" => Ok(GValue::Direction(crate::structure::Direction::In)),
+        other => Err(GremlinError::Cast(format!(
+            "Unknown direction literal {other}"
+        ))),
+    }
+}
+
 // Vertex deserializer [docs](http://tinkerpop.apache.org/docs/current/dev/io/#_vertex_3)
 pub fn deserialize_vertex<T>(reader: &T, val: &Value) -> GremlinResult<GValue>
 where
@@ -360,7 +374,8 @@ g_serializer_2!(deserializer_v2, {
     "g:TraversalMetrics" => deserialize_metrics,
     "g:Metrics" => deserialize_metric,
     "g:TraversalExplanation" => deserialize_explain,
-    "g:Traverser" => deserialize_traverser
+    "g:Traverser" => deserialize_traverser,
+    "g:Direction" => deserialize_direction
 });
 
 fn deserialize_vertex_properties<T>(

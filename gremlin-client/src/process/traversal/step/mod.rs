@@ -8,6 +8,7 @@ pub mod limit;
 pub mod local;
 pub mod loops;
 pub mod match_step;
+pub mod merge_edge;
 pub mod merge_vertex;
 pub mod not;
 pub mod option;

@@ -15,6 +15,7 @@ use crate::structure::Labels;
 use crate::structure::{Edge, GValue, Vertex};
 use crate::GremlinClient;
 
+use super::merge_edge::MergeEdgeStep;
 use super::merge_vertex::MergeVertexStep;
 
 #[derive(Clone)]
@@ -144,6 +145,18 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
         let mut code = Bytecode::new();
 
         code.add_step(String::from("mergeV"), merge_v.into().into());
+
+        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
+    }
+
+    pub fn merge_e<V>(&self, merge_e: V) -> GraphTraversal<Edge, Edge, A>
+    where
+        V: Into<MergeEdgeStep>,
+        A: Terminator<Edge>,
+    {
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("mergeE"), merge_e.into().into());
 
         GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
     }
