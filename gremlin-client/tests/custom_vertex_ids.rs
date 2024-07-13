@@ -16,6 +16,8 @@ mod common;
 fn test_merge_v_custom_id() {
     let g = traversal().with_remote(expect_janusgraph_client());
     let expected_id = "test_merge_v_custom_id";
+    //Drop the vertex if the test was previously ran since we test on the difference between onCreate vs onMatch
+    g.v(expected_id).drop();
     let expected_label = "myvertexlabel";
     let mut start_step_map: HashMap<GKey, GValue> = HashMap::new();
     start_step_map.insert(T::Id.into(), expected_id.into());
@@ -77,6 +79,7 @@ fn test_merge_v_custom_id() {
 fn test_add_v_custom_id() {
     let g = traversal().with_remote(expect_janusgraph_client());
     let expected_id = "test_add_v_custom_id";
+    //If the test is reran remove the previously inserted vertex
     g.v(expected_id).drop().iter().unwrap();
     let actual_vertex = g
         .add_v("some_label")
