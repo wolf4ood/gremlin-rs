@@ -15,6 +15,24 @@ mod common;
 #[test]
 fn test_merge_v_custom_id() {
     let g = traversal().with_remote(expect_janusgraph_client());
+    let expected_id = "test_merge_v_custom_id";
+    let expected_label = "myvertexlabel";
+    let mut start_step_map: HashMap<GKey, GValue> = HashMap::new();
+    start_step_map.insert(T::Id.into(), expected_id.into());
+    start_step_map.insert(T::Label.into(), expected_label.into());
+    let actual_vertex = g
+        .merge_v(start_step_map)
+        .next()
+        .expect("Should get a response")
+        .expect("Should return a vertex");
+    match actual_vertex.id() {
+        gremlin_client::GID::String(actual) => assert_eq!(expected_id, actual),
+        other => panic!("Didn't get expected id type {:?}", other),
+    }
+
+    assert_eq!(expected_label, actual_vertex.label());
+
+    //Now try it as a mid-traversal step (inject is the start step)
     let expected_id = "foo";
     let expected_property = "propValue";
 
@@ -56,30 +74,10 @@ fn test_merge_v_custom_id() {
 }
 
 #[test]
-fn test_merge_v_custom_id_start_step() {
-    let g = traversal().with_remote(expect_janusgraph_client());
-    let expected_id = "test_merge_v_custom_id_start_step_id";
-    let expected_label = "myvertexlabel";
-    let mut start_step_map: HashMap<GKey, GValue> = HashMap::new();
-    start_step_map.insert(T::Id.into(), expected_id.into());
-    start_step_map.insert(T::Label.into(), expected_label.into());
-    let actual_vertex = g
-        .merge_v(start_step_map)
-        .next()
-        .expect("Should get a response")
-        .expect("Should return a vertex");
-    match actual_vertex.id() {
-        gremlin_client::GID::String(actual) => assert_eq!(expected_id, actual),
-        other => panic!("Didn't get expected id type {:?}", other),
-    }
-
-    assert_eq!(expected_label, actual_vertex.label())
-}
-
-#[test]
 fn test_add_v_custom_id() {
     let g = traversal().with_remote(expect_janusgraph_client());
     let expected_id = "test_add_v_custom_id";
+    g.v(expected_id).drop().iter().unwrap();
     let actual_vertex = g
         .add_v("some_label")
         .property(T::Id, expected_id)
