@@ -2,6 +2,10 @@ use std::convert::TryInto;
 
 use gremlin_client::process::traversal::{traversal, Order, __};
 use gremlin_client::structure::{Cardinality, List, Map, Pop, TextP, Vertex, VertexProperty, P, T};
+
+#[cfg(feature = "merge_tests")]
+use gremlin_client::structure::Merge;
+
 use gremlin_client::utils;
 
 mod common;
@@ -20,7 +24,7 @@ fn test_simple_vertex_traversal() {
 }
 
 #[test]
-#[cfg(feature = "merge_v_tests")]
+#[cfg(feature = "merge_tests")]
 fn test_merge_v_no_options() {
     let g = traversal().with_remote(graph());
     let expected_id = 1_000i64;
@@ -65,7 +69,7 @@ fn test_merge_v_no_options() {
 }
 
 #[test]
-#[cfg(feature = "merge_v_tests")]
+#[cfg(feature = "merge_tests")]
 fn test_merge_v_options() {
     let g = traversal().with_remote(graph());
     let expected_label = "test_merge_v_options_label";
@@ -131,7 +135,7 @@ fn test_merge_v_options() {
 }
 
 #[test]
-#[cfg(feature = "merge_v_tests")]
+#[cfg(feature = "merge_tests")]
 fn test_merge_v_start_step() {
     let g = traversal().with_remote(graph());
     let expected_id = 10000i64;

@@ -42,27 +42,27 @@ jobs:
           command: fmt
           args: --all -- --check
       - name: Run cargo test with tokio
-        if: ${{ matrix.gremlin-server }} == 3.5.7
+        if: ${{ matrix.gremlin-server }} == "3.5.7"
         uses: actions-rs/cargo@v1
         with:
           command: test
           args: --manifest-path gremlin-client/Cargo.toml  --features=tokio-runtime
       - name: Run cargo test with async-std
-        if: ${{ matrix.gremlin-server }} == 3.5.7
+        if: ${{ matrix.gremlin-server }} == "3.5.7"
         uses: actions-rs/cargo@v1
         with:
           command: test
           args: --manifest-path gremlin-client/Cargo.toml --features=async-std-runtime
       # MergeV as a step doesn't exist in 3.5.x, so selectively run those tests
       - name: Run cargo test with tokio
-        if: ${{ matrix.gremlin-server }} == 3.6.5
+        if: ${{ matrix.gremlin-server }} != "3.5.7"
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --manifest-path gremlin-client/Cargo.toml  --features=tokio-runtime,merge_v_tests
+          args: --manifest-path gremlin-client/Cargo.toml  --features=tokio-runtime,merge_tests
       - name: Run cargo test with async-std
-        if: ${{ matrix.gremlin-server }} == 3.6.5
+        if: ${{ matrix.gremlin-server }} != "3.5.7"
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --manifest-path gremlin-client/Cargo.toml --features=async-std-runtime,merge_v_tests
+          args: --manifest-path gremlin-client/Cargo.toml --features=async-std-runtime,merge_tests
