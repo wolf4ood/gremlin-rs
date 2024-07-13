@@ -140,6 +140,23 @@ mod merge_tests {
 
         assert_eq!(expected_label, actual_vertex.label())
     }
+
+    #[test]
+    fn test_merge_v_anonymous_traversal() {
+        let client = graph();
+        let expected_label = "test_merge_v_anonymous_traversal";
+        drop_vertices(&client, &expected_label).expect("Failed to drop vertiecs");
+        let g = traversal().with_remote(client);
+        let mut start_step_map: HashMap<GKey, GValue> = HashMap::new();
+        start_step_map.insert(T::Label.into(), expected_label.into());
+        let actual_vertex = g.inject(1)
+            .unfold()
+            .coalesce::<Vertex, _>([__.merge_v(start_step_map)])
+            .next()
+            .expect("Should get a response")
+            .expect("Should return a vertex");
+        assert_eq!(expected_label, actual_vertex.label())
+    }
 }
 
 #[test]

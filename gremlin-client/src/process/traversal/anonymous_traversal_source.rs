@@ -10,6 +10,8 @@ use crate::process::traversal::TraversalBuilder;
 use crate::structure::{Either2, GIDs, IntoPredicate, Labels, T};
 use crate::GValue;
 
+use super::merge_vertex::MergeVertexStep;
+
 pub struct AnonymousTraversalSource {
     traversal: TraversalBuilder,
 }
@@ -37,6 +39,13 @@ impl AnonymousTraversalSource {
         A: Into<Labels>,
     {
         self.traversal.clone().add_v(label)
+    }
+
+    pub fn merge_v<V>(&self, merge_v: V) -> TraversalBuilder
+    where
+        V: Into<MergeVertexStep>,
+    {
+        self.traversal.clone().merge_v(merge_v)
     }
 
     pub fn property<A>(&self, key: Either2<&str, T>, value: A) -> TraversalBuilder
