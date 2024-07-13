@@ -26,4 +26,9 @@ services:
       - JANUS_PROPS_TEMPLATE=inmemory
     ports:
       - "8184:8182"
+    healthcheck:
+      test: ["CMD", "bin/gremlin.sh", "-e", "scripts/remote-connect.groovy"]
+      interval: 10s
+      timeout: 30s
+      retries: 3
   

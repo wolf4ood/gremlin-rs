@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Starting Gremlin Servers
         run: |
-          docker-compose -f ./docker-compose/docker-compose.yaml up -d 
+          docker-compose -f ./docker-compose/docker-compose.yaml up -d --wait --wait-timeout 30
         env: 
           GREMLIN_SERVER: ${{ matrix.gremlin-server }}
 
