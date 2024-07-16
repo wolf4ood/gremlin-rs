@@ -32,6 +32,7 @@ use std::marker::PhantomData;
 use super::merge_edge::MergeEdgeStep;
 use super::merge_vertex::MergeVertexStep;
 use super::option::OptionStep;
+use super::side_effect::SideEffectStep;
 
 #[derive(Clone)]
 pub struct GraphTraversal<S, E: FromGValue, T: Terminator<E>> {
@@ -185,6 +186,15 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         A: Into<GValue> + FromGValue,
     {
         self.builder = self.builder.with_side_effect(step);
+
+        self
+    }
+
+    pub fn side_effect<A>(mut self, step: A) -> Self
+    where
+        A: Into<SideEffectStep>,
+    {
+        self.builder = self.builder.side_effect(step);
 
         self
     }

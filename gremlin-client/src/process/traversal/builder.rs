@@ -13,7 +13,6 @@ use crate::process::traversal::step::not::NotStep;
 use crate::process::traversal::step::or::OrStep;
 use crate::process::traversal::step::repeat::RepeatStep;
 use crate::process::traversal::step::select::SelectStep;
-use crate::process::traversal::step::side_effect::IntoSideEffectStep;
 use crate::process::traversal::step::to::ToStep;
 use crate::process::traversal::step::until::UntilStep;
 use crate::process::traversal::step::where_step::WhereStep;
@@ -25,6 +24,7 @@ use crate::GValue;
 use super::merge_edge::MergeEdgeStep;
 use super::merge_vertex::MergeVertexStep;
 use super::option::OptionStep;
+use super::side_effect::SideEffectStep;
 
 #[derive(Clone)]
 pub struct TraversalBuilder {
@@ -143,10 +143,10 @@ impl TraversalBuilder {
 
     pub fn side_effect<A>(mut self, step: A) -> Self
     where
-        A: IntoSideEffectStep,
+        A: Into<SideEffectStep>,
     {
         self.bytecode
-            .add_step(String::from("sideEffect"), step.into_step());
+            .add_step(String::from("sideEffect"), step.into().into());
         self
     }
 

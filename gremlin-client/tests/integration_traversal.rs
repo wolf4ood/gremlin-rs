@@ -2307,6 +2307,33 @@ fn test_local() {
 }
 
 #[test]
+fn test_side_effect() {
+    let client = graph();
+    let test_vertex_label = "test_side_effect";
+    let expected_side_effect_key = "prop_key";
+    let expected_side_effect_value = "prop_val";
+
+    drop_vertices(&client, &test_vertex_label).unwrap();
+
+    let g = traversal().with_remote(client);
+
+    let element_map = g
+        .add_v(test_vertex_label)
+        .side_effect(__.property(
+            gremlin_client::structure::Either2::A(expected_side_effect_key),
+            expected_side_effect_value,
+        ))
+        .element_map(())
+        .next()
+        .expect("Should get response")
+        .expect("Should have returned an element map");
+
+    let actual_prop_value: &String = element_map.get(expected_side_effect_key).expect("Should have property").get().expect("Should be str");
+
+    assert_eq!(expected_side_effect_value, actual_prop_value);
+}
+
+#[test]
 fn test_property_cardinality() {
     let client = graph();
 
