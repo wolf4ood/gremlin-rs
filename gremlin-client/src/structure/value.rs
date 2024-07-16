@@ -12,7 +12,7 @@ pub type Date = chrono::DateTime<chrono::offset::Utc>;
 use std::convert::TryInto;
 use std::hash::Hash;
 
-use super::{Direction, Merge};
+use super::{Column, Direction, Merge};
 /// Represent possible values coming from the [Gremlin Server](http://tinkerpop.apache.org/docs/3.4.0/dev/io/)
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, PartialEq, Clone)]
@@ -50,6 +50,7 @@ pub enum GValue {
     Cardinality(Cardinality),
     Merge(Merge),
     Direction(Direction),
+    Column(Column),
 }
 
 impl GValue {
@@ -201,6 +202,12 @@ impl From<Merge> for GValue {
 impl From<Direction> for GValue {
     fn from(value: Direction) -> Self {
         GValue::Direction(value)
+    }
+}
+
+impl From<Column> for GValue {
+    fn from(value: Column) -> Self {
+        GValue::Column(value)
     }
 }
 

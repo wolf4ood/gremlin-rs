@@ -238,6 +238,16 @@ impl GraphSON {
                     "@value" : direction,
                 }))
             }
+            (_, GValue::Column(column)) => {
+                let column = match column {
+                    crate::structure::Column::Keys => "keys",
+                    crate::structure::Column::Values => "values",
+                };
+                Ok(json!({
+                    "@type" : "g:Column",
+                    "@value" : column,
+                }))
+            }
             (_, _) => panic!("Type {:?} not supported.", value),
         }
     }

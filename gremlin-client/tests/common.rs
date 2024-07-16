@@ -1,3 +1,14 @@
+use gremlin_client::Map;
+
+pub fn assert_map_property(element_map: &Map, expected_key: &str, expected_value: &str) {
+    let actual_prop_value: &String = element_map
+        .get(expected_key)
+        .unwrap_or_else(|| panic!("Didn't have expected key {}", expected_key))
+        .get()
+        .expect("Should be String");
+    assert_eq!(expected_value, actual_prop_value);
+}
+
 #[allow(dead_code)]
 pub mod io {
     use gremlin_client::{ConnectionOptions, Edge, GraphSON, GremlinClient, GremlinResult, Vertex};

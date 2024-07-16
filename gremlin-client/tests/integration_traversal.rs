@@ -1,9 +1,13 @@
+use std::collections::HashMap;
 use std::convert::TryInto;
 
+use common::assert_map_property;
 use gremlin_client::process::traversal::{traversal, Order, __};
-use gremlin_client::structure::{Cardinality, List, Map, Pop, TextP, Vertex, VertexProperty, P, T};
+use gremlin_client::structure::{
+    Cardinality, Column, List, Map, Pop, TextP, Vertex, VertexProperty, P, T,
+};
 
-use gremlin_client::{utils, GValue};
+use gremlin_client::{utils, GKey, GValue};
 
 mod common;
 
@@ -17,7 +21,7 @@ mod merge_tests {
     use gremlin_client::{
         process::traversal::{GraphTraversalSource, SyncTerminator},
         structure::{Direction, Merge},
-        Edge, GKey, GValue, ToGValue,
+        Edge, GValue, ToGValue,
     };
     use std::collections::HashMap;
 
@@ -53,12 +57,7 @@ mod merge_tests {
             .expect("Should get response")
             .expect("Should have returned a vertex");
 
-        let on_create_prop_value: &String = vertex_properties
-            .get("propertyKey")
-            .expect("Should have property")
-            .get()
-            .unwrap();
-        assert_eq!(on_create_prop_value, "propertyValue");
+        assert_map_property(&vertex_properties, "propertyKey", "propertyValue");
     }
 
     #[test]
@@ -89,19 +88,13 @@ mod merge_tests {
             .expect("Should get a response")
             .expect("Should return a vertex");
 
-        let actual_label: &String = on_create_vertex_map
-            .get("label")
-            .expect("Should have id")
-            .get()
-            .unwrap();
-        assert_eq!(expected_label, actual_label);
+        assert_map_property(&on_create_vertex_map, "label", expected_label);
 
-        let on_create_prop_value: &String = on_create_vertex_map
-            .get(prop_key)
-            .expect("Should have property")
-            .get()
-            .unwrap();
-        assert_eq!(on_create_prop_value, expected_on_create_prop_value);
+        assert_map_property(
+            &on_create_vertex_map,
+            prop_key,
+            expected_on_create_prop_value,
+        );
 
         //Now run the traversal again, and confirm the OnMatch applied this time
         let on_match_vertex_map = g
@@ -113,19 +106,9 @@ mod merge_tests {
             .expect("Should get a response")
             .expect("Should return a vertex");
 
-        let actual_label: &String = on_match_vertex_map
-            .get("label")
-            .expect("Should have id")
-            .get()
-            .unwrap();
-        assert_eq!(expected_label, actual_label);
+        assert_map_property(&on_match_vertex_map, "label", expected_label);
 
-        let on_match_prop_value: &String = on_match_vertex_map
-            .get(prop_key)
-            .expect("Should have property")
-            .get()
-            .unwrap();
-        assert_eq!(on_match_prop_value, expected_on_match_prop_value);
+        assert_map_property(&on_match_vertex_map, prop_key, expected_on_match_prop_value);
     }
 
     #[test]
@@ -200,25 +183,20 @@ mod merge_tests {
             .expect("Should get a response")
             .expect("Should return a edge properties");
 
-        let actual_edge_label: &String = merged_edge_properties
-            .get("label")
-            .expect("Should have returned edge label")
-            .get()
-            .unwrap();
-        assert_eq!(actual_edge_label, expected_edge_label);
+        assert_map_property(&merged_edge_properties, "label", expected_edge_label);
 
-        let actual_edge_property: &String = merged_edge_properties
-            .get(expected_edge_property_key)
-            .expect("Should have returned edge property")
-            .get()
-            .unwrap();
-        assert_eq!(actual_edge_property, expected_edge_property_value);
+        assert_map_property(
+            &merged_edge_properties,
+            expected_edge_property_key,
+            expected_edge_property_value,
+        );
 
         let incoming_vertex: &Map = merged_edge_properties
             .get(Direction::In)
             .expect("Should have returned incoming vertex info")
             .get()
             .unwrap();
+
         let incoming_vertex_id = incoming_vertex
             .get("id")
             .expect("Should have returned vertex id");
@@ -276,19 +254,12 @@ mod merge_tests {
             .expect("Should get a response")
             .expect("Should return edge properties");
 
-        let actual_edge_label: &String = merged_edge_properties
-            .get("label")
-            .expect("Should have returned edge label")
-            .get()
-            .unwrap();
-        assert_eq!(actual_edge_label, expected_edge_label);
-
-        let actual_edge_property: &String = merged_edge_properties
-            .get(expected_edge_property_key)
-            .expect("Should have returned edge property")
-            .get()
-            .unwrap();
-        assert_eq!(actual_edge_property, expected_edge_property_value);
+        assert_map_property(&merged_edge_properties, "label", expected_edge_label);
+        assert_map_property(
+            &merged_edge_properties,
+            expected_edge_property_key,
+            expected_edge_property_value,
+        );
 
         let incoming_vertex: &Map = merged_edge_properties
             .get(Direction::In)
@@ -367,21 +338,18 @@ mod merge_tests {
         let on_create_edge_properties = do_merge_edge(g.clone());
 
         //Initially the edge should be the on create value
-        let actual_edge_property: &String = on_create_edge_properties
-            .get(expected_edge_property_key)
-            .expect("Should have returned edge property")
-            .get()
-            .unwrap();
-        assert_eq!(actual_edge_property, "on_create");
+        assert_map_property(
+            &on_create_edge_properties,
+            expected_edge_property_key,
+            "on_create",
+        );
 
         let on_match_edge_properties = do_merge_edge(g);
-
-        let actual_edge_property: &String = on_match_edge_properties
-            .get(expected_edge_property_key)
-            .expect("Should have returned edge property")
-            .get()
-            .unwrap();
-        assert_eq!(actual_edge_property, "on_match");
+        assert_map_property(
+            &on_match_edge_properties,
+            expected_edge_property_key,
+            "on_match",
+        );
     }
 
     #[test]
@@ -500,12 +468,7 @@ mod merge_tests {
             .expect("Should have returned vertex id");
         assert_eq!(*toby_vertex_id, GValue::Int64(expected_toby_id));
 
-        let actual_edge_label: &String = combo_merge_edge_properties
-            .get("label")
-            .expect("Should have returned edge label")
-            .get()
-            .unwrap();
-        assert_eq!(actual_edge_label, expected_edge_label);
+        assert_map_property(&combo_merge_edge_properties, "label", expected_edge_label);
     }
 }
 
@@ -2328,9 +2291,67 @@ fn test_side_effect() {
         .expect("Should get response")
         .expect("Should have returned an element map");
 
-    let actual_prop_value: &String = element_map.get(expected_side_effect_key).expect("Should have property").get().expect("Should be str");
+    assert_map_property(
+        &element_map,
+        expected_side_effect_key,
+        expected_side_effect_value,
+    );
+}
 
-    assert_eq!(expected_side_effect_value, actual_prop_value);
+#[test]
+fn test_by_columns() {
+    let client = graph();
+    let test_vertex_label = "test_by_columns";
+    let expected_side_effect_key_a = "prop_key_a";
+    let expected_side_effect_value_a = "prop_val_a";
+    let expected_side_effect_key_b = "prop_key_b";
+    let expected_side_effect_value_b = "prop_val_b";
+
+    drop_vertices(&client, &test_vertex_label).unwrap();
+
+    let g = traversal().with_remote(client);
+    let mut property_map: HashMap<GKey, GValue> = HashMap::new();
+    property_map.insert(
+        expected_side_effect_key_a.into(),
+        expected_side_effect_value_a.into(),
+    );
+    property_map.insert(
+        expected_side_effect_key_b.into(),
+        expected_side_effect_value_b.into(),
+    );
+
+    let element_map = g
+        .inject(vec![property_map.into()])
+        .unfold()
+        .as_("properties")
+        .add_v(test_vertex_label)
+        .as_("v")
+        .side_effect(
+            __.select("properties")
+                .unfold()
+                .as_("kv_pair")
+                .select("v")
+                .property(
+                    __.select("kv_pair").by(Column::Keys),
+                    __.select("kv_pair").by(Column::Values),
+                ),
+        )
+        .element_map(())
+        .next()
+        .expect("Should get response")
+        .expect("Should have returned an element map");
+
+    assert_map_property(
+        &element_map,
+        expected_side_effect_key_a,
+        expected_side_effect_value_a,
+    );
+
+    assert_map_property(
+        &element_map,
+        expected_side_effect_key_b,
+        expected_side_effect_value_b,
+    );
 }
 
 #[test]
