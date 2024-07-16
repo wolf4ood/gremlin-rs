@@ -2299,6 +2299,61 @@ fn test_side_effect() {
 }
 
 #[test]
+fn test_anonymous_traversal_properties_drop() {
+    let client = graph();
+    let test_vertex_label = "test_anonymous_traversal_properties_drop";
+    let pre_drop_prop_key = "pre_drop_prop_key";
+    let expected_prop_value = "prop_val";
+
+    drop_vertices(&client, &test_vertex_label).unwrap();
+
+    let g = traversal().with_remote(client);
+
+    let element_map = g
+        .add_v(test_vertex_label)
+        .side_effect(__.property(
+            gremlin_client::structure::Either2::A(pre_drop_prop_key),
+            expected_prop_value,
+        ))
+        .element_map(())
+        .next()
+        .expect("Should get response")
+        .expect("Should have returned an element map");
+
+    //Make sure the property was assigned
+    assert_map_property(&element_map, pre_drop_prop_key, expected_prop_value);
+
+    let created_vertex_id = element_map.get("id").expect("Should have id property");
+    let GValue::Int64(id) = created_vertex_id else {
+        panic!("Not expected id type");
+    };
+
+    let post_drop_prop_key = "post_drop_prop_key";
+    //Operate on the same vertex via id
+    let post_drop_map = g
+        .v(*id)
+        //Drop all properties first
+        .side_effect(__.properties(()).drop())
+        //Then add a different property
+        .side_effect(__.property(
+            gremlin_client::structure::Either2::A(pre_drop_prop_key),
+            expected_prop_value,
+        ))
+        .element_map(())
+        .next()
+        .expect("Should get response")
+        .expect("Should have returned an element map");
+
+    assert_map_property(&post_drop_map, pre_drop_prop_key, expected_prop_value);
+
+    //Now make sure the pre drop property key is no longer present
+    assert!(
+        post_drop_map.get(post_drop_prop_key).is_none(),
+        "Pre drop key should have been dropped"
+    );
+}
+
+#[test]
 fn test_by_columns() {
     let client = graph();
     let test_vertex_label = "test_by_columns";

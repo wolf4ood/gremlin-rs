@@ -67,6 +67,13 @@ impl AnonymousTraversalSource {
         self.traversal.clone().property(key, value)
     }
 
+    pub fn properties<L>(&self, labels: L) -> TraversalBuilder
+    where
+        L: Into<Labels>,
+    {
+        self.traversal.clone().properties(labels)
+    }
+
     pub fn v<T>(&self, ids: T) -> TraversalBuilder
     where
         T: Into<GIDs>,
