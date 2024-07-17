@@ -103,14 +103,15 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self
     }
 
-    pub fn property_with_cardinality<A>(
+    pub fn property_with_cardinality<K, V>(
         mut self,
         cardinality: Cardinality,
-        key: &str,
-        value: A,
+        key: K,
+        value: V,
     ) -> Self
     where
-        A: Into<GValue>,
+        K: Into<GValue>,
+        V: Into<GValue>,
     {
         self.builder = self
             .builder
@@ -118,30 +119,27 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self
     }
 
-    pub fn property_many<A>(mut self, values: Vec<(String, A)>) -> Self
+    pub fn property_many<K, V>(mut self, values: Vec<(K, V)>) -> Self
     where
-        A: Into<GValue>,
+        K: Into<GValue>,
+        V: Into<GValue>,
     {
         for property in values {
-            self.builder = self
-                .builder
-                .property::<&str, A>(property.0.as_ref(), property.1)
+            self.builder = self.builder.property(property.0, property.1)
         }
 
         self
     }
 
-    pub fn property_many_with_cardinality<A>(
-        mut self,
-        values: Vec<(Cardinality, String, A)>,
-    ) -> Self
+    pub fn property_many_with_cardinality<K, V>(mut self, values: Vec<(Cardinality, K, V)>) -> Self
     where
-        A: Into<GValue>,
+        K: Into<GValue>,
+        V: Into<GValue>,
     {
         for property in values {
-            self.builder =
-                self.builder
-                    .property_with_cardinality(property.0, property.1.as_ref(), property.2);
+            self.builder = self
+                .builder
+                .property_with_cardinality(property.0, property.1, property.2);
         }
 
         self
