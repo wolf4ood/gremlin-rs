@@ -423,6 +423,7 @@ mod tests {
 
     use super::deserializer_v3;
     use serde_json::json;
+    use serde_json::Value;
 
     use crate::{edge, vertex};
 
@@ -733,5 +734,45 @@ mod tests {
         .collect();
 
         assert_eq!(result, GValue::Map(value_map));
+    }
+
+    #[test]
+    fn test_direct_decode() {
+        let value = json!({
+            "@type": "g:List",
+            "@value": [
+                json!(0.2),
+                json!(0.1),
+            ]
+        });
+
+        let result = deserializer_v3(&value).expect("Failed to deserialize a List");
+
+        assert_eq!(
+            result,
+            GValue::List(vec![GValue::Double(0.2), GValue::Double(0.1)].into())
+        );
+
+        let value = json!({
+            "@type": "g:List",
+            "@value": [
+                Value::Null,
+            ]
+        });
+
+        let result = deserializer_v3(&value).expect("Failed to deserialize a List");
+
+        assert_eq!(result, GValue::List(vec![GValue::Null].into()));
+
+        let value = json!({
+            "@type": "g:List",
+            "@value": [
+                json!(1),
+            ]
+        });
+
+        let result = deserializer_v3(&value).expect("Failed to deserialize a List");
+
+        assert_eq!(result, GValue::List(vec![GValue::Int64(1)].into()));
     }
 }

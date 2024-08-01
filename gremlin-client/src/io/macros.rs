@@ -5,6 +5,18 @@ macro_rules! g_serializer {
                 Ok(s.clone().into())
             } else if let Value::Bool(b) = val {
                 Ok((*b).into())
+            } else if let Value::Null = val {
+                Ok(GValue::Null)
+            } else if let Value::Number(ref n) = val {
+                if let Some(i) = n.as_i64() {
+                    Ok(i.into())
+                } else if let Some(f) = n.as_f64() {
+                    Ok(f.into())
+                } else {
+                    Err(GremlinError::Json("Expected number".to_string()))
+                }
+            } else if let Value::Array(ref l) = val {
+                Ok(l.iter().map($name).collect::<GremlinResult<Vec<GValue>>>()?.into())
             } else {
                 let _type = &val["@type"];
                 let _type = get_value!(_type,serde_json::Value::String)?.as_str();
