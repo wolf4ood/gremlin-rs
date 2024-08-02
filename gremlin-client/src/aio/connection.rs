@@ -190,6 +190,16 @@ impl Conn {
             .await
             .expect("It should contain the response")
             .map(|r| (r, receiver))
+            .map_err(|e| {
+                //If there's been an websocket layer error, mark the connection as invalid
+                match e {
+                    GremlinError::WebSocket(_) | GremlinError::WebSocketAsync(_) => {
+                        self.valid = false;
+                    }
+                    _ => {}
+                }
+                e
+            })
     }
 
     pub fn is_valid(&self) -> bool {
