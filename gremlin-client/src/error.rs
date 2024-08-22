@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::structure::GValue;
 
 use thiserror::Error;
@@ -34,7 +36,7 @@ pub enum GremlinError {
 
     #[cfg(feature = "async_gremlin")]
     #[error(transparent)]
-    WebSocketAsync(#[from] async_tungstenite::tungstenite::Error),
+    WebSocketAsync(#[from] Arc<async_tungstenite::tungstenite::Error>),
     #[cfg(feature = "async_gremlin")]
     #[error(transparent)]
     ChannelSend(#[from] futures::channel::mpsc::SendError),
