@@ -121,6 +121,13 @@ impl ConnectionOptionsBuilder {
         self
     }
 
+    /// Only applicable to async client. By default a connection is checked on each return to the pool (None)
+    /// This allows setting an interval of how often it is checked on return.
+    pub fn pool_healthcheck_interval(mut self, pool_healthcheck_interval: Option<Duration>) -> Self {
+        self.0.pool_healthcheck_interval = pool_healthcheck_interval;
+        self
+    }
+
     /// Both the sync and async pool providers use a default of 30 seconds,
     /// Async pool interprets `None` as no timeout. Sync pool maps `None` to the default value
     pub fn pool_connection_timeout(mut self, pool_connection_timeout: Option<Duration>) -> Self {
@@ -171,6 +178,7 @@ pub struct ConnectionOptions {
     pub(crate) host: String,
     pub(crate) port: u16,
     pub(crate) pool_size: u32,
+    pub(crate) pool_healthcheck_interval: Option<Duration>,
     pub(crate) pool_get_connection_timeout: Option<Duration>,
     pub(crate) credentials: Option<Credentials>,
     pub(crate) ssl: bool,
@@ -255,6 +263,7 @@ impl Default for ConnectionOptions {
             port: 8182,
             pool_size: 10,
             pool_get_connection_timeout: Some(Duration::from_secs(30)),
+            pool_healthcheck_interval: None,
             credentials: None,
             ssl: false,
             tls_options: None,

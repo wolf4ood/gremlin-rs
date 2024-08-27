@@ -59,6 +59,7 @@ impl GremlinClient {
         let pool = Pool::builder()
             .get_timeout(opts.pool_get_connection_timeout)
             .max_open(pool_size as u64)
+            .health_check_interval(opts.pool_healthcheck_interval)
             .build(manager);
 
         Ok(GremlinClient {
