@@ -196,7 +196,9 @@ impl Conn {
             .map_err(|e| {
                 //If there's been an websocket layer error, mark the connection as invalid
                 match e {
-                    GremlinError::WebSocket(_) | GremlinError::WebSocketAsync(_) => {
+                    GremlinError::WebSocket(_)
+                    | GremlinError::WebSocketAsync(_)
+                    | GremlinError::WebSocketPoolAsync(_) => {
                         self.valid = false;
                     }
                     _ => {}

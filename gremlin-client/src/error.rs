@@ -39,6 +39,9 @@ pub enum GremlinError {
     WebSocketAsync(#[from] Arc<async_tungstenite::tungstenite::Error>),
     #[cfg(feature = "async_gremlin")]
     #[error(transparent)]
+    WebSocketPoolAsync(#[from] Arc<mobc::Error<GremlinError>>),
+    #[cfg(feature = "async_gremlin")]
+    #[error(transparent)]
     ChannelSend(#[from] futures::channel::mpsc::SendError),
     #[error(transparent)]
     Uuid(#[from] uuid::Error),
@@ -49,10 +52,7 @@ impl From<mobc::Error<GremlinError>> for GremlinError {
     fn from(e: mobc::Error<GremlinError>) -> GremlinError {
         match e {
             mobc::Error::Inner(e) => e,
-            mobc::Error::BadConn => {
-                GremlinError::Generic(String::from("Async pool bad connection"))
-            }
-            mobc::Error::Timeout => GremlinError::Generic(String::from("Async pool timeout")),
+            other => GremlinError::WebSocketPoolAsync(Arc::new(other)),
         }
     }
 }
