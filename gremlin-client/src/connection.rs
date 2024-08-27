@@ -123,7 +123,10 @@ impl ConnectionOptionsBuilder {
 
     /// Only applicable to async client. By default a connection is checked on each return to the pool (None)
     /// This allows setting an interval of how often it is checked on return.
-    pub fn pool_healthcheck_interval(mut self, pool_healthcheck_interval: Option<Duration>) -> Self {
+    pub fn pool_healthcheck_interval(
+        mut self,
+        pool_healthcheck_interval: Option<Duration>,
+    ) -> Self {
         self.0.pool_healthcheck_interval = pool_healthcheck_interval;
         self
     }
