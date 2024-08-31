@@ -22,6 +22,7 @@ mod tokio_use {
 }
 
 use futures::TryFutureExt;
+use log::{error, info, warn};
 #[cfg(feature = "tokio-runtime")]
 use tokio_use::*;
 
@@ -137,6 +138,7 @@ impl Conn {
         let url = url::Url::parse(&opts.websocket_url()).expect("failed to parse url");
 
         let websocket_config = opts.websocket_options.as_ref().map(WebSocketConfig::from);
+        info!("Openning websocket connection");
 
         #[cfg(feature = "async-std-runtime")]
         let (client, _) = {
@@ -159,6 +161,7 @@ impl Conn {
             .await?
         };
 
+        info!("Opened websocket connection");
         let (sink, stream) = client.split();
         let (sender, receiver) = channel(20);
         let requests = Arc::new(Mutex::new(HashMap::new()));
@@ -184,6 +187,7 @@ impl Conn {
             .send(Cmd::Msg((sender, id, payload)))
             .await
             .map_err(|e| {
+                error!("Marking websocket connection invalid on send error");
                 self.valid = false;
                 e
             })?;
@@ -199,6 +203,7 @@ impl Conn {
                     GremlinError::WebSocket(_)
                     | GremlinError::WebSocketAsync(_)
                     | GremlinError::WebSocketPoolAsync(_) => {
+                        error!("Marking websocket connection invalid on received error");
                         self.valid = false;
                     }
                     _ => {}
@@ -214,11 +219,13 @@ impl Conn {
 
 impl Drop for Conn {
     fn drop(&mut self) {
+        warn!("Websocket connection instance dropped");
         send_shutdown(self);
     }
 }
 
 fn send_shutdown(conn: &mut Conn) {
+    warn!("Websocket connection instance shutting down channel");
     conn.sender.close_channel();
 }
 
@@ -235,6 +242,7 @@ fn sender_loop(
                         let mut guard = requests.lock().await;
                         guard.insert(msg.1, msg.0);
                         if let Err(e) = sink.send(Message::Binary(msg.2)).await {
+                            error!("Sink sending error occured");
                             let mut sender = guard.remove(&msg.1).unwrap();
                             sender
                                 .send(Err(GremlinError::from(Arc::new(e))))
@@ -244,20 +252,24 @@ fn sender_loop(
                         drop(guard);
                     }
                     Cmd::Pong(data) => {
+                        info!("Sending Pong");
                         sink.send(Message::Pong(data))
                             .await
                             .expect("Failed to send pong message.");
                     }
                     Cmd::Shutdown => {
+                        warn!("Shuting down connection");
                         let mut guard = requests.lock().await;
                         guard.clear();
                     }
                 },
                 None => {
+                    warn!("Sending loop breaking");
                     break;
                 }
             }
         }
+        warn!("Sending loop closing sink");
         let _ = sink.close().await;
     });
 }
@@ -273,6 +285,7 @@ fn receiver_loop(
                 Some(Err(error)) => {
                     let mut guard = requests.lock().await;
                     let error = Arc::new(error);
+                    error!("Receiver loop error");
                     for s in guard.values_mut() {
                         match s.send(Err(error.clone().into())).await {
                             Ok(_r) => {}
@@ -306,11 +319,13 @@ fn receiver_loop(
                         }
                     }
                     Message::Ping(data) => {
+                        info!("Received Ping");
                         let _ = sender.send(Cmd::Pong(data)).await;
                     }
                     _ => {}
                 },
                 None => {
+                    warn!("Receiver loop breaking");
                     break;
                 }
             }
