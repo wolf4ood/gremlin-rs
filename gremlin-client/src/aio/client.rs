@@ -60,6 +60,8 @@ impl GremlinClient {
             .get_timeout(opts.pool_get_connection_timeout)
             .max_open(pool_size as u64)
             .health_check_interval(opts.pool_healthcheck_interval)
+            //Makes max idle connections equal to max open, matching the behavior of the sync pool r2d2
+            .max_idle(0)
             .build(manager);
 
         Ok(GremlinClient {
