@@ -23,7 +23,7 @@ async_gremlin = ["futures","mobc","async-tungstenite","async-trait","url","pin-p
 
 async_std = ["async-std-runtime"]
 tokio-runtime = ["async_gremlin","tokio","async-tungstenite/tokio-runtime","async-tungstenite/tokio-native-tls","tokio-native-tls","tokio-stream"]
-async-std-runtime = ["async_gremlin","async-std","async-tungstenite/async-std-runtime","async-tungstenite/async-tls","mobc/async-std","async-tls","rustls","webpki"]
+async-std-runtime = ["async_gremlin","async-std","async-tungstenite/async-std-runtime","async-tungstenite/async-tls","tokio/sync", "mobc/async-std","async-tls","rustls","webpki"]
 
 derive = ["gremlin-derive"] 
 
