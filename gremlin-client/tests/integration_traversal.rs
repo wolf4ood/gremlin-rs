@@ -2612,15 +2612,12 @@ fn test_none_step() {
     let g = traversal().with_remote(client);
 
     //The addition of a None step however should not IO a vertex back
-    let mut iter = g
-        .add_v("test_none_step")
+    g.add_v("test_none_step")
         .none()
         .iter()
-        .expect("Should get a iter back");
-    assert!(
-        iter.next().is_none(),
-        "But the iter should have no elements because of the None step"
-    );
+        .expect("Should get a iter back")
+        .iterate()
+        .expect("Shouldn't error consuming iterator");
 
     //Make sure the vertex is present in the graph
     let vertex_count = g

@@ -47,6 +47,16 @@ impl<T: FromGValue> RemoteTraversalIterator<T> {
     }
 }
 
+impl RemoteTraversalIterator<crate::structure::Null> {
+    pub fn iterate(&mut self) -> GremlinResult<()> {
+        while let Some(response) = self.next() {
+            //consume the entire iterator, returning any errors
+            response?;
+        }
+        Ok(())
+    }
+}
+
 impl<T: FromGValue> Iterator for RemoteTraversalIterator<T> {
     type Item = GremlinResult<T>;
 
