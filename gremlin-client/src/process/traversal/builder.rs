@@ -299,6 +299,12 @@ impl TraversalBuilder {
         self
     }
 
+    pub fn none(mut self) -> Self {
+        self.bytecode.add_step(String::from("none"), vec![]);
+
+        self
+    }
+
     pub fn label(mut self) -> Self {
         self.bytecode.add_step(String::from("label"), vec![]);
 

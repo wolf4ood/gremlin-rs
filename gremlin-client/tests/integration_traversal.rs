@@ -2604,6 +2604,37 @@ fn test_coalesce_unfold() {
 }
 
 #[test]
+fn test_none_step() {
+    let client = graph();
+
+    drop_vertices(&client, "test_none_step").unwrap();
+
+    let g = traversal().with_remote(client);
+
+    //The addition of a None step however should not IO a vertex back
+    let mut iter = g
+        .add_v("test_none_step")
+        .none()
+        .iter()
+        .expect("Should get a iter back");
+    assert!(
+        iter.next().is_none(),
+        "But the iter should have no elements because of the None step"
+    );
+
+    //Make sure the vertex is present in the graph
+    let vertex_count = g
+        .v(())
+        .has_label("test_none_step")
+        .count()
+        .next()
+        .ok()
+        .flatten()
+        .expect("Should have gotten a response");
+    assert_eq!(1, vertex_count);
+}
+
+#[test]
 #[cfg(feature = "derive")]
 fn test_traversal_vertex_mapping() {
     use chrono::{DateTime, TimeZone, Utc};

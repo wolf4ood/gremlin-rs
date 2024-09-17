@@ -22,7 +22,7 @@ use crate::process::traversal::strategies::{
     RemoteStrategy, TraversalStrategies, TraversalStrategy,
 };
 use crate::process::traversal::{Bytecode, Scope, TraversalBuilder, WRITE_OPERATORS};
-use crate::structure::{Cardinality, Labels};
+use crate::structure::{Cardinality, Labels, Null};
 use crate::{
     structure::GIDs, structure::GProperty, structure::IntoPredicate, Edge, GValue, GremlinClient,
     List, Map, Path, Vertex,
@@ -298,6 +298,16 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         T: Terminator<Vertex>,
     {
         self.builder = self.builder.other_v();
+
+        GraphTraversal::new(self.terminator, self.builder)
+    }
+
+    ///Filters all objects from the traversal stream. Generally only useful for applying traversal sideffects and avoiding unwanted response I/O
+    pub fn none(mut self) -> GraphTraversal<S, Null, T>
+    where
+        T: Terminator<Null>,
+    {
+        self.builder = self.builder.none();
 
         GraphTraversal::new(self.terminator, self.builder)
     }
