@@ -10,6 +10,7 @@ use crate::ToGValue;
 use crate::{ConnectionOptions, GremlinError, GremlinResult};
 use base64::encode;
 use futures::future::{BoxFuture, FutureExt};
+use futures::StreamExt;
 use mobc::{Connection, Pool};
 use serde::Serialize;
 use std::collections::{HashMap, VecDeque};
@@ -162,8 +163,22 @@ impl GremlinClient {
             let payload = String::from("") + content_type + &message;
             let mut binary = payload.into_bytes();
             binary.insert(0, content_type.len() as u8);
-
-            let (response, receiver) = conn.send(id, binary).await?;
+            let mut receiver = conn.send(id, binary).await?;
+            let response = receiver
+                .next()
+                .await
+                .expect("It should contain the response")?;
+            //Prepare holding onto the connection for an auth challenge if we have credentials
+            //Tinkerpop performs authentication at the channel level, and if we let it go,
+            //a healthcheck may disrupt the challenge
+            //Otherwise drop the connection so it can be multiplexed
+            let retained_auth_context = match self.options.credentials.as_ref() {
+                None => {
+                    drop(conn);
+                    None
+                }
+                Some(credentials) => Some((credentials, conn)),
+            };
 
             let (response, results) = match response.status.code {
                 200 | 206 => {
@@ -176,8 +191,8 @@ impl GremlinClient {
                     Ok((response, results))
                 }
                 204 => Ok((response, VecDeque::new())),
-                407 => match &self.options.credentials {
-                    Some(c) => {
+                407 => match retained_auth_context {
+                    Some((c, conn)) => {
                         let mut args = HashMap::new();
 
                         args.insert(

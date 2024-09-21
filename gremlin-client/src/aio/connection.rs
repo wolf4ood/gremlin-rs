@@ -43,6 +43,7 @@ use futures::{
 
 use futures::channel::mpsc::{channel, Receiver, Sender};
 use std::collections::HashMap;
+use std::sync::atomic::{self, AtomicBool};
 use std::sync::Arc;
 use url;
 use uuid::Uuid;
@@ -64,7 +65,7 @@ pub enum Cmd {
 
 pub(crate) struct Conn {
     sender: Sender<Cmd>,
-    valid: bool,
+    valid: Arc<AtomicBool>,
     connection_uuid: Uuid,
 }
 
@@ -170,16 +171,19 @@ impl Conn {
 
         sender_loop(connection_uuid.clone(), sink, requests.clone(), receiver);
 
+        let valid_flag = Arc::new(AtomicBool::new(true));
+
         receiver_loop(
             connection_uuid.clone(),
             stream,
             requests.clone(),
             sender.clone(),
+            valid_flag.clone(),
         );
 
         Ok(Conn {
             sender,
-            valid: true,
+            valid: valid_flag,
             connection_uuid,
         })
     }
@@ -188,8 +192,8 @@ impl Conn {
         &mut self,
         id: Uuid,
         payload: Vec<u8>,
-    ) -> GremlinResult<(Response, Receiver<GremlinResult<Response>>)> {
-        let (sender, mut receiver) = channel(1);
+    ) -> GremlinResult<Receiver<GremlinResult<Response>>> {
+        let (sender, receiver) = channel(1);
 
         self.sender
             .send(Cmd::Msg((sender, id, payload)))
@@ -199,35 +203,14 @@ impl Conn {
                     "{} Marking websocket connection invalid on send error",
                     self.connection_uuid
                 );
-                self.valid = false;
-                e
-            })?;
-
-        receiver
-            .next()
-            .await
-            .expect("It should contain the response")
-            .map(|r| (r, receiver))
-            .map_err(|e| {
-                //If there's been an websocket layer error, mark the connection as invalid
-                match e {
-                    GremlinError::WebSocket(_)
-                    | GremlinError::WebSocketAsync(_)
-                    | GremlinError::WebSocketPoolAsync(_) => {
-                        error!(
-                            "{} Marking websocket connection invalid on received error",
-                            self.connection_uuid
-                        );
-                        self.valid = false;
-                    }
-                    _ => {}
-                }
-                e
+                self.valid.store(false, atomic::Ordering::Release);
+                GremlinError::from(e)
             })
+            .map(|_| receiver)
     }
 
     pub fn is_valid(&self) -> bool {
-        self.valid
+        self.valid.load(atomic::Ordering::Acquire)
     }
 }
 
@@ -300,11 +283,14 @@ fn receiver_loop(
     mut stream: SplitStream<WSStream>,
     requests: Arc<Mutex<HashMap<Uuid, Sender<GremlinResult<Response>>>>>,
     mut sender: Sender<Cmd>,
+    connection_valid_flag: Arc<AtomicBool>,
 ) {
     task::spawn(async move {
         loop {
             match stream.next().await {
                 Some(Err(error)) => {
+                    //If there's been an websocket layer error, mark the connection as invalid
+                    connection_valid_flag.store(false, atomic::Ordering::Release);
                     let mut guard = requests.lock().await;
                     let error = Arc::new(error);
                     error!("{connection_uuid} Receiver loop error");
@@ -316,36 +302,38 @@ fn receiver_loop(
                     }
                     guard.clear();
                 }
-                Some(Ok(item)) => match item {
-                    Message::Binary(data) => {
-                        let response: Response = serde_json::from_slice(&data).unwrap();
-                        let mut guard = requests.lock().await;
-                        if response.status.code != 206 {
-                            let item = guard.remove(&response.request_id);
-                            drop(guard);
-                            if let Some(mut s) = item {
-                                match s.send(Ok(response)).await {
-                                    Ok(_r) => {}
-                                    Err(_e) => {}
-                                };
+                Some(Ok(item)) => {
+                    match item {
+                        Message::Binary(data) => {
+                            let response: Response = serde_json::from_slice(&data).unwrap();
+                            let mut guard = requests.lock().await;
+                            if response.status.code != 206 {
+                                let item = guard.remove(&response.request_id);
+                                drop(guard);
+                                if let Some(mut s) = item {
+                                    match s.send(Ok(response)).await {
+                                        Ok(_r) => {}
+                                        Err(_e) => {}
+                                    };
+                                }
+                            } else {
+                                let item = guard.get_mut(&response.request_id);
+                                if let Some(s) = item {
+                                    match s.send(Ok(response)).await {
+                                        Ok(_r) => {}
+                                        Err(_e) => {}
+                                    };
+                                }
+                                drop(guard);
                             }
-                        } else {
-                            let item = guard.get_mut(&response.request_id);
-                            if let Some(s) = item {
-                                match s.send(Ok(response)).await {
-                                    Ok(_r) => {}
-                                    Err(_e) => {}
-                                };
-                            }
-                            drop(guard);
                         }
+                        Message::Ping(data) => {
+                            info!("{connection_uuid} Received Ping");
+                            let _ = sender.send(Cmd::Pong(data)).await;
+                        }
+                        _ => {}
                     }
-                    Message::Ping(data) => {
-                        info!("{connection_uuid} Received Ping");
-                        let _ = sender.send(Cmd::Pong(data)).await;
-                    }
-                    _ => {}
-                },
+                }
                 None => {
                     warn!("{connection_uuid} Receiver loop breaking");
                     break;
