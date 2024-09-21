@@ -302,38 +302,36 @@ fn receiver_loop(
                     }
                     guard.clear();
                 }
-                Some(Ok(item)) => {
-                    match item {
-                        Message::Binary(data) => {
-                            let response: Response = serde_json::from_slice(&data).unwrap();
-                            let mut guard = requests.lock().await;
-                            if response.status.code != 206 {
-                                let item = guard.remove(&response.request_id);
-                                drop(guard);
-                                if let Some(mut s) = item {
-                                    match s.send(Ok(response)).await {
-                                        Ok(_r) => {}
-                                        Err(_e) => {}
-                                    };
-                                }
-                            } else {
-                                let item = guard.get_mut(&response.request_id);
-                                if let Some(s) = item {
-                                    match s.send(Ok(response)).await {
-                                        Ok(_r) => {}
-                                        Err(_e) => {}
-                                    };
-                                }
-                                drop(guard);
+                Some(Ok(item)) => match item {
+                    Message::Binary(data) => {
+                        let response: Response = serde_json::from_slice(&data).unwrap();
+                        let mut guard = requests.lock().await;
+                        if response.status.code != 206 {
+                            let item = guard.remove(&response.request_id);
+                            drop(guard);
+                            if let Some(mut s) = item {
+                                match s.send(Ok(response)).await {
+                                    Ok(_r) => {}
+                                    Err(_e) => {}
+                                };
                             }
+                        } else {
+                            let item = guard.get_mut(&response.request_id);
+                            if let Some(s) = item {
+                                match s.send(Ok(response)).await {
+                                    Ok(_r) => {}
+                                    Err(_e) => {}
+                                };
+                            }
+                            drop(guard);
                         }
-                        Message::Ping(data) => {
-                            info!("{connection_uuid} Received Ping");
-                            let _ = sender.send(Cmd::Pong(data)).await;
-                        }
-                        _ => {}
                     }
-                }
+                    Message::Ping(data) => {
+                        info!("{connection_uuid} Received Ping");
+                        let _ = sender.send(Cmd::Pong(data)).await;
+                    }
+                    _ => {}
+                },
                 None => {
                     warn!("{connection_uuid} Receiver loop breaking");
                     break;
