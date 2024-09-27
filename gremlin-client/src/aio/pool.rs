@@ -1,4 +1,3 @@
-use futures::StreamExt;
 use mobc::Manager;
 
 use crate::aio::connection::Conn;
@@ -57,12 +56,7 @@ impl Manager for GremlinConnectionManager {
         let mut binary = payload.into_bytes();
         binary.insert(0, content_type.len() as u8);
 
-        let response = conn
-            .send(id, binary)
-            .await?
-            .next()
-            .await
-            .expect("Should have received response")?;
+        let (response, _receiver) = conn.send(id, binary).await?;
 
         match response.status.code {
             200 | 206 => Ok(conn),
@@ -93,12 +87,7 @@ impl Manager for GremlinConnectionManager {
                     let mut binary = payload.into_bytes();
                     binary.insert(0, content_type.len() as u8);
 
-                    let response = conn
-                        .send(id, binary)
-                        .await?
-                        .next()
-                        .await
-                        .expect("Should have received response")?;
+                    let (response, _receiver) = conn.send(id, binary).await?;
 
                     match response.status.code {
                         200 | 206 => Ok(conn),
