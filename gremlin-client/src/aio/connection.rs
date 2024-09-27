@@ -41,9 +41,7 @@ use futures::{
     SinkExt, StreamExt,
 };
 
-use futures::channel::mpsc::{
-    channel, unbounded, Receiver, Sender, UnboundedReceiver, UnboundedSender,
-};
+use futures::channel::mpsc::{channel, Receiver, Sender};
 use std::collections::HashMap;
 use std::sync::atomic::{self, AtomicBool};
 use std::sync::Arc;
@@ -66,7 +64,7 @@ pub enum Cmd {
 }
 
 pub(crate) struct Conn {
-    sender: UnboundedSender<Cmd>,
+    sender: Sender<Cmd>,
     valid: Arc<AtomicBool>,
     connection_uuid: Uuid,
 }
@@ -168,7 +166,7 @@ impl Conn {
 
         info!("{connection_uuid} Opened websocket connection");
         let (sink, stream) = client.split();
-        let (sender, receiver) = unbounded();
+        let (sender, receiver) = channel(20);
         let requests = Arc::new(Mutex::new(HashMap::new()));
 
         sender_loop(connection_uuid.clone(), sink, requests.clone(), receiver);
@@ -238,7 +236,7 @@ fn sender_loop(
     connection_uuid: Uuid,
     mut sink: SplitSink<WSStream, Message>,
     requests: Arc<Mutex<HashMap<Uuid, Sender<GremlinResult<Response>>>>>,
-    mut receiver: UnboundedReceiver<Cmd>,
+    mut receiver: Receiver<Cmd>,
 ) {
     task::spawn(async move {
         loop {
@@ -284,7 +282,7 @@ fn receiver_loop(
     connection_uuid: Uuid,
     mut stream: SplitStream<WSStream>,
     requests: Arc<Mutex<HashMap<Uuid, Sender<GremlinResult<Response>>>>>,
-    mut sender: UnboundedSender<Cmd>,
+    mut sender: Sender<Cmd>,
     connection_valid_flag: Arc<AtomicBool>,
 ) {
     task::spawn(async move {
