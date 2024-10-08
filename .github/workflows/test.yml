@@ -41,6 +41,12 @@ jobs:
         with:
           command: fmt
           args: --all -- --check
+      - name: Run cargo test with blocking client
+        if: matrix.gremlin-server == '3.5.7'
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --manifest-path gremlin-client/Cargo.toml
       - name: Run cargo test with tokio
         if: matrix.gremlin-server == '3.5.7'
         uses: actions-rs/cargo@v1
@@ -54,6 +60,12 @@ jobs:
           command: test
           args: --manifest-path gremlin-client/Cargo.toml --features=async-std-runtime
       # MergeV as a step doesn't exist in 3.5.x, so selectively run those tests
+      - name: Run cargo test with blocking client
+        if: matrix.gremlin-server != '3.5.7'
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --manifest-path gremlin-client/Cargo.toml  --features=merge_tests
       - name: Run cargo test with tokio
         if: matrix.gremlin-server != '3.5.7'
         uses: actions-rs/cargo@v1
