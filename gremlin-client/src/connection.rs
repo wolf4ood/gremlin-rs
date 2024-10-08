@@ -63,12 +63,11 @@ impl ConnectionStream {
     fn send(&mut self, payload: Vec<u8>) -> GremlinResult<()> {
         self.0
             .write_message(Message::Binary(payload))
-            .map_err(|e| Arc::new(e))
             .map_err(GremlinError::from)
     }
 
     fn recv(&mut self) -> GremlinResult<Vec<u8>> {
-        match self.0.read_message().map_err(|e| Arc::new(e))? {
+        match self.0.read_message()? {
             Message::Binary(binary) => Ok(binary),
             _ => unimplemented!(),
         }
