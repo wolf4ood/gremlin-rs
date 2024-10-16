@@ -1,7 +1,7 @@
 [package]
 authors = ["Enrico Risa <enrico.risa@gmail.com>"]
 name = "gremlin-client"
-version = "0.8.10"
+version = "0.8.11"
 edition = "2018"
 license = "Apache-2.0"
 description= "A Rust client for Apache TinkerPop™"
