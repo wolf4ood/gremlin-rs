@@ -21,6 +21,7 @@ mod tokio_use {
     pub use tokio_native_tls::TlsStream;
 }
 
+use futures::TryFutureExt;
 #[cfg(feature = "tokio-runtime")]
 use tokio_use::*;
 
@@ -144,6 +145,7 @@ impl Conn {
                 tls::connector(&opts),
                 websocket_config,
             )
+            .map_err(|e| Arc::new(e))
             .await?
         };
         #[cfg(feature = "tokio-runtime")]
@@ -153,6 +155,7 @@ impl Conn {
                 tls::connector(&opts),
                 websocket_config,
             )
+            .map_err(|e| Arc::new(e))
             .await?
         };
 
@@ -190,6 +193,18 @@ impl Conn {
             .await
             .expect("It should contain the response")
             .map(|r| (r, receiver))
+            .map_err(|e| {
+                //If there's been an websocket layer error, mark the connection as invalid
+                match e {
+                    GremlinError::WebSocket(_)
+                    | GremlinError::WebSocketAsync(_)
+                    | GremlinError::WebSocketPoolAsync(_) => {
+                        self.valid = false;
+                    }
+                    _ => {}
+                }
+                e
+            })
     }
 
     pub fn is_valid(&self) -> bool {
@@ -222,7 +237,7 @@ fn sender_loop(
                         if let Err(e) = sink.send(Message::Binary(msg.2)).await {
                             let mut sender = guard.remove(&msg.1).unwrap();
                             sender
-                                .send(Err(GremlinError::from(e)))
+                                .send(Err(GremlinError::from(Arc::new(e))))
                                 .await
                                 .expect("Failed to send error");
                         }
@@ -257,8 +272,9 @@ fn receiver_loop(
             match stream.next().await {
                 Some(Err(error)) => {
                     let mut guard = requests.lock().await;
+                    let error = Arc::new(error);
                     for s in guard.values_mut() {
-                        match s.send(Err(GremlinError::from(&error))).await {
+                        match s.send(Err(error.clone().into())).await {
                             Ok(_r) => {}
                             Err(_e) => {}
                         }

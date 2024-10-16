@@ -22,12 +22,17 @@ use crate::process::traversal::strategies::{
     RemoteStrategy, TraversalStrategies, TraversalStrategy,
 };
 use crate::process::traversal::{Bytecode, Scope, TraversalBuilder, WRITE_OPERATORS};
-use crate::structure::{Cardinality, Labels};
+use crate::structure::{Cardinality, Labels, Null};
 use crate::{
     structure::GIDs, structure::GProperty, structure::IntoPredicate, Edge, GValue, GremlinClient,
     List, Map, Path, Vertex,
 };
 use std::marker::PhantomData;
+
+use super::merge_edge::MergeEdgeStep;
+use super::merge_vertex::MergeVertexStep;
+use super::option::OptionStep;
+use super::side_effect::SideEffectStep;
 
 #[derive(Clone)]
 pub struct GraphTraversal<S, E: FromGValue, T: Terminator<E>> {
@@ -89,22 +94,24 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         GraphTraversal::new(self.terminator, self.builder)
     }
 
-    pub fn property<A>(mut self, key: &str, value: A) -> Self
+    pub fn property<K, V>(mut self, key: K, value: V) -> Self
     where
-        A: Into<GValue>,
+        K: Into<GValue>,
+        V: Into<GValue>,
     {
         self.builder = self.builder.property(key, value);
         self
     }
 
-    pub fn property_with_cardinality<A>(
+    pub fn property_with_cardinality<K, V>(
         mut self,
         cardinality: Cardinality,
-        key: &str,
-        value: A,
+        key: K,
+        value: V,
     ) -> Self
     where
-        A: Into<GValue>,
+        K: Into<GValue>,
+        V: Into<GValue>,
     {
         self.builder = self
             .builder
@@ -112,30 +119,27 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         self
     }
 
-    pub fn property_many<A>(mut self, values: Vec<(String, A)>) -> Self
+    pub fn property_many<K, V>(mut self, values: Vec<(K, V)>) -> Self
     where
-        A: Into<GValue>,
+        K: Into<GValue>,
+        V: Into<GValue>,
     {
         for property in values {
-            self.builder = self
-                .builder
-                .property::<&str, A>(property.0.as_ref(), property.1)
+            self.builder = self.builder.property(property.0, property.1)
         }
 
         self
     }
 
-    pub fn property_many_with_cardinality<A>(
-        mut self,
-        values: Vec<(Cardinality, String, A)>,
-    ) -> Self
+    pub fn property_many_with_cardinality<K, V>(mut self, values: Vec<(Cardinality, K, V)>) -> Self
     where
-        A: Into<GValue>,
+        K: Into<GValue>,
+        V: Into<GValue>,
     {
         for property in values {
-            self.builder =
-                self.builder
-                    .property_with_cardinality(property.0, property.1.as_ref(), property.2);
+            self.builder = self
+                .builder
+                .property_with_cardinality(property.0, property.1, property.2);
         }
 
         self
@@ -180,6 +184,15 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         A: Into<GValue> + FromGValue,
     {
         self.builder = self.builder.with_side_effect(step);
+
+        self
+    }
+
+    pub fn side_effect<A>(mut self, step: A) -> Self
+    where
+        A: Into<SideEffectStep>,
+    {
+        self.builder = self.builder.side_effect(step);
 
         self
     }
@@ -285,6 +298,16 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         T: Terminator<Vertex>,
     {
         self.builder = self.builder.other_v();
+
+        GraphTraversal::new(self.terminator, self.builder)
+    }
+
+    ///Filters all objects from the traversal stream. Generally only useful for applying traversal sideffects and avoiding unwanted response I/O
+    pub fn none(mut self) -> GraphTraversal<S, Null, T>
+    where
+        T: Terminator<Null>,
+    {
+        self.builder = self.builder.none();
 
         GraphTraversal::new(self.terminator, self.builder)
     }
@@ -669,6 +692,24 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
         GraphTraversal::new(self.terminator, self.builder)
     }
 
+    pub fn merge_v<A>(mut self, merge_v: A) -> GraphTraversal<Vertex, Vertex, T>
+    where
+        A: Into<MergeVertexStep>,
+        T: Terminator<Vertex>,
+    {
+        self.builder = self.builder.merge_v(merge_v);
+        GraphTraversal::new(self.terminator, self.builder)
+    }
+
+    pub fn merge_e<A>(mut self, merge_e: A) -> GraphTraversal<Edge, Edge, T>
+    where
+        A: Into<MergeEdgeStep>,
+        T: Terminator<Edge>,
+    {
+        self.builder = self.builder.merge_e(merge_e);
+        GraphTraversal::new(self.terminator, self.builder)
+    }
+
     pub fn identity(mut self) -> Self {
         self.builder = self.builder.identity();
         self
@@ -686,6 +727,14 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn barrier(mut self) -> Self {
         self.builder = self.builder.barrier();
+        self
+    }
+
+    pub fn option<A>(mut self, step: A) -> Self
+    where
+        A: Into<OptionStep>,
+    {
+        self.builder = self.builder.option(step);
         self
     }
 

@@ -15,6 +15,9 @@ use crate::structure::Labels;
 use crate::structure::{Edge, GValue, Vertex};
 use crate::GremlinClient;
 
+use super::merge_edge::MergeEdgeStep;
+use super::merge_vertex::MergeVertexStep;
+
 #[derive(Clone)]
 pub struct GraphTraversalSource<A: Terminator<GValue>> {
     term: A,
@@ -120,6 +123,41 @@ impl<A: Terminator<GValue>> GraphTraversalSource<A> {
             String::from("withSideEffect"),
             vec![step.0.into(), step.1.into()],
         );
+        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
+    }
+
+    pub fn inject<T>(&self, injection: T) -> GraphTraversal<GValue, GValue, A>
+    where
+        T: Into<GValue> + FromGValue,
+        A: Terminator<T>,
+    {
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("inject"), vec![injection.into()]);
+        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
+    }
+
+    pub fn merge_v<V>(&self, merge_v: V) -> GraphTraversal<Vertex, Vertex, A>
+    where
+        V: Into<MergeVertexStep>,
+        A: Terminator<Vertex>,
+    {
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("mergeV"), merge_v.into().into());
+
+        GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
+    }
+
+    pub fn merge_e<V>(&self, merge_e: V) -> GraphTraversal<Edge, Edge, A>
+    where
+        V: Into<MergeEdgeStep>,
+        A: Terminator<Edge>,
+    {
+        let mut code = Bytecode::new();
+
+        code.add_step(String::from("mergeE"), merge_e.into().into());
+
         GraphTraversal::new(self.term.clone(), TraversalBuilder::new(code))
     }
 }
@@ -982,5 +1020,25 @@ mod tests {
         );
     }
 
-    // g.V().hasLabel('person').coalesce(values('nickname'), values('name'))
+    #[test]
+    fn inject_test() {
+        let g = empty();
+
+        let mut code = Bytecode::new();
+
+        code.add_step(
+            String::from("inject"),
+            vec![GValue::List(vec!["foo".into(), "bar".into()].into())],
+        );
+        code.add_step(String::from("unfold"), vec![]);
+
+        assert_eq!(
+            &code,
+            g.inject(vec!["foo".into(), "bar".into()])
+                .unfold()
+                .bytecode()
+        );
+    }
+
+    //TODO add tests for mergeV, etc
 }

@@ -13,7 +13,6 @@ use crate::process::traversal::step::not::NotStep;
 use crate::process::traversal::step::or::OrStep;
 use crate::process::traversal::step::repeat::RepeatStep;
 use crate::process::traversal::step::select::SelectStep;
-use crate::process::traversal::step::side_effect::IntoSideEffectStep;
 use crate::process::traversal::step::to::ToStep;
 use crate::process::traversal::step::until::UntilStep;
 use crate::process::traversal::step::where_step::WhereStep;
@@ -21,6 +20,11 @@ use crate::process::traversal::step::where_step::WhereStep;
 use crate::process::traversal::{Bytecode, Scope};
 use crate::structure::{Cardinality, GIDs, IntoPredicate, Labels};
 use crate::GValue;
+
+use super::merge_edge::MergeEdgeStep;
+use super::merge_vertex::MergeVertexStep;
+use super::option::OptionStep;
+use super::side_effect::SideEffectStep;
 
 #[derive(Clone)]
 pub struct TraversalBuilder {
@@ -98,9 +102,10 @@ impl TraversalBuilder {
         self
     }
 
-    pub fn property_many<A>(mut self, values: Vec<(String, A)>) -> Self
+    pub fn property_many<K, V>(mut self, values: Vec<(K, V)>) -> Self
     where
-        A: Into<GValue>,
+        K: Into<GValue>,
+        V: Into<GValue>,
     {
         for property in values {
             self.bytecode.add_step(
@@ -112,18 +117,19 @@ impl TraversalBuilder {
         self
     }
 
-    pub fn property_with_cardinality<A>(
+    pub fn property_with_cardinality<K, V>(
         mut self,
         cardinality: Cardinality,
-        key: &str,
-        value: A,
+        key: K,
+        value: V,
     ) -> Self
     where
-        A: Into<GValue>,
+        K: Into<GValue>,
+        V: Into<GValue>,
     {
         self.bytecode.add_step(
             String::from("property"),
-            vec![cardinality.into(), String::from(key).into(), value.into()],
+            vec![cardinality.into(), key.into(), value.into()],
         );
         self
     }
@@ -139,10 +145,10 @@ impl TraversalBuilder {
 
     pub fn side_effect<A>(mut self, step: A) -> Self
     where
-        A: IntoSideEffectStep,
+        A: Into<SideEffectStep>,
     {
         self.bytecode
-            .add_step(String::from("sideEffect"), step.into_step());
+            .add_step(String::from("sideEffect"), step.into().into());
         self
     }
 
@@ -289,6 +295,12 @@ impl TraversalBuilder {
 
     pub fn other_v(mut self) -> Self {
         self.bytecode.add_step(String::from("otherV"), vec![]);
+
+        self
+    }
+
+    pub fn none(mut self) -> Self {
+        self.bytecode.add_step(String::from("none"), vec![]);
 
         self
     }
@@ -649,6 +661,36 @@ impl TraversalBuilder {
     {
         self.bytecode
             .add_step(String::from("coalesce"), coalesce.into().into());
+
+        self
+    }
+
+    pub fn merge_v<A>(mut self, merge_v: A) -> Self
+    where
+        A: Into<MergeVertexStep>,
+    {
+        self.bytecode
+            .add_step(String::from("mergeV"), merge_v.into().into());
+
+        self
+    }
+
+    pub fn merge_e<A>(mut self, merge_e: A) -> Self
+    where
+        A: Into<MergeEdgeStep>,
+    {
+        self.bytecode
+            .add_step(String::from("mergeE"), merge_e.into().into());
+
+        self
+    }
+
+    pub fn option<A>(mut self, option: A) -> Self
+    where
+        A: Into<OptionStep>,
+    {
+        self.bytecode
+            .add_step(String::from("option"), option.into().into());
 
         self
     }

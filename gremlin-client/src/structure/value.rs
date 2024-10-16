@@ -1,16 +1,18 @@
 use crate::conversion::{BorrowFromGValue, FromGValue};
-use crate::process::traversal::{Bytecode, Order, Scope};
+use crate::process::traversal::{Bytecode, Order, Scope, TraversalBuilder};
 use crate::structure::traverser::Traverser;
 use crate::structure::{
     label::LabelType, Cardinality, Edge, GKey, IntermediateRepr, List, Map, Metric, Path, Property,
     Set, Token, TraversalExplanation, TraversalMetrics, Vertex, VertexProperty,
 };
 use crate::structure::{Pop, TextP, P, T};
-use crate::{GremlinError, GremlinResult};
+use crate::{GremlinError, GremlinResult, ToGValue, GID};
 use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 pub type Date = chrono::DateTime<chrono::offset::Utc>;
 use std::convert::TryInto;
 use std::hash::Hash;
+
+use super::{Column, Direction, Merge};
 /// Represent possible values coming from the [Gremlin Server](http://tinkerpop.apache.org/docs/3.4.0/dev/io/)
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, PartialEq, Clone)]
@@ -46,6 +48,9 @@ pub enum GValue {
     TextP(TextP),
     Pop(Pop),
     Cardinality(Cardinality),
+    Merge(Merge),
+    Direction(Direction),
+    Column(Column),
 }
 
 impl GValue {
@@ -99,6 +104,13 @@ impl From<f32> for GValue {
         GValue::Float(val)
     }
 }
+
+impl From<&GID> for GValue {
+    fn from(value: &GID) -> Self {
+        value.to_gvalue()
+    }
+}
+
 impl From<f64> for GValue {
     fn from(val: f64) -> Self {
         GValue::Double(val)
@@ -180,6 +192,25 @@ impl From<Order> for GValue {
         GValue::Order(val)
     }
 }
+
+impl From<Merge> for GValue {
+    fn from(value: Merge) -> Self {
+        GValue::Merge(value)
+    }
+}
+
+impl From<Direction> for GValue {
+    fn from(value: Direction) -> Self {
+        GValue::Direction(value)
+    }
+}
+
+impl From<Column> for GValue {
+    fn from(value: Column) -> Self {
+        GValue::Column(value)
+    }
+}
+
 impl From<Token> for GValue {
     fn from(val: Token) -> Self {
         GValue::Token(val)
@@ -229,6 +260,8 @@ impl From<GValue> for VecDeque<GValue> {
 impl From<GKey> for GValue {
     fn from(val: GKey) -> Self {
         match val {
+            GKey::Direction(d) => GValue::Direction(d),
+            GKey::T(t) => GValue::T(t),
             GKey::String(s) => GValue::String(s),
             GKey::Token(s) => GValue::String(s.value().clone()),
             GKey::Vertex(v) => GValue::Vertex(v),
@@ -286,6 +319,12 @@ impl From<Cardinality> for GValue {
 impl From<uuid::Uuid> for GValue {
     fn from(val: uuid::Uuid) -> GValue {
         GValue::Uuid(val)
+    }
+}
+
+impl From<TraversalBuilder> for GValue {
+    fn from(value: TraversalBuilder) -> Self {
+        value.bytecode.into()
     }
 }
 

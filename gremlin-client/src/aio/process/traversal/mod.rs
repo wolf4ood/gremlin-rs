@@ -6,6 +6,7 @@ use crate::GremlinResult;
 use core::task::Context;
 use core::task::Poll;
 use futures::Stream;
+use futures::StreamExt;
 use std::marker::PhantomData;
 use std::pin::Pin;
 
@@ -29,6 +30,17 @@ impl<T> RemoteTraversalStream<T> {
         }
     }
 }
+
+impl RemoteTraversalStream<crate::structure::Null> {
+    pub async fn iterate(&mut self) -> GremlinResult<()> {
+        while let Some(response) = self.next().await {
+            //consume the entire stream, returning any errors
+            response?;
+        }
+        Ok(())
+    }
+}
+
 impl<T: FromGValue> Stream for RemoteTraversalStream<T> {
     type Item = GremlinResult<T>;
 

@@ -5,7 +5,7 @@ mod serializer_v3;
 
 use crate::conversion::ToGValue;
 use crate::process::traversal::{Order, Scope};
-use crate::structure::{Cardinality, GValue, T};
+use crate::structure::{Cardinality, Direction, GValue, Merge, T};
 use serde_json::{json, Map, Value};
 use std::string::ToString;
 
@@ -216,7 +216,38 @@ impl GraphSON {
                     "@value" : v
                 }))
             }
-
+            (_, GValue::Merge(merge)) => {
+                let merge_option = match merge {
+                    Merge::OnCreate => "onCreate",
+                    Merge::OnMatch => "onMatch",
+                    Merge::OutV => "outV",
+                    Merge::InV => "inV",
+                };
+                Ok(json!({
+                    "@type" : "g:Merge",
+                    "@value" : merge_option
+                }))
+            }
+            (_, GValue::Direction(direction)) => {
+                let direction = match direction {
+                    Direction::Out | Direction::From => "OUT",
+                    Direction::In | Direction::To => "IN",
+                };
+                Ok(json!({
+                    "@type" : "g:Direction",
+                    "@value" : direction,
+                }))
+            }
+            (_, GValue::Column(column)) => {
+                let column = match column {
+                    crate::structure::Column::Keys => "keys",
+                    crate::structure::Column::Values => "values",
+                };
+                Ok(json!({
+                    "@type" : "g:Column",
+                    "@value" : column,
+                }))
+            }
             (_, _) => panic!("Type {:?} not supported.", value),
         }
     }
