@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.11](https://github.com/wolf4ood/gremlin-rs/compare/v0.8.10...v0.8.11) - 2024-10-16
+
+### Other
+
+- MergeV, MergeE, & Option Steps ([#214](https://github.com/wolf4ood/gremlin-rs/pull/214))
+
 ## [0.8.10](https://github.com/wolf4ood/gremlin-rs/compare/v0.8.9...v0.8.10) - 2024-05-13
 
 ### Other

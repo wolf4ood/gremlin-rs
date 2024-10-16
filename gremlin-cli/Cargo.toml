@@ -13,7 +13,7 @@ readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-gremlin-client = { path = "../gremlin-client", version = "0.8.10", features = ["async-std-runtime"] }
+gremlin-client = { path = "../gremlin-client", version = "0.8.11", features = ["async-std-runtime"] }
 rustyline = "6.2.0"
 smol = "0.4.3"
 shellwords = "1.1.0"
