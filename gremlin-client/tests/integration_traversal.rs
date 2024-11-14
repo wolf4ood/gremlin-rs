@@ -1,3 +1,4 @@
+use core::panic;
 use std::collections::HashMap;
 use std::convert::TryInto;
 
@@ -7,12 +8,18 @@ use gremlin_client::structure::{
     Cardinality, Column, List, Map, Pop, TextP, Vertex, VertexProperty, P, T,
 };
 
-use gremlin_client::{utils, GKey, GValue};
+use gremlin_client::{utils, BorrowFromGValue, GKey, GValue, GremlinError, IoProtocol};
 
 mod common;
 
+use rstest::rstest;
+use rstest_reuse::{self, *};
+
+use serial_test::serial;
+
 use common::io::{
-    create_edge, create_vertex, create_vertex_with_label, drop_edges, drop_vertices, graph,
+    create_edge, create_vertex, create_vertex_with_label, drop_edges, drop_vertices,
+    graph_serializer,
 };
 
 #[cfg(feature = "merge_tests")]
@@ -25,9 +32,15 @@ mod merge_tests {
     };
     use std::collections::HashMap;
 
-    #[test]
-    fn test_merge_v_no_options() {
-        let client = graph();
+    #[apply(common::serializers)]
+    #[serial(test_merge_v_no_options)]
+    fn test_merge_v_no_options(protocol: IoProtocol) {
+        if protocol == IoProtocol::GraphSONV2 {
+            //GraphSONV2 doesn't support the non-string key of the merge step,
+            //so skip it in testing
+            return;
+        }
+        let client = graph_serializer(protocol);
         let test_vertex_label = "test_merge_v_no_options";
         drop_vertices(&client, test_vertex_label)
             .expect("Failed to drop vertices in case of rerun");
@@ -60,9 +73,15 @@ mod merge_tests {
         assert_map_property(&vertex_properties, "propertyKey", "propertyValue");
     }
 
-    #[test]
-    fn test_merge_v_options() {
-        let client = graph();
+    #[apply(common::serializers)]
+    #[serial(test_merge_v_options)]
+    fn test_merge_v_options(protocol: IoProtocol) {
+        if protocol == IoProtocol::GraphSONV2 {
+            //GraphSONV2 doesn't support the non-string key of the merge step,
+            //so skip it in testing
+            return;
+        }
+        let client = graph_serializer(protocol);
         let expected_label = "test_merge_v_options";
         drop_vertices(&client, expected_label).expect("Failed to drop vertices");
         let g = traversal().with_remote(client);
@@ -111,9 +130,15 @@ mod merge_tests {
         assert_map_property(&on_match_vertex_map, prop_key, expected_on_match_prop_value);
     }
 
-    #[test]
-    fn test_merge_v_start_step() {
-        let client = graph();
+    #[apply(common::serializers)]
+    #[serial(test_merge_v_start_step)]
+    fn test_merge_v_start_step(protocol: IoProtocol) {
+        if protocol == IoProtocol::GraphSONV2 {
+            //GraphSONV2 doesn't support the non-string key of the merge step,
+            //so skip it in testing
+            return;
+        }
+        let client = graph_serializer(protocol);
         let expected_label = "test_merge_v_start_step";
         drop_vertices(&client, &expected_label).expect("Failed to drop vertiecs");
         let g = traversal().with_remote(client);
@@ -128,9 +153,15 @@ mod merge_tests {
         assert_eq!(expected_label, actual_vertex.label())
     }
 
-    #[test]
-    fn test_merge_v_anonymous_traversal() {
-        let client = graph();
+    #[apply(common::serializers)]
+    #[serial(test_merge_v_anonymous_traversal)]
+    fn test_merge_v_anonymous_traversal(protocol: IoProtocol) {
+        if protocol == IoProtocol::GraphSONV2 {
+            //GraphSONV2 doesn't support the non-string key of the merge step,
+            //so skip it in testing
+            return;
+        }
+        let client = graph_serializer(protocol);
         let expected_label = "test_merge_v_anonymous_traversal";
         drop_vertices(&client, &expected_label).expect("Failed to drop vertiecs");
         let g = traversal().with_remote(client);
@@ -146,9 +177,15 @@ mod merge_tests {
         assert_eq!(expected_label, actual_vertex.label())
     }
 
-    #[test]
-    fn test_merge_e_start_step() {
-        let client = graph();
+    #[apply(common::serializers)]
+    #[serial(test_merge_e_start_step)]
+    fn test_merge_e_start_step(protocol: IoProtocol) {
+        if protocol == IoProtocol::GraphSONV2 {
+            //GraphSONV2 doesn't support the non-string key of the merge step,
+            //so skip it in testing
+            return;
+        }
+        let client = graph_serializer(protocol);
         let expected_vertex_label = "test_merge_e_start_step_vertex";
         let expected_edge_label = "test_merge_e_start_step_edge";
         let expected_edge_property_key = "test_merge_e_start_step_edge_prop";
@@ -213,9 +250,15 @@ mod merge_tests {
         assert_eq!(outgoing_vertex_id, &vertex_b.id().to_gvalue());
     }
 
-    #[test]
-    fn test_merge_e_no_options() {
-        let client = graph();
+    #[apply(common::serializers)]
+    #[serial(test_merge_e_no_options)]
+    fn test_merge_e_no_options(protocol: IoProtocol) {
+        if protocol == IoProtocol::GraphSONV2 {
+            //GraphSONV2 doesn't support the non-string key of the merge step,
+            //so skip it in testing
+            return;
+        }
+        let client = graph_serializer(protocol);
         let expected_vertex_label = "test_merge_e_no_options_vertex";
         let expected_edge_label = "test_merge_e_no_options_edge";
         let expected_edge_property_key = "test_merge_e_no_options_edge_prop";
@@ -282,9 +325,15 @@ mod merge_tests {
         assert_eq!(outgoing_vertex_id, &vertex_b.id().to_gvalue());
     }
 
-    #[test]
-    fn test_merge_e_options() {
-        let client = graph();
+    #[apply(common::serializers)]
+    #[serial(test_merge_e_options)]
+    fn test_merge_e_options(protocol: IoProtocol) {
+        if protocol == IoProtocol::GraphSONV2 {
+            //GraphSONV2 doesn't support the non-string key of the merge step,
+            //so skip it in testing
+            return;
+        }
+        let client = graph_serializer(protocol);
         let expected_vertex_label = "test_merge_e_options_vertex";
         let expected_edge_label = "test_merge_e_options_edge";
         let expected_edge_property_key = "test_merge_e_options_edge_prop";
@@ -352,11 +401,17 @@ mod merge_tests {
         );
     }
 
-    #[test]
-    fn test_merge_e_anonymous_traversal() {
-        let client = graph();
-        let expected_vertex_label = "test_merge_e_options_vertex";
-        let expected_edge_label = "test_merge_e_options_edge";
+    #[apply(common::serializers)]
+    #[serial(test_merge_e_anonymous_traversal)]
+    fn test_merge_e_anonymous_traversal(protocol: IoProtocol) {
+        if protocol == IoProtocol::GraphSONV2 {
+            //GraphSONV2 doesn't support the non-string key of the merge step,
+            //so skip it in testing
+            return;
+        }
+        let client = graph_serializer(protocol);
+        let expected_vertex_label = "test_merge_e_anonymous_traversal_vertex";
+        let expected_edge_label = "test_merge_e_anonymous_traversal_edge";
         drop_vertices(&client, &expected_vertex_label).expect("Failed to drop vertiecs");
         let g = traversal().with_remote(client);
 
@@ -380,7 +435,7 @@ mod merge_tests {
         let anonymous_merge_e_properties = g
             .inject(1)
             .unfold()
-            .coalesce::<Edge, _>([__.merge_e(assignment_map)])
+            .coalesce::<Edge, _>([__.merge_e(assignment_map.clone())])
             .element_map(())
             .next()
             .expect("Should get a response")
@@ -407,10 +462,17 @@ mod merge_tests {
         assert_eq!(outgoing_vertex_id, &vertex_b.id().to_gvalue());
     }
 
-    #[test]
-    fn test_merge_v_into_merge_e() {
+    #[apply(common::serializers)]
+    #[serial(test_merge_v_into_merge_e)]
+    fn test_merge_v_into_merge_e(protocol: IoProtocol) {
+        if protocol == IoProtocol::GraphSONV2 {
+            //GraphSONV2 doesn't support the non-string key of the merge step,
+            //so skip it in testing
+            return;
+        }
+        let client = graph_serializer(protocol);
         //Based on the reference doc's combo example
-        let client = graph();
+
         let expected_vertex_label = "test_merge_v_into_merge_e_vertex";
         let expected_edge_label = "test_merge_v_into_merge_e_edge";
         drop_vertices(&client, &expected_vertex_label).expect("Failed to drop vertiecs");
@@ -472,18 +534,22 @@ mod merge_tests {
     }
 }
 
-#[test]
-fn test_simple_vertex_traversal() {
-    let g = traversal().with_remote(graph());
+#[apply(common::serializers)]
+#[serial(test_simple_vertex_traversal)]
+fn test_simple_vertex_traversal(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
+    let g = traversal().with_remote(client);
 
     let results = g.v(()).to_list().unwrap();
 
     assert!(results.len() > 0);
 }
 
-#[test]
-fn test_inject() {
-    let g = traversal().with_remote(graph());
+#[apply(common::serializers)]
+#[serial(test_inject)]
+fn test_inject(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
+    let g = traversal().with_remote(client);
     let expected_value = "foo";
     let response: String = g
         .inject(vec![expected_value.into()])
@@ -495,10 +561,10 @@ fn test_inject() {
     assert_eq!(expected_value, response);
 }
 
-#[test]
-fn test_simple_vertex_traversal_with_id() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_simple_vertex_traversal_with_id)]
+fn test_simple_vertex_traversal_with_id(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let vertex = create_vertex(&client, "Traversal");
 
     let g = traversal().with_remote(client);
@@ -510,9 +576,10 @@ fn test_simple_vertex_traversal_with_id() {
     assert_eq!(vertex.id(), results[0].id());
 }
 
-#[test]
-fn test_simple_vertex_traversal_with_multiple_id() {
-    let client = graph();
+#[apply(common::serializers)]
+#[serial(test_simple_vertex_traversal_with_multiple_id)]
+fn test_simple_vertex_traversal_with_multiple_id(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_simple_vertex_traversal").unwrap();
 
     let vertex = create_vertex_with_label(&client, "test_simple_vertex_traversal", "Traversal");
@@ -528,10 +595,10 @@ fn test_simple_vertex_traversal_with_multiple_id() {
     assert_eq!(vertex2.id(), results[1].id());
 }
 
-#[test]
-fn test_simple_vertex_traversal_with_label() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_simple_vertex_traversal_with_label)]
+fn test_simple_vertex_traversal_with_label(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_simple_vertex_traversal_with_label").unwrap();
 
     let vertex = create_vertex_with_label(
@@ -553,10 +620,10 @@ fn test_simple_vertex_traversal_with_label() {
     assert_eq!(vertex.id(), results[0].id());
 }
 
-#[test]
-fn test_simple_vertex_traversal_with_label_and_has() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_simple_vertex_traversal_with_label_and_has)]
+fn test_simple_vertex_traversal_with_label_and_has(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_simple_vertex_traversal_with_label_and_has").unwrap();
 
     let vertex = create_vertex_with_label(
@@ -621,19 +688,21 @@ fn test_simple_vertex_traversal_with_label_and_has() {
     assert_eq!(vertex.id(), results[0].id());
 }
 
-#[test]
-fn test_simple_edge_traversal() {
-    let g = traversal().with_remote(graph());
+#[apply(common::serializers)]
+#[serial(test_simple_edge_traversal)]
+fn test_simple_edge_traversal(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
+    let g = traversal().with_remote(client);
 
     let results = g.e(()).to_list().unwrap();
 
     assert!(results.len() > 0);
 }
 
-#[test]
-fn test_simple_edge_traversal_id() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_simple_edge_traversal_id)]
+fn test_simple_edge_traversal_id(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let v = create_vertex(&client, "Traversal");
     let v1 = create_vertex(&client, "Traversal");
 
@@ -648,10 +717,10 @@ fn test_simple_edge_traversal_id() {
     assert_eq!(e.id(), results[0].id());
 }
 
-#[test]
-fn test_simple_edge_traversal_with_label() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_simple_edge_traversal_with_label)]
+fn test_simple_edge_traversal_with_label(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_edges(&client, "test_simple_edge_traversal_with_label").unwrap();
 
     let v = create_vertex(&client, "Traversal");
@@ -672,10 +741,10 @@ fn test_simple_edge_traversal_with_label() {
     assert_eq!(e.id(), results[0].id());
 }
 
-#[test]
-fn test_traversal() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_traversal)]
+fn test_traversal(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_edges(&client, "test_vertex_out_traversal").unwrap();
 
     let v = create_vertex(&client, "Traversal");
@@ -815,9 +884,11 @@ fn test_traversal() {
     assert_eq!(0, results.len());
 }
 
-#[test]
-fn test_add_v() {
-    let g = traversal().with_remote(graph());
+#[apply(common::serializers)]
+#[serial(test_add_v)]
+fn test_add_v(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
+    let g = traversal().with_remote(client);
 
     let results = g.add_v("person").to_list().unwrap();
 
@@ -833,9 +904,10 @@ fn test_add_v() {
     assert_eq!("vertex", results[0].label());
 }
 
-#[test]
-fn test_add_v_with_properties() {
-    let client = graph();
+#[apply(common::serializers)]
+#[serial(test_add_v_with_properties)]
+fn test_add_v_with_properties(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let g = traversal().with_remote(client.clone());
 
     let results = g
@@ -878,10 +950,10 @@ fn test_add_v_with_properties() {
     );
 }
 
-#[test]
-fn test_add_v_with_property_many() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_add_v_with_property_many)]
+fn test_add_v_with_property_many(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_add_v_with_property_many").unwrap();
 
     let g = traversal().with_remote(client.clone());
@@ -928,10 +1000,10 @@ fn test_add_v_with_property_many() {
     );
 }
 
-#[test]
-fn test_has_many() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_has_many)]
+fn test_has_many(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_has_many").unwrap();
 
     let g = traversal().with_remote(client.clone());
@@ -961,9 +1033,10 @@ fn test_has_many() {
     assert_eq!(results.len(), 1);
 }
 
-#[test]
-fn test_add_e() {
-    let client = graph();
+#[apply(common::serializers)]
+#[serial(test_add_e)]
+fn test_add_e(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let g = traversal().with_remote(client.clone());
 
     let v = g
@@ -1024,10 +1097,10 @@ fn test_add_e() {
     assert_eq!("knows", edges[0].label());
 }
 
-#[test]
-fn test_label_step() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_label_step)]
+fn test_label_step(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let vertex = create_vertex(&client, "Traversal");
 
     let g = traversal().with_remote(client);
@@ -1039,10 +1112,10 @@ fn test_label_step() {
     assert_eq!("person", results[0]);
 }
 
-#[test]
-fn test_properties_step() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_properties_step)]
+fn test_properties_step(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let vertex = create_vertex(&client, "Traversal");
 
     let g = traversal().with_remote(client);
@@ -1064,10 +1137,10 @@ fn test_properties_step() {
     assert_eq!(0, results.len());
 }
 
-#[test]
-fn test_property_map() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_property_map)]
+fn test_property_map(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let vertex = create_vertex(&client, "Traversal");
 
     let g = traversal().with_remote(client);
@@ -1111,10 +1184,10 @@ fn test_property_map() {
     assert_eq!(0, properties.len());
 }
 
-#[test]
-fn test_values() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_values)]
+fn test_values(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let vertex = create_vertex(&client, "Traversal");
 
     let g = traversal().with_remote(client);
@@ -1140,10 +1213,10 @@ fn test_values() {
     assert_eq!(0, results.len());
 }
 
-#[test]
-fn test_value_map() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_value_map)]
+fn test_value_map(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let g = traversal().with_remote(client);
 
     let vertices = g
@@ -1162,9 +1235,7 @@ fn test_value_map() {
 
     assert_eq!(
         "test",
-        value["name"].get::<List>().unwrap()[0]
-            .get::<String>()
-            .unwrap()
+        get_map::<String, _>(value, "name").unwrap().unwrap()
     );
 
     let results = g.v(vertex.id()).value_map("name").to_list().unwrap();
@@ -1175,9 +1246,7 @@ fn test_value_map() {
 
     assert_eq!(
         "test",
-        value["name"].get::<List>().unwrap()[0]
-            .get::<String>()
-            .unwrap()
+        get_map::<String, _>(value, "name").unwrap().unwrap()
     );
 
     let results = g.v(vertex.id()).value_map("fake").to_list().unwrap();
@@ -1185,16 +1254,27 @@ fn test_value_map() {
     assert_eq!(0, results[0].len());
 
     let results = g.v(vertex.id()).value_map(true).to_list().unwrap();
+    assert_eq!(1, results.len());
+    let value = &results[0];
 
-    assert_eq!(true, results[0].get("id").is_some());
-    assert_eq!(true, results[0].get("label").is_some());
+    assert_eq!(
+        Some(vertex.id().get().unwrap()),
+        get_map_id(&value).unwrap()
+    );
+    assert_eq!(Some(vertex.label()), get_map_label(&value).unwrap());
+    assert_eq!(
+        Some("test".to_owned()).as_ref(),
+        get_map(&value, "name").unwrap()
+    );
+    assert!(results[0].get("id").is_some());
+    assert!(results[0].get("label").is_some());
     assert_eq!(true, results[0].get("name").is_some());
 }
 
-#[test]
-fn test_unwrap_map() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_unwrap_map)]
+fn test_unwrap_map(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let g = traversal().with_remote(client);
 
     let vertices = g
@@ -1208,23 +1288,18 @@ fn test_unwrap_map() {
     let results = g.v(vertex.id()).value_map(true).next().unwrap().unwrap();
     let v_id = vertex.id().get::<i64>().unwrap();
 
-    let id = utils::unwrap_map::<i64>(&results, "id", 0);
-    let property = utils::unwrap_map::<String>(&results, "name", 0);
-    let label = utils::unwrap_map::<String>(&results, "label", 0);
-
-    assert_eq!(id.is_ok(), true);
-    assert_eq!(property.is_ok(), true);
-    assert_eq!(label.is_ok(), true);
-
-    assert_eq!(id.unwrap(), v_id);
+    let id = get_map_id(&results).unwrap();
+    let property = get_map::<String, _>(&results, "name").unwrap();
+    let label = get_map_label(&results).unwrap();
+    assert_eq!(id, Some(v_id));
     assert_eq!(property.unwrap(), "test");
-    assert_eq!(label.unwrap(), "test_value_map");
+    assert_eq!(label, Some(vertex.label()));
 }
 
-#[test]
-fn test_element_map() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_element_map)]
+fn test_element_map(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let g = traversal().with_remote(client);
 
     let vertices = g
@@ -1252,22 +1327,39 @@ fn test_element_map() {
     assert_eq!("test", value["name"].get::<String>().unwrap());
 
     let results = g.v(vertex.id()).element_map("fake").to_list().unwrap();
+    let value = &results[0];
 
+    assert_eq!(2, value.len());
+    assert_eq!(
+        Some(vertex.id().get().unwrap()),
+        get_map_id(&value).unwrap()
+    );
+    assert_eq!(Some(vertex.label()), get_map_label(&value).unwrap());
     assert_eq!(2, results[0].len());
-    assert_eq!(true, results[0].get("id").is_some());
-    assert_eq!(true, results[0].get("label").is_some());
+    assert!(results[0].get("id").is_some());
+    assert!(results[0].get("label").is_some());
 
     let results = g.v(vertex.id()).element_map(()).to_list().unwrap();
+    let value = &results[0];
 
-    assert_eq!(true, results[0].get("id").is_some());
-    assert_eq!(true, results[0].get("label").is_some());
+    assert_eq!(
+        Some(vertex.id().get().unwrap()),
+        get_map_id(&value).unwrap()
+    );
+    assert_eq!(Some(vertex.label()), get_map_label(&value).unwrap());
+    assert_eq!(
+        Some("test".to_owned()).as_ref(),
+        get_map(&value, "name").unwrap()
+    );
+    assert!(results[0].get("id").is_some());
+    assert!(results[0].get("label").is_some());
     assert_eq!(true, results[0].get("name").is_some());
 }
 
-#[test]
-fn test_count() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_count)]
+fn test_count(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let vertex = create_vertex_with_label(&client, "test_count", "Count");
 
     let g = traversal().with_remote(client);
@@ -1281,10 +1373,10 @@ fn test_count() {
     assert_eq!(&1, value);
 }
 
-#[test]
-fn test_group_count_step() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_group_count_step)]
+fn test_group_count_step(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_group_count").unwrap();
 
     let vertex = create_vertex_with_label(&client, "test_group_count", "Count");
@@ -1295,14 +1387,36 @@ fn test_group_count_step() {
         .v(())
         .has_label("test_group_count")
         .group_count()
-        .to_list()
+        //Normalize the keys to a common type of Id across serializers
+        .by(T::Id)
+        .next()
         .unwrap();
 
-    assert_eq!(1, results.len());
+    let value = results.expect("Should have returned a map");
+    assert_eq!(1, value.len(), "Should only have 1 entry in map");
+    let (actual_key, actual_value) = value.into_iter().next().unwrap();
 
-    let value = &results[0];
+    //The actual key may come back as either an int or a string depending
+    //on the serializer, so normalize it and the vertex gid to a string
+    let normalized_actual_key = match actual_key {
+        GKey::String(v) => v,
+        GKey::Int64(v) => v.to_string(),
+        other => panic!("Unexpected key type: {:?}", other),
+    };
 
-    assert_eq!(&1, value[&vertex].get::<i64>().unwrap());
+    let normalized_vertex_id = match vertex.id() {
+        gremlin_client::GID::String(v) => v.clone(),
+        gremlin_client::GID::Int32(v) => v.to_string(),
+        gremlin_client::GID::Int64(v) => v.to_string(),
+    };
+
+    assert_eq!(normalized_actual_key, normalized_vertex_id);
+
+    assert_eq!(
+        actual_value,
+        GValue::Int64(1),
+        "Group count should have been the single vertex"
+    );
 
     let results = g
         .v(())
@@ -1333,10 +1447,10 @@ fn test_group_count_step() {
     assert_eq!(&1, value["test_group_count"].get::<i64>().unwrap());
 }
 
-#[test]
-fn test_group_by_step() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_group_by_step)]
+fn test_group_by_step(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_group_by_step").unwrap();
 
     create_vertex_with_label(&client, "test_group_by_step", "Count");
@@ -1389,10 +1503,10 @@ fn test_group_by_step() {
     assert_eq!(&1, value["test_group_by_step"].get::<i64>().unwrap());
 }
 
-#[test]
-fn test_select_step() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_select_step)]
+fn test_select_step(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_select_step").unwrap();
 
     create_vertex_with_label(&client, "test_select_step", "Count");
@@ -1415,10 +1529,10 @@ fn test_select_step() {
     assert_eq!(&1, value.get::<i64>().unwrap());
 }
 
-#[test]
-fn test_fold_step() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_fold_step)]
+fn test_fold_step(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_fold_step").unwrap();
 
     create_vertex_with_label(&client, "test_fold_step", "Count");
@@ -1440,10 +1554,10 @@ fn test_fold_step() {
     assert_eq!("Count", value[0].get::<String>().unwrap());
 }
 
-#[test]
-fn test_unfold_step() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_unfold_step)]
+fn test_unfold_step(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_unfold_step").unwrap();
 
     let vertex = create_vertex_with_label(&client, "test_unfold_step", "Count");
@@ -1471,10 +1585,10 @@ fn test_unfold_step() {
     );
 }
 
-#[test]
-fn test_path_step() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_path_step)]
+fn test_path_step(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_path_step").unwrap();
 
     let v = create_vertex_with_label(&client, "test_path_step", "Count");
@@ -1495,10 +1609,10 @@ fn test_path_step() {
     assert_eq!(v.id(), value.objects()[0].get::<Vertex>().unwrap().id());
 }
 
-#[test]
-fn test_limit_step() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_limit_step)]
+fn test_limit_step(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_limit_step").unwrap();
 
     create_vertex_with_label(&client, "test_limit_step", "Count");
@@ -1516,10 +1630,10 @@ fn test_limit_step() {
     assert_eq!(1, results.len());
 }
 
-#[test]
-fn test_dedup_step() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_dedup_step)]
+fn test_dedup_step(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_limit_step").unwrap();
 
     create_vertex_with_label(&client, "test_limit_step", "Count");
@@ -1538,10 +1652,10 @@ fn test_dedup_step() {
     assert_eq!(1, results.len());
 }
 
-#[test]
-fn test_numerical_steps() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_numerical_steps)]
+fn test_numerical_steps(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_numerical_steps").unwrap();
 
     let g = traversal().with_remote(client);
@@ -1610,10 +1724,10 @@ fn test_numerical_steps() {
     assert_eq!(&20, results[0].get::<i32>().unwrap());
 }
 
-#[test]
-fn test_has_with_p_steps() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_has_with_p_steps)]
+fn test_has_with_p_steps(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_has_with_p_steps").unwrap();
 
     let g = traversal().with_remote(client);
@@ -1652,6 +1766,29 @@ fn test_has_with_p_steps() {
 
     let results = g
         .v(())
+        .has(("test_has_with_p_steps", "age", 20))
+        .values("age")
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(&20, results[0].get::<i32>().unwrap());
+
+    let results = g
+        .v(())
+        .has_label("test_has_with_p_steps")
+        .values("age")
+        .where_(__.is(P::eq(20)))
+        .to_list()
+        .unwrap();
+
+    assert_eq!(1, results.len());
+
+    assert_eq!(&20, results[0].get::<i32>().unwrap());
+
+    let results = g
+        .v(())
         .has_label("test_has_with_p_steps")
         .values("age")
         .is(P::within(vec![19, 20]))
@@ -1663,10 +1800,10 @@ fn test_has_with_p_steps() {
     assert_eq!(&20, results[0].get::<i32>().unwrap());
 }
 
-#[test]
-fn test_has_with_text_p_step() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_has_with_text_p_step)]
+fn test_has_with_text_p_step(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_has_with_text_p_step").unwrap();
 
     let g = traversal().with_remote(client);
@@ -1730,10 +1867,10 @@ fn test_has_with_text_p_step() {
     assert_eq!(2, results.len());
 }
 
-#[test]
-fn where_step_test() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(where_step_test)]
+fn where_step_test(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "where_step_test").unwrap();
 
     let g = traversal().with_remote(client);
@@ -1756,10 +1893,10 @@ fn where_step_test() {
     assert_eq!(v[0].id(), results[0].id());
 }
 
-#[test]
-fn not_step_test() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(not_step_test)]
+fn not_step_test(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "not_step_test").unwrap();
 
     let g = traversal().with_remote(client);
@@ -1779,10 +1916,10 @@ fn not_step_test() {
     assert_eq!(0, results.len());
 }
 
-#[test]
-fn order_step_test() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(order_step_test)]
+fn order_step_test(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "order_step_test").unwrap();
 
     let g = traversal().with_remote(client);
@@ -1823,10 +1960,10 @@ fn order_step_test() {
     assert_eq!("b", results[0].get::<String>().unwrap());
 }
 
-#[test]
-fn match_step_test() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(match_step_test)]
+fn match_step_test(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "match_step_test").unwrap();
 
     drop_edges(&client, "match_step_test_edge").unwrap();
@@ -1885,10 +2022,10 @@ fn match_step_test() {
     assert_eq!(&v3[0], first["c"].get::<Vertex>().unwrap());
 }
 
-#[test]
-fn drop_step_test() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(drop_step_test)]
+fn drop_step_test(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "drop_step_test").unwrap();
 
     let g = traversal().with_remote(client);
@@ -1918,10 +2055,10 @@ fn drop_step_test() {
     assert_eq!(false, results);
 }
 
-#[test]
-fn or_step_test() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(or_step_test)]
+fn or_step_test(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "or_step_test").unwrap();
 
     let g = traversal().with_remote(client);
@@ -1959,10 +2096,10 @@ fn or_step_test() {
     assert_eq!(result.len(), 2);
 }
 
-#[test]
-fn iter_terminator_test() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(iter_terminator_test)]
+fn iter_terminator_test(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "iter_terminator_test").unwrap();
 
     let g = traversal().with_remote(client);
@@ -1988,10 +2125,10 @@ fn iter_terminator_test() {
     assert_eq!(2, results.len())
 }
 
-#[test]
-fn test_select_pop() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_select_pop)]
+fn test_select_pop(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_select_pop").unwrap();
     drop_vertices(&client, "test_select_pop_child").unwrap();
 
@@ -2077,10 +2214,10 @@ fn test_select_pop() {
     assert_eq!(results.len(), 1);
 }
 
-#[test]
-fn test_repeat_until_loops_loops() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_repeat_until_loops_loops)]
+fn test_repeat_until_loops_loops(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_repeat_until_loops").unwrap();
     drop_vertices(&client, "test_repeat_until_loops_child").unwrap();
 
@@ -2118,10 +2255,30 @@ fn test_repeat_until_loops_loops() {
     assert_eq!(results[0], e2[0]);
 }
 
-#[test]
-fn test_simple_path() {
-    let client = graph();
+#[apply(common::serializers)]
+#[serial(test_simple_path)]
+fn test_simple_vertex_property(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
+    drop_vertices(&client, "test_simple_vertex_property").unwrap();
 
+    let g = traversal().with_remote(client);
+
+    let v = g
+        .add_v("test_simple_vertex_property")
+        .property("name", "a")
+        .element_map(())
+        .next()
+        .unwrap()
+        .unwrap();
+
+    let actual_property: &String = v.get("name").expect("Should have property").get().unwrap();
+    assert_eq!(actual_property, "a");
+}
+
+#[apply(common::serializers)]
+#[serial(test_simple_path)]
+fn test_simple_path(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_simple_path").unwrap();
     drop_vertices(&client, "test_simple_path_child").unwrap();
 
@@ -2160,10 +2317,10 @@ fn test_simple_path() {
     assert_eq!(results[0], e2[0]);
 }
 
-#[test]
-fn test_sample() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_sample)]
+fn test_sample(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_sample").unwrap();
     drop_vertices(&client, "test_sample_child").unwrap();
 
@@ -2193,10 +2350,10 @@ fn test_sample() {
     assert_eq!(results.len(), 1);
 }
 
-#[test]
-fn test_local() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_local)]
+fn test_local(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_local").unwrap();
     drop_vertices(&client, "test_local_child").unwrap();
     drop_vertices(&client, "test_local_child_child").unwrap();
@@ -2269,9 +2426,10 @@ fn test_local() {
     assert_eq!(results.len(), 2);
 }
 
-#[test]
-fn test_side_effect() {
-    let client = graph();
+#[apply(common::serializers)]
+#[serial(test_side_effect)]
+fn test_side_effect(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let test_vertex_label = "test_side_effect";
     let expected_side_effect_key = "prop_key";
     let expected_side_effect_value = "prop_val";
@@ -2298,9 +2456,10 @@ fn test_side_effect() {
     );
 }
 
-#[test]
-fn test_anonymous_traversal_properties_drop() {
-    let client = graph();
+#[apply(common::serializers)]
+#[serial(test_anonymous_traversal_properties_drop)]
+fn test_anonymous_traversal_properties_drop(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let test_vertex_label = "test_anonymous_traversal_properties_drop";
     let pre_drop_prop_key = "pre_drop_prop_key";
     let expected_prop_value = "prop_val";
@@ -2353,9 +2512,10 @@ fn test_anonymous_traversal_properties_drop() {
     );
 }
 
-#[test]
-fn test_by_columns() {
-    let client = graph();
+#[apply(common::serializers)]
+#[serial(test_by_columns)]
+fn test_by_columns(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let test_vertex_label = "test_by_columns";
     let expected_side_effect_key_a = "prop_key_a";
     let expected_side_effect_value_a = "prop_val_a";
@@ -2409,10 +2569,10 @@ fn test_by_columns() {
     );
 }
 
-#[test]
-fn test_property_cardinality() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_property_cardinality)]
+fn test_property_cardinality(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_property_cardinality").unwrap();
 
     let g = traversal().with_remote(client);
@@ -2440,10 +2600,10 @@ fn test_property_cardinality() {
     assert_eq!(1, new_v["name"].get::<List>().unwrap().len());
 }
 
-#[test]
-fn test_choose() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_choose)]
+fn test_choose(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_choose").unwrap();
 
     let g = traversal().with_remote(client);
@@ -2482,9 +2642,10 @@ fn test_choose() {
     assert_eq!(success_vertices.is_some(), true);
 }
 
-#[test]
-fn test_choose_by_literal_options() {
-    let client = graph();
+#[apply(common::serializers)]
+#[serial(test_choose_by_literal_options)]
+fn test_choose_by_literal_options(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     let g = traversal().with_remote(client);
 
     let choosen_literal_a = g
@@ -2510,10 +2671,10 @@ fn test_choose_by_literal_options() {
     assert_eq!(choosen_literal_b, Some("option-b".into()));
 }
 
-#[test]
-fn test_coalesce() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial()]
+fn test_coalesce(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     use gremlin_client::GValue;
 
     drop_vertices(&client, "test_coalesce").unwrap();
@@ -2546,10 +2707,10 @@ fn test_coalesce() {
     assert!(values.contains(&String::from("b")));
 }
 
-#[test]
-fn test_coalesce_unfold() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_coalesce_unfold)]
+fn test_coalesce_unfold(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_coalesce_unfold").unwrap();
 
     let g = traversal().with_remote(client);
@@ -2603,10 +2764,10 @@ fn test_coalesce_unfold() {
     );
 }
 
-#[test]
-fn test_none_step() {
-    let client = graph();
-
+#[apply(common::serializers)]
+#[serial(test_none_step)]
+fn test_none_step(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     drop_vertices(&client, "test_none_step").unwrap();
 
     let g = traversal().with_remote(client);
@@ -2631,14 +2792,46 @@ fn test_none_step() {
     assert_eq!(1, vertex_count);
 }
 
-#[test]
+fn get_map_id<'a>(map: &'a Map) -> Result<Option<&i64>, GremlinError> {
+    let string_keyed = get_map(map, "id")?;
+    if string_keyed.is_some() {
+        Ok(string_keyed)
+    } else {
+        get_map(map, T::Id)
+    }
+}
+
+fn get_map_label<'a>(map: &'a Map) -> Result<Option<&String>, GremlinError> {
+    let string_keyed = get_map(map, "label")?;
+    if string_keyed.is_some() {
+        Ok(string_keyed)
+    } else {
+        get_map(map, T::Label)
+    }
+}
+
+fn get_map<'a, T, K>(map: &'a Map, key: K) -> Result<Option<&'a T>, GremlinError>
+where
+    T: BorrowFromGValue,
+    K: Into<GKey>,
+{
+    map.get(key)
+        .map(|val| match val {
+            GValue::List(list) => list[0].get::<T>(),
+            other => other.get::<T>(),
+        })
+        .transpose()
+}
+
+#[apply(common::serializers)]
+#[serial(test_traversal_vertex_mapping)]
 #[cfg(feature = "derive")]
-fn test_traversal_vertex_mapping() {
+fn test_traversal_vertex_mapping(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     use chrono::{DateTime, TimeZone, Utc};
     use gremlin_client::derive::FromGMap;
+    use gremlin_client::process::traversal::{Bytecode, TraversalBuilder};
     use std::convert::TryFrom;
-
-    let client = graph();
 
     drop_vertices(&client, "test_vertex_mapping").unwrap();
 
@@ -2661,6 +2854,7 @@ fn test_traversal_vertex_mapping() {
 
     #[derive(Debug, PartialEq, FromGMap)]
     struct Person {
+        label: String,
         name: String,
         age: i32,
         time: i64,
@@ -2668,11 +2862,11 @@ fn test_traversal_vertex_mapping() {
         uuid: uuid::Uuid,
         optional: Option<String>,
     }
-    let person = Person::try_from(mark.unwrap().unwrap());
-    assert_eq!(person.is_ok(), true);
+    let person = Person::try_from(mark.unwrap().unwrap()).expect("Should get person");
 
     assert_eq!(
         Person {
+            label: String::from("person"),
             name: String::from("Mark"),
             age: 22,
             time: 22,
@@ -2680,6 +2874,6 @@ fn test_traversal_vertex_mapping() {
             uuid: uuid,
             optional: None
         },
-        person.unwrap()
+        person
     );
 }

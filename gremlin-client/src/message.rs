@@ -3,14 +3,16 @@ use serde_derive::{Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
 
+use crate::GValue;
+
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RequestIdV2 {
     #[serde(rename = "@type")]
-    id_type: String,
+    pub id_type: String,
 
     #[serde(rename = "@value")]
-    value: Uuid,
+    pub value: Uuid,
 }
 
 #[derive(Serialize)]
@@ -49,17 +51,16 @@ impl<T> Message<T> {
         }
     }
 }
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
 pub struct Response {
-    pub request_id: Uuid,
+    pub request_id: Option<Uuid>,
     pub result: ResponseResult,
     pub status: ReponseStatus,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug)]
 pub struct ResponseResult {
-    pub data: Value,
+    pub data: Option<GValue>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -76,45 +77,6 @@ where
     T: Default + SerdeDeserialize<'de>,
 {
     Option::<T>::deserialize(de).map(Option::unwrap_or_default)
-}
-
-pub fn message_with_args_v2<T>(op: String, processor: String, args: T) -> Message<T> {
-    message_with_args_and_uuid_v2(op, processor, Uuid::new_v4(), args)
-}
-
-pub fn message_with_args_and_uuid_v2<T>(
-    op: String,
-    processor: String,
-    id: Uuid,
-    args: T,
-) -> Message<T> {
-    Message::V2 {
-        request_id: RequestIdV2 {
-            id_type: "g:UUID".to_string(),
-            value: id,
-        },
-        op,
-        processor,
-        args,
-    }
-}
-
-pub fn message_with_args<T>(op: String, processor: String, args: T) -> Message<T> {
-    message_with_args_and_uuid(op, processor, Uuid::new_v4(), args)
-}
-
-pub fn message_with_args_and_uuid<T>(
-    op: String,
-    processor: String,
-    id: Uuid,
-    args: T,
-) -> Message<T> {
-    Message::V3 {
-        request_id: id,
-        op,
-        processor,
-        args,
-    }
 }
 
 #[cfg(test)]

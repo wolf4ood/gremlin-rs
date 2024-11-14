@@ -266,6 +266,8 @@ impl From<GKey> for GValue {
             GKey::Token(s) => GValue::String(s.value().clone()),
             GKey::Vertex(v) => GValue::Vertex(v),
             GKey::Edge(v) => GValue::Edge(v),
+            GKey::Int64(v) => GValue::Int64(v),
+            GKey::Int32(v) => GValue::Int32(v),
         }
     }
 }

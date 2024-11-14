@@ -1,6 +1,6 @@
-use std::{net::TcpStream, sync::Arc, time::Duration};
+use std::{net::TcpStream, time::Duration};
 
-use crate::{GraphSON, GremlinError, GremlinResult};
+use crate::{GremlinError, GremlinResult, IoProtocol};
 use native_tls::TlsConnector;
 use tungstenite::{
     client::{uri_mode, IntoClientRequest},
@@ -164,12 +164,12 @@ impl ConnectionOptionsBuilder {
         self
     }
 
-    pub fn serializer(mut self, serializer: GraphSON) -> Self {
+    pub fn serializer(mut self, serializer: IoProtocol) -> Self {
         self.0.serializer = serializer;
         self
     }
 
-    pub fn deserializer(mut self, deserializer: GraphSON) -> Self {
+    pub fn deserializer(mut self, deserializer: IoProtocol) -> Self {
         self.0.deserializer = deserializer;
         self
     }
@@ -185,8 +185,8 @@ pub struct ConnectionOptions {
     pub(crate) credentials: Option<Credentials>,
     pub(crate) ssl: bool,
     pub(crate) tls_options: Option<TlsOptions>,
-    pub(crate) serializer: GraphSON,
-    pub(crate) deserializer: GraphSON,
+    pub(crate) serializer: IoProtocol,
+    pub(crate) deserializer: IoProtocol,
     pub(crate) websocket_options: Option<WebSocketOptions>,
 }
 
@@ -269,8 +269,8 @@ impl Default for ConnectionOptions {
             credentials: None,
             ssl: false,
             tls_options: None,
-            serializer: GraphSON::V3,
-            deserializer: GraphSON::V3,
+            serializer: IoProtocol::GraphSONV3,
+            deserializer: IoProtocol::GraphSONV3,
             websocket_options: None,
         }
     }

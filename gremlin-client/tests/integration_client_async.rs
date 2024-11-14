@@ -5,24 +5,27 @@ mod common;
 mod aio {
 
     use gremlin_client::{aio::GremlinClient, ConnectionOptions, GremlinError, TlsOptions};
-    use gremlin_client::{Edge, GValue, Map, Vertex};
+    use gremlin_client::{Edge, GValue, IoProtocol, Map, Vertex};
 
-    use super::common::aio::{connect, create_edge, create_vertex, drop_vertices};
+    use rstest::*;
+    use rstest_reuse::{self, *};
+    use serial_test::serial;
+
+    use crate::common;
+
+    use super::common::aio::{
+        connect, connect_serializer, create_edge, create_vertex, drop_vertices,
+    };
     #[cfg(feature = "async-std-runtime")]
     use async_std::prelude::*;
 
     #[cfg(feature = "tokio-runtime")]
     use tokio_stream::StreamExt;
 
+    #[apply(common::serializers)]
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
     #[cfg_attr(feature = "tokio-runtime", tokio::test)]
-    async fn test_client_connection_ok() {
-        connect().await;
-    }
-
-    #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    #[cfg_attr(feature = "tokio-runtime", tokio::test)]
-    async fn test_ok_credentials() {
+    async fn test_ok_credentials(protocol: IoProtocol) {
         let client = GremlinClient::connect(
             ConnectionOptions::builder()
                 .host("localhost")
@@ -32,6 +35,8 @@ mod aio {
                 .tls_options(TlsOptions {
                     accept_invalid_certs: true,
                 })
+                .serializer(protocol.clone())
+                .deserializer(protocol)
                 .build(),
         )
         .await
@@ -41,10 +46,11 @@ mod aio {
         assert!(result.is_ok(), "{:?}", result);
     }
 
+    #[apply(common::serializers)]
     #[cfg(feature = "async-std-runtime")]
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    async fn test_empty_query() {
-        let graph = connect().await;
+    async fn test_empty_query(protocol: IoProtocol) {
+        let graph = connect_serializer(protocol).await;
 
         assert_eq!(
             0,
@@ -57,10 +63,12 @@ mod aio {
         )
     }
 
+    #[apply(common::serializers)]
+    #[serial(test_session_empty_query)]
     #[cfg(feature = "async-std-runtime")]
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    async fn test_session_empty_query() {
-        let mut graph = connect().await;
+    async fn test_session_empty_query(protocol: IoProtocol) {
+        let mut graph = connect_serializer(protocol).await;
         let mut sessioned_graph = graph
             .create_session("test-session".to_string())
             .await
@@ -82,10 +90,11 @@ mod aio {
             .expect("It should close the session.");
     }
 
+    #[apply(common::serializers)]
     #[cfg(feature = "async-std-runtime")]
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    async fn test_keep_alive_query() {
-        let graph = connect().await;
+    async fn test_keep_alive_query(protocol: IoProtocol) {
+        let graph = connect_serializer(protocol).await;
 
         assert_eq!(
             0,
@@ -110,10 +119,12 @@ mod aio {
         )
     }
 
+    #[apply(common::serializers)]
+    #[serial(test_partial_content)]
     #[cfg(feature = "async-std-runtime")]
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
-    async fn test_partial_content() {
-        let graph = connect().await;
+    async fn test_partial_content(protocol: IoProtocol) {
+        let graph = connect_serializer(protocol).await;
 
         drop_vertices(&graph, "Partial")
             .await
@@ -137,10 +148,11 @@ mod aio {
         );
     }
 
+    #[apply(common::serializers)]
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
     #[cfg_attr(feature = "tokio-runtime", tokio::test)]
-    async fn test_wrong_query() {
-        let error = connect()
+    async fn test_wrong_query(protocol: IoProtocol) {
+        let error = connect_serializer(protocol)
             .await
             .execute("g.V", &[])
             .await
@@ -155,10 +167,11 @@ mod aio {
         }
     }
 
+    #[apply(common::serializers)]
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
     #[cfg_attr(feature = "tokio-runtime", tokio::test)]
-    async fn test_wrong_alias() {
-        let error = connect()
+    async fn test_wrong_alias(protocol: IoProtocol) {
+        let error = connect_serializer(protocol)
             .await
             .alias("foo")
             .execute("g.V()", &[])
@@ -174,11 +187,11 @@ mod aio {
         }
     }
 
+    #[apply(common::serializers)]
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
     #[cfg_attr(feature = "tokio-runtime", tokio::test)]
-
-    async fn test_vertex_query() {
-        let graph = connect().await;
+    async fn test_vertex_query(protocol: IoProtocol) {
+        let graph = connect_serializer(protocol).await;
         let vertices = graph
             .execute(
                 "g.V().hasLabel('person').has('name',name)",
@@ -194,10 +207,12 @@ mod aio {
 
         assert_eq!("person", vertices[0].label());
     }
+
+    #[apply(common::serializers)]
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
     #[cfg_attr(feature = "tokio-runtime", tokio::test)]
-    async fn test_edge_query() {
-        let graph = connect().await;
+    async fn test_edge_query(protocol: IoProtocol) {
+        let graph = connect_serializer(protocol).await;
         let edges = graph
             .execute("g.E().hasLabel('knows').limit(1)", &[])
             .await
@@ -211,10 +226,11 @@ mod aio {
         assert_eq!("knows", edges[0].label());
     }
 
+    #[apply(common::serializers)]
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
     #[cfg_attr(feature = "tokio-runtime", tokio::test)]
-    async fn test_vertex_creation() {
-        let graph = connect().await;
+    async fn test_vertex_creation(protocol: IoProtocol) {
+        let graph = connect_serializer(protocol).await;
         let mark = create_vertex(&graph, "mark").await;
 
         assert_eq!("person", mark.label());
@@ -237,10 +253,11 @@ mod aio {
         );
     }
 
+    #[apply(common::serializers)]
     #[cfg_attr(feature = "async-std-runtime", async_std::test)]
     #[cfg_attr(feature = "tokio-runtime", tokio::test)]
-    async fn test_edge_creation() {
-        let graph = connect().await;
+    async fn test_edge_creation(protocol: IoProtocol) {
+        let graph = connect_serializer(protocol).await;
         let mark = create_vertex(&graph, "mark").await;
         let frank = create_vertex(&graph, "frank").await;
 

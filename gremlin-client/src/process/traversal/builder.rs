@@ -18,7 +18,7 @@ use crate::process::traversal::step::until::UntilStep;
 use crate::process::traversal::step::where_step::WhereStep;
 
 use crate::process::traversal::{Bytecode, Scope};
-use crate::structure::{Cardinality, GIDs, IntoPredicate, Labels};
+use crate::structure::{Cardinality, GIDs, Labels};
 use crate::GValue;
 
 use super::merge_edge::MergeEdgeStep;
@@ -505,10 +505,10 @@ impl TraversalBuilder {
 
     pub fn is<A>(mut self, val: A) -> Self
     where
-        A: IntoPredicate,
+        A: ToGValue,
     {
         self.bytecode
-            .add_step(String::from("is"), vec![val.into_predicate().into()]);
+            .add_step(String::from("is"), vec![val.to_gvalue()]);
 
         self
     }

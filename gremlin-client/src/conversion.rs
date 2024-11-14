@@ -129,8 +129,6 @@ impl_from_gvalue!(bool, GValue::Bool);
 impl_from_gvalue!(uuid::Uuid, GValue::Uuid);
 impl_from_gvalue!(Metric, GValue::Metric);
 impl_from_gvalue!(TraversalMetrics, GValue::TraversalMetrics);
-impl_from_gvalue!(TraversalExplanation, GValue::TraversalExplanation);
-impl_from_gvalue!(IntermediateRepr, GValue::IntermediateRepr);
 impl_from_gvalue!(chrono::DateTime<chrono::Utc>, GValue::Date);
 impl_from_gvalue!(Traverser, GValue::Traverser);
 
@@ -139,9 +137,90 @@ impl FromGValue for Null {
         match v {
             GValue::Null => Ok(crate::structure::Null {}),
             _ => Err(GremlinError::Cast(format!(
-                "Cannot convert {:?} to {}",
+                "Cannot convert {:?} to Null",
                 v,
-                stringify!($t)
+            ))),
+        }
+    }
+}
+
+impl FromGValue for TraversalExplanation {
+    fn from_gvalue(v: GValue) -> GremlinResult<Self> {
+        match v {
+            GValue::TraversalExplanation(traversal_explaination) => Ok(traversal_explaination),
+            //GraphBinary sends TraversalExplainations as just a map instead of as a distinct type,
+            //so handle converting it here
+            GValue::Map(mut map) => {
+                let original = map.remove("original").ok_or(GremlinError::Cast(format!(
+                    "Missing expected \"original\" TraversalExplaination property"
+                )))?;
+                let intermediate =
+                    map.remove("intermediate")
+                        .ok_or(GremlinError::Cast(format!(
+                            "Missing expected \"intermediate\" TraversalExplaination property"
+                        )))?;
+                let final_ = map.remove("final").ok_or(GremlinError::Cast(format!(
+                    "Missing expected \"final\" TraversalExplaination property"
+                )))?;
+
+                let original = <List as FromGValue>::from_gvalue(original)?;
+                let intermediate = <List as FromGValue>::from_gvalue(intermediate)?;
+                let final_ = <List as FromGValue>::from_gvalue(final_)?;
+
+                let original: GremlinResult<Vec<String>> = original
+                    .into_iter()
+                    .map(|val| <String as FromGValue>::from_gvalue(val))
+                    .collect();
+                let final_: GremlinResult<Vec<String>> = final_
+                    .into_iter()
+                    .map(|val| <String as FromGValue>::from_gvalue(val))
+                    .collect();
+                let intermediate: GremlinResult<Vec<IntermediateRepr>> = intermediate
+                    .into_iter()
+                    .map(|val| IntermediateRepr::from_gvalue(val))
+                    .collect();
+
+                Ok(TraversalExplanation::new(original?, final_?, intermediate?))
+            }
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot convert {:?} to TraversalExplanation",
+                v
+            ))),
+        }
+    }
+}
+
+impl FromGValue for IntermediateRepr {
+    fn from_gvalue(v: GValue) -> GremlinResult<Self> {
+        match v {
+            GValue::IntermediateRepr(ir) => Ok(ir),
+            //GraphBinary sends TraversalExplainations as just a map instead of as a distinct type,
+            //so handle converting it here
+            GValue::Map(mut map) => {
+                let traversal = map.remove("traversal").ok_or(GremlinError::Cast(format!(
+                    "Missing expected \"traversal\" IntermediateRepr property"
+                )))?;
+                let category = map.remove("category").ok_or(GremlinError::Cast(format!(
+                    "Missing expected \"category\" IntermediateRepr property"
+                )))?;
+                let strategy = map.remove("strategy").ok_or(GremlinError::Cast(format!(
+                    "Missing expected \"strategy\" IntermediateRepr property"
+                )))?;
+
+                let traversal: GremlinResult<Vec<String>> =
+                    <List as FromGValue>::from_gvalue(traversal)?
+                        .into_iter()
+                        .map(|val| <String as FromGValue>::from_gvalue(val))
+                        .collect();
+                Ok(IntermediateRepr::new(
+                    traversal?,
+                    <String as FromGValue>::from_gvalue(strategy)?,
+                    <String as FromGValue>::from_gvalue(category)?,
+                ))
+            }
+            _ => Err(GremlinError::Cast(format!(
+                "Cannot convert {:?} to IntermediateRepr",
+                v
             ))),
         }
     }
@@ -155,6 +234,9 @@ impl FromGValue for GKey {
             GValue::Token(s) => Ok(GKey::String(s.value().clone())),
             GValue::Vertex(s) => Ok(GKey::Vertex(s)),
             GValue::Edge(s) => Ok(GKey::Edge(s)),
+            GValue::Int64(v) => Ok(GKey::Int64(v)),
+            GValue::Int32(v) => Ok(GKey::Int32(v)),
+            GValue::T(t) => Ok(GKey::T(t)),
             _ => Err(GremlinError::Cast(format!(
                 "Cannot convert {:?} to {}",
                 v, "GKey"

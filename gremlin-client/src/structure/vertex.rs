@@ -8,7 +8,7 @@ use std::hash::Hasher;
 pub struct Vertex {
     id: GID,
     label: String,
-    properties: HashMap<String, Vec<VertexProperty>>,
+    pub(crate) properties: HashMap<String, Vec<VertexProperty>>,
 }
 
 impl Vertex {

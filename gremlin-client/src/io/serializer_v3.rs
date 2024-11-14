@@ -170,6 +170,20 @@ where
     let out_v_id = deserialize_id(reader, &val["outV"])?;
     let out_v_label = get_value!(&val["outVLabel"], Value::String)?.clone();
 
+    let json_properties = &val["properties"];
+    let properties = if json_properties.is_object() {
+        get_value!(&json_properties, Value::Object)?
+            .values()
+            .map(|value| {
+                deserialize_property(reader, &value["@value"])
+                    .and_then(|property| property.take::<Property>())
+                    .map(|property| (property.label().clone(), property))
+            })
+            .collect::<GremlinResult<_>>()?
+    } else {
+        HashMap::new()
+    };
+
     Ok(Edge::new(
         id,
         label,
@@ -177,7 +191,7 @@ where
         in_v_label,
         out_v_id,
         out_v_label,
-        HashMap::new(),
+        properties,
     )
     .into())
 }
@@ -439,7 +453,7 @@ mod tests {
     use super::deserializer_v3;
     use serde_json::json;
 
-    use crate::{edge, vertex};
+    use crate::{edge, vertex, Edge};
 
     use crate::structure::{
         GValue, Map, Metric, Path, Property, Token, TraversalMetrics, Vertex, VertexProperty, GID,
@@ -626,26 +640,29 @@ mod tests {
         let value = json!({"@type":"g:Edge","@value":{"id":{"@type":"g:Int32","@value":13},"label":"develops","inVLabel":"software","outVLabel":"person","inV":{"@type":"g:Int32","@value":10},"outV":{"@type":"g:Int32","@value":1},"properties":{"since":{"@type":"g:Property","@value":{"key":"since","value":{"@type":"g:Int32","@value":2009}}}}}});
 
         let result = deserializer_v3(&value).expect("Failed to deserialize an Edge");
+        let actual: Edge = result.take().expect("Should have deserialized");
 
-        assert_eq!(
-            result,
-            edge!({
-                id => 13,
-                label=> "develops",
-                inV => {
-                    id => 10,
-                    label => "software"
-                },
-                outV => {
-                    id => 1,
-                    label => "person"
-                },
-                properties => {
+        let expected = edge!({
+            id => 13,
+            label=> "develops",
+            inV => {
+                id => 10,
+                label => "software"
+            },
+            outV => {
+                id => 1,
+                label => "person"
+            },
+            properties => {
+                "since" => 2009i32
+            }
+        });
 
-                }
-            })
-            .into()
-        );
+        assert_eq!(actual, expected);
+        //Now make sure the properties deserialized correctly
+        let expected_properties: Vec<(String, Property)> = expected.into_iter().collect();
+        let actual_properites: Vec<(String, Property)> = actual.into_iter().collect();
+        assert_eq!(actual_properites, expected_properties);
     }
 
     #[test]

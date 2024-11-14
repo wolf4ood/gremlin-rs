@@ -24,8 +24,8 @@ use crate::process::traversal::strategies::{
 use crate::process::traversal::{Bytecode, Scope, TraversalBuilder, WRITE_OPERATORS};
 use crate::structure::{Cardinality, Labels, Null};
 use crate::{
-    structure::GIDs, structure::GProperty, structure::IntoPredicate, Edge, GValue, GremlinClient,
-    List, Map, Path, Vertex,
+    structure::GIDs, structure::GProperty, Edge, GValue, GremlinClient, List, Map, Path, ToGValue,
+    Vertex,
 };
 use std::marker::PhantomData;
 
@@ -537,7 +537,7 @@ impl<S, E: FromGValue, T: Terminator<E>> GraphTraversal<S, E, T> {
 
     pub fn is<A>(mut self, val: A) -> Self
     where
-        A: IntoPredicate,
+        A: ToGValue,
     {
         self.builder = self.builder.is(val);
 

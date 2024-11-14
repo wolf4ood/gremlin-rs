@@ -3,8 +3,7 @@ use mobc::Manager;
 use crate::aio::connection::Conn;
 use crate::connection::ConnectionOptions;
 use crate::error::GremlinError;
-use crate::message::{message_with_args, message_with_args_and_uuid, message_with_args_v2};
-use crate::{GValue, GraphSON};
+use crate::GValue;
 use async_trait::async_trait;
 use base64::encode;
 use std::collections::HashMap;
@@ -40,23 +39,13 @@ impl Manager for GremlinConnectionManager {
             String::from("language"),
             GValue::String(String::from("gremlin-groovy")),
         );
-        let args = self.options.serializer.write(&GValue::from(args))?;
 
-        let message = match self.options.serializer {
-            GraphSON::V2 => message_with_args_v2(String::from("eval"), String::default(), args),
-            GraphSON::V3 => message_with_args(String::from("eval"), String::default(), args),
-        };
+        let (id, message) = self
+            .options
+            .serializer
+            .build_message("eval", "", args, None)?;
 
-        let id = message.id().clone();
-        let msg = serde_json::to_string(&message).map_err(GremlinError::from)?;
-
-        let content_type = self.options.serializer.content_type();
-
-        let payload = String::from("") + content_type + &msg;
-        let mut binary = payload.into_bytes();
-        binary.insert(0, content_type.len() as u8);
-
-        let (response, _receiver) = conn.send(id, binary).await?;
+        let (response, _receiver) = conn.send(id, message).await?;
 
         match response.status.code {
             200 | 206 => Ok(conn),
@@ -70,25 +59,17 @@ impl Manager for GremlinConnectionManager {
                         GValue::String(encode(&format!("\0{}\0{}", c.username, c.password))),
                     );
 
-                    let args = self.options.serializer.write(&GValue::from(args))?;
-                    let message = message_with_args_and_uuid(
-                        String::from("authentication"),
-                        String::from("traversal"),
-                        response.request_id,
+                    let (id, message) = self.options.serializer.build_message(
+                        "authentication",
+                        "traversal",
                         args,
-                    );
-
-                    let id = message.id().clone();
-                    let msg = serde_json::to_string(&message).map_err(GremlinError::from)?;
-
-                    let content_type = self.options.serializer.content_type();
-                    let payload = String::from("") + content_type + &msg;
-
-                    let mut binary = payload.into_bytes();
-                    binary.insert(0, content_type.len() as u8);
-
-                    let (response, _receiver) = conn.send(id, binary).await?;
-
+                        Some(
+                            response
+                                .request_id
+                                .expect("Auth challenge requires response id"),
+                        ),
+                    )?;
+                    let (response, _receiver) = conn.send(id, message).await?;
                     match response.status.code {
                         200 | 206 => Ok(conn),
                         204 => Ok(conn),

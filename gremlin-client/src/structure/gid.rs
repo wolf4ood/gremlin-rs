@@ -1,5 +1,9 @@
+use std::convert::TryFrom;
+
 use crate::{GremlinError, GremlinResult};
 use uuid::Uuid;
+
+use super::GValue;
 
 #[derive(Debug, Clone)]
 pub struct GIDs(pub(crate) Vec<GID>);
@@ -27,6 +31,21 @@ pub enum GID {
     String(String),
     Int32(i32),
     Int64(i64),
+}
+
+impl TryFrom<GValue> for GID {
+    type Error = GremlinError;
+
+    fn try_from(value: GValue) -> Result<Self, Self::Error> {
+        match value {
+            GValue::Int32(v) => Ok(GID::Int32(v)),
+            GValue::Int64(v) => Ok(GID::Int64(v)),
+            GValue::String(v) => Ok(GID::String(v)),
+            other => Err(GremlinError::Cast(format!(
+                "Invalid GValue for GID {other:?}"
+            ))),
+        }
+    }
 }
 
 impl GID {

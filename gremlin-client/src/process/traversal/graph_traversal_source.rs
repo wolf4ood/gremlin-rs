@@ -221,14 +221,11 @@ mod tests {
         code.add_step(String::from("V"), vec![1.into()]);
         code.add_step(
             String::from("has"),
-            vec![
-                String::from("name").into(),
-                P::new("eq", String::from("marko").into()).into(),
-            ],
+            vec![String::from("name").into(), String::from("marko").into()],
         );
         code.add_step(
             String::from("has"),
-            vec![String::from("age").into(), P::new("eq", 23.into()).into()],
+            vec![String::from("age").into(), 23.into()],
         );
 
         assert_eq!(
@@ -246,7 +243,7 @@ mod tests {
             vec![
                 String::from("person").into(),
                 String::from("name").into(),
-                P::new("eq", String::from("marko").into()).into(),
+                String::from("marko").into(),
             ],
         );
 
@@ -359,7 +356,7 @@ mod tests {
 
         code.add_step(String::from("V"), vec![1.into()]);
         code.add_step(String::from("values"), vec!["age".into()]);
-        code.add_step(String::from("is"), vec![P::eq(23).into()]);
+        code.add_step(String::from("is"), vec![23i32.into()]);
 
         assert_eq!(&code, g.v(1).values("age").is(23).bytecode());
     }

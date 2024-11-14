@@ -7,8 +7,8 @@ use crate::process::traversal::step::select::SelectStep;
 use crate::process::traversal::step::until::UntilStep;
 use crate::process::traversal::step::where_step::WhereStep;
 use crate::process::traversal::TraversalBuilder;
-use crate::structure::{Either2, GIDs, IntoPredicate, Labels, T};
-use crate::GValue;
+use crate::structure::{Either2, GIDs, Labels, T};
+use crate::{GValue, ToGValue};
 
 use super::merge_edge::MergeEdgeStep;
 use super::merge_vertex::MergeVertexStep;
@@ -211,7 +211,7 @@ impl AnonymousTraversalSource {
 
     pub fn is<A>(&self, val: A) -> TraversalBuilder
     where
-        A: IntoPredicate,
+        A: ToGValue,
     {
         self.traversal.clone().is(val)
     }

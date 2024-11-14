@@ -26,6 +26,8 @@ services:
       - JANUS_PROPS_TEMPLATE=inmemory
     ports:
       - "8184:8182"
+    volumes:
+      - ./janusgraph_config.yaml:/opt/janusgraph/conf/janusgraph-server.yaml
     healthcheck:
       test: ["CMD", "bin/gremlin.sh", "-e", "scripts/remote-connect.groovy"]
       interval: 10s

@@ -3,6 +3,8 @@ macro_rules! g_serializer {
         pub fn $name(val: &Value) -> GremlinResult<GValue> {
             if let Value::String(ref s) = val {
                 Ok(s.clone().into())
+            } else if let Value::Null = val {
+                Ok(GValue::Null)
             } else if let Value::Bool(b) = val {
                 Ok((*b).into())
             } else {
@@ -26,6 +28,8 @@ macro_rules! g_serializer_2 {
         pub fn $name(val: &Value) -> GremlinResult<GValue> {
             if let Value::String(ref s) = val {
                 return Ok(s.clone().into())
+            } else if let Value::Null = val {
+                return Ok(GValue::Null)
             }
             if let Value::Array(_) = val {
                 let _type = "g:List";

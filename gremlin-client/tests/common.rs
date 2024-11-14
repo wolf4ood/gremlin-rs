@@ -1,4 +1,7 @@
-use gremlin_client::Map;
+use std::convert::TryInto;
+
+use gremlin_client::{structure::T, Map};
+use rstest_reuse::template;
 
 pub fn assert_map_property(element_map: &Map, expected_key: &str, expected_value: &str) {
     let actual_prop_value: &String = element_map
@@ -9,22 +12,39 @@ pub fn assert_map_property(element_map: &Map, expected_key: &str, expected_value
     assert_eq!(expected_value, actual_prop_value);
 }
 
+#[template]
+#[rstest]
+#[case::graphson_v2(IoProtocol::GraphSONV2)]
+#[case::graphson_v3(IoProtocol::GraphSONV3)]
+#[case::graph_binary_v1(IoProtocol::GraphBinaryV1)]
+fn serializers(#[case] protocol: IoProtocol) {}
+
 #[allow(dead_code)]
 pub mod io {
-    use gremlin_client::{ConnectionOptions, Edge, GraphSON, GremlinClient, GremlinResult, Vertex};
+    use gremlin_client::{
+        ConnectionOptions, Edge, GremlinClient, GremlinResult, IoProtocol, Vertex,
+    };
 
     pub fn connect() -> GremlinResult<GremlinClient> {
         GremlinClient::connect(("localhost", 8182))
     }
 
-    fn connect_janusgraph_client() -> GremlinResult<GremlinClient> {
-        GremlinClient::connect(("localhost", 8184))
+    fn connect_janusgraph_client(serializer: IoProtocol) -> GremlinResult<GremlinClient> {
+        GremlinClient::connect(
+            ConnectionOptions::builder()
+                .host("localhost")
+                .port(8184)
+                .serializer(serializer.clone())
+                .deserializer(serializer)
+                .build(),
+        )
     }
 
-    pub fn connect_serializer(serializer: GraphSON) -> GremlinResult<GremlinClient> {
+    pub fn connect_serializer(serializer: IoProtocol) -> GremlinResult<GremlinClient> {
         let port = match serializer {
-            GraphSON::V2 => 8182,
-            GraphSON::V3 => 8182,
+            IoProtocol::GraphSONV2 => 8182,
+            IoProtocol::GraphSONV3 => 8182,
+            IoProtocol::GraphBinaryV1 => 8182,
         };
         GremlinClient::connect(
             ConnectionOptions::builder()
@@ -40,21 +60,15 @@ pub mod io {
         connect().expect("It should connect")
     }
 
-    pub fn expect_janusgraph_client() -> GremlinClient {
-        connect_janusgraph_client().expect("It should connect")
+    pub fn expect_janusgraph_client(serializer: IoProtocol) -> GremlinClient {
+        connect_janusgraph_client(serializer).expect("It should connect")
     }
 
-    pub fn expect_client_serializer(serializer: GraphSON) -> GremlinClient {
+    pub fn expect_client_serializer(serializer: IoProtocol) -> GremlinClient {
         connect_serializer(serializer).expect("It should connect")
     }
 
-    pub fn graph() -> GremlinClient {
-        let client = expect_client();
-
-        client
-    }
-
-    pub fn graph_serializer(serializer: GraphSON) -> GremlinClient {
+    pub fn graph_serializer(serializer: IoProtocol) -> GremlinClient {
         let client = expect_client_serializer(serializer);
 
         client
@@ -112,7 +126,7 @@ pub mod io {
 pub mod aio {
     use gremlin_client::aio::GremlinClient;
 
-    use gremlin_client::{ConnectionOptions, Edge, GraphSON, GremlinResult, Vertex};
+    use gremlin_client::{ConnectionOptions, Edge, GremlinResult, IoProtocol, Vertex};
 
     #[cfg(feature = "async-std-runtime")]
     use async_std::prelude::*;
@@ -126,10 +140,11 @@ pub mod aio {
             .expect("It should connect")
     }
 
-    pub async fn connect_serializer(serializer: GraphSON) -> GremlinClient {
+    pub async fn connect_serializer(serializer: IoProtocol) -> GremlinClient {
         let port = match serializer {
-            GraphSON::V2 => 8182,
-            GraphSON::V3 => 8182,
+            IoProtocol::GraphSONV2 => 8182,
+            IoProtocol::GraphSONV3 => 8182,
+            IoProtocol::GraphBinaryV1 => 8182,
         };
         GremlinClient::connect(
             ConnectionOptions::builder()

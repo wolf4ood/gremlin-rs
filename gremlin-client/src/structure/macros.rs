@@ -31,7 +31,7 @@ macro_rules! edge {
            #[allow(unused_mut)]
         let mut properties  = ::std::collections::HashMap::<String,$crate::Property>::new();
             $(
-                let p = Property::new($key.into(),$value.into());
+                let p = Property::new($key,$value);
                 properties.insert($key.into(),p);
             )*
         $crate::Edge::new($id.into(), $label, $inVId.into(),$inVLabel,$outVId.into(),$outVLabel,properties)

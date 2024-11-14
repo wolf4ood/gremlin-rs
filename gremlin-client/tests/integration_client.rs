@@ -6,32 +6,31 @@ use std::iter::FromIterator;
 use chrono::{offset::TimeZone, DateTime, Utc};
 use gremlin_client::{
     ConnectionOptions, GremlinClient, GremlinError, List, TlsOptions, ToGValue,
-    TraversalExplanation, TraversalMetrics, VertexProperty,
+    TraversalExplanation, TraversalMetrics, VertexProperty, GID,
 };
-use gremlin_client::{Edge, GValue, Map, Vertex};
+use gremlin_client::{Edge, GValue, IoProtocol, Map, Vertex};
 
-use common::io::{create_edge, create_vertex, expect_client, graph};
+use common::io::{create_edge, create_vertex, graph_serializer};
+use rstest::*;
+use rstest_reuse::apply;
+use serial_test::serial;
 
-#[test]
-fn test_client_connection_ok() {
-    expect_client();
-}
-
-#[test]
-fn test_empty_query() {
+#[apply(common::serializers)]
+fn test_empty_query(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
     assert_eq!(
         0,
-        graph()
+        client
             .execute("g.V().hasLabel('NotFound')", &[])
             .expect("It should execute a traversal")
             .count()
     )
 }
 
-#[test]
-fn test_session_empty_query() {
-    let mut graph = graph();
-    let mut sessioned_graph = graph
+#[apply(common::serializers)]
+#[serial(test_session_empty_query)]
+fn test_session_empty_query(protocol: IoProtocol) {
+    let mut sessioned_graph = graph_serializer(protocol)
         .create_session("test-session".to_string())
         .expect("It should create a session.");
     assert_eq!(
@@ -46,8 +45,8 @@ fn test_session_empty_query() {
         .expect("It should close the session.");
 }
 
-#[test]
-fn test_ok_credentials() {
+#[apply(common::serializers)]
+fn test_ok_credentials(#[case] protocol: IoProtocol) {
     let client = GremlinClient::connect(
         ConnectionOptions::builder()
             .host("localhost")
@@ -57,6 +56,8 @@ fn test_ok_credentials() {
             .tls_options(TlsOptions {
                 accept_invalid_certs: true,
             })
+            .serializer(protocol.clone())
+            .deserializer(protocol)
             .build(),
     )
     .expect("Cannot connect");
@@ -65,8 +66,8 @@ fn test_ok_credentials() {
     assert!(result.is_ok(), "{:?}", result);
 }
 
-#[test]
-fn test_ko_credentials() {
+#[apply(common::serializers)]
+fn test_ko_credentials(#[case] protocol: IoProtocol) {
     let client = GremlinClient::connect(
         ConnectionOptions::builder()
             .host("localhost")
@@ -76,6 +77,8 @@ fn test_ko_credentials() {
             .tls_options(TlsOptions {
                 accept_invalid_certs: true,
             })
+            .serializer(protocol.clone())
+            .deserializer(protocol)
             .build(),
     )
     .expect("Cannot connect");
@@ -84,9 +87,9 @@ fn test_ko_credentials() {
     assert!(result.is_err(), "{:?}", result);
 }
 
-#[test]
-fn test_wrong_query() {
-    let error = graph()
+#[apply(common::serializers)]
+fn test_wrong_query(protocol: IoProtocol) {
+    let error = graph_serializer(protocol)
         .execute("g.V", &[])
         .expect_err("it should return an error");
 
@@ -99,9 +102,9 @@ fn test_wrong_query() {
     }
 }
 
-#[test]
-fn test_wrong_alias() {
-    let error = graph()
+#[apply(common::serializers)]
+fn test_wrong_alias(protocol: IoProtocol) {
+    let error = graph_serializer(protocol)
         .alias("foo")
         .execute("g.V()", &[])
         .expect_err("it should return an error");
@@ -115,11 +118,9 @@ fn test_wrong_alias() {
     }
 }
 
-#[test]
-
-fn test_vertex_query() {
-    let graph = graph();
-    let vertices = graph
+#[apply(common::serializers)]
+fn test_vertex_query(protocol: IoProtocol) {
+    let vertices = graph_serializer(protocol)
         .execute(
             "g.V().hasLabel('person').has('name',name)",
             &[("name", &"marko")],
@@ -132,10 +133,10 @@ fn test_vertex_query() {
 
     assert_eq!("person", vertices[0].label());
 }
-#[test]
-fn test_edge_query() {
-    let graph = graph();
-    let edges = graph
+
+#[apply(common::serializers)]
+fn test_edge_query(protocol: IoProtocol) {
+    let edges = graph_serializer(protocol)
         .execute("g.E().hasLabel('knows').limit(1)", &[])
         .expect("it should execute a query")
         .filter_map(Result::ok)
@@ -146,14 +147,14 @@ fn test_edge_query() {
     assert_eq!("knows", edges[0].label());
 }
 
-#[test]
-fn test_vertex_creation() {
-    let graph = graph();
-    let mark = create_vertex(&graph, "mark");
+#[apply(common::serializers)]
+fn test_vertex_creation(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
+    let mark = create_vertex(&client, "mark");
 
     assert_eq!("person", mark.label());
 
-    let value_map = graph
+    let value_map = client
         .execute("g.V(identity).valueMap()", &[("identity", mark.id())])
         .expect("should fetch valueMap with properties")
         .filter_map(Result::ok)
@@ -169,10 +170,9 @@ fn test_vertex_creation() {
     );
 }
 
-#[test]
-fn test_complex_vertex_creation_with_option_none_properties() {
-    let graph = graph();
-    let properties = graph
+#[apply(common::serializers)]
+fn test_complex_vertex_creation_with_option_none_properties(protocol: IoProtocol) {
+    let properties = graph_serializer(protocol)
         .execute(r#"g.addV('person').valueMap()"#, &[])
         .expect("it should execute addV")
         .filter_map(Result::ok)
@@ -216,9 +216,12 @@ fn test_complex_vertex_creation_with_option_none_properties() {
         .is_none());
 }
 
-#[test]
-fn test_complex_vertex_creation_with_option_some_properties() {
-    let graph = graph();
+#[apply(common::serializers)]
+fn test_complex_vertex_creation_with_option_some_properties(protocol: IoProtocol) {
+    //GraphSON V2 doesn't have maps, so skip it
+    if protocol == IoProtocol::GraphSONV2 {
+        return;
+    }
     let q = r#"
         g.addV('person')
             .property('name',name)
@@ -242,7 +245,7 @@ fn test_complex_vertex_creation_with_option_some_properties() {
         ("uuid", &uuid),
         ("date", &now),
     ];
-    let properties = graph
+    let properties = graph_serializer(protocol)
         .execute(q, params)
         .expect("it should execute addV")
         .filter_map(Result::ok)
@@ -313,10 +316,8 @@ fn test_complex_vertex_creation_with_option_some_properties() {
     );
 }
 
-#[test]
-fn test_complex_vertex_creation_with_properties() {
-    let graph = graph();
-
+#[apply(common::serializers)]
+fn test_complex_vertex_creation_with_properties(protocol: IoProtocol) {
     let q = r#"
         g.addV('person')
             .property('id',UUID.randomUUID())
@@ -339,7 +340,7 @@ fn test_complex_vertex_creation_with_properties() {
         ("dateTime", &chrono::Utc.timestamp(1551825863, 0)),
         ("date", &(1551825863 as i64)),
     ];
-    let results = graph
+    let results = graph_serializer(protocol)
         .execute(q, params)
         .expect("it should execute addV")
         .filter_map(Result::ok)
@@ -421,20 +422,18 @@ fn test_complex_vertex_creation_with_properties() {
     );
 }
 
-#[test]
-fn test_inserting_date_with_milisecond_precision() {
+#[apply(common::serializers)]
+fn test_inserting_date_with_milisecond_precision(protocol: IoProtocol) {
     use chrono::offset::TimeZone;
     use chrono::DateTime;
     use chrono::Utc;
-
-    let graph = graph();
 
     let q = r#"g.addV('person').property('dateTime',dateTime).propertyMap()"#;
 
     let expected = chrono::Utc.timestamp(1551825863, 0);
     let params: &[(&str, &dyn ToGValue)] = &[("dateTime", &expected)];
 
-    let results = graph
+    let results = graph_serializer(protocol)
         .execute(q, params)
         .expect("it should execute addV")
         .filter_map(Result::ok)
@@ -456,10 +455,13 @@ fn test_inserting_date_with_milisecond_precision() {
     );
 }
 
-#[test]
-fn test_list_cardinality() {
-    let graph = graph();
-
+#[apply(common::serializers)]
+fn test_list_cardinality(protocol: IoProtocol) {
+    //GraphSON V2 doesn't have lists, so skip it
+    if protocol == IoProtocol::GraphSONV2 {
+        return;
+    }
+    let client = graph_serializer(protocol);
     //split into 2 queries due to the bindings limit
 
     let q1 = r#"
@@ -545,7 +547,7 @@ fn test_list_cardinality() {
         ("bool_4", &true),
     ];
 
-    let results1 = graph
+    let results1 = client
         .execute(q1, params1)
         .expect("it should execute addV")
         .filter_map(Result::ok)
@@ -566,7 +568,7 @@ fn test_list_cardinality() {
     let f32_list = properties1["float1"].clone().take::<Vec<f32>>().unwrap();
     assert_eq!(f32_list, vec![1.1, 1.1, 2.3, 3.4]);
 
-    let results2 = graph
+    let results2 = client
         .execute(q2, params2)
         .expect("it should execute addV")
         .filter_map(Result::ok)
@@ -595,10 +597,13 @@ fn test_list_cardinality() {
     assert_eq!(boolean_list, vec![false, true, false, true]);
 }
 
-#[test]
-fn test_set_cardinality() {
-    let graph = graph();
-
+#[apply(common::serializers)]
+fn test_set_cardinality(protocol: IoProtocol) {
+    //GraphSON V2 doesn't have sets, so skip it
+    if protocol == IoProtocol::GraphSONV2 {
+        return;
+    }
+    let client = graph_serializer(protocol);
     //split into 2 queries due to the bindings limit
 
     let q1 = r#"
@@ -667,7 +672,7 @@ fn test_set_cardinality() {
         ("bool_4", &true),
     ];
 
-    let results1 = graph
+    let results1 = client
         .execute(q1, params1)
         .expect("it should execute addV")
         .filter_map(Result::ok)
@@ -705,7 +710,7 @@ fn test_set_cardinality() {
         .unwrap();
     assert_eq!(i64_set, HashSet::from_iter(vec![4, 5, 6].iter().cloned()));
 
-    let results2 = graph
+    let results2 = client
         .execute(q2, params2)
         .expect("it should execute addV")
         .filter_map(Result::ok)
@@ -743,20 +748,20 @@ fn test_set_cardinality() {
     );
 }
 
-#[test]
-fn test_edge_creation() {
-    let graph = graph();
-    let mark = create_vertex(&graph, "mark");
-    let frank = create_vertex(&graph, "frank");
+#[apply(common::serializers)]
+fn test_edge_creation(protocol: IoProtocol) {
+    let client = graph_serializer(protocol);
+    let mark = create_vertex(&client, "mark");
+    let frank = create_vertex(&client, "frank");
 
-    let edge = create_edge(&graph, &mark, &frank, "knows");
+    let edge = create_edge(&client, &mark, &frank, "knows");
 
     assert_eq!("knows", edge.label());
 
     assert_eq!(&mark, edge.out_v());
     assert_eq!(&frank, edge.in_v());
 
-    let edges = graph
+    let edges = client
         .execute("g.V(identity).outE()", &[("identity", mark.id())])
         .expect("should fetch edge")
         .filter_map(Result::ok)
@@ -774,11 +779,9 @@ fn test_edge_creation() {
     assert_eq!(&frank, edge.in_v());
 }
 
-#[test]
-fn test_profile() {
-    let graph = graph();
-
-    let metrics = graph
+#[apply(common::serializers)]
+fn test_profile(protocol: IoProtocol) {
+    let metrics = graph_serializer(protocol)
         .execute("g.V().limit(1).profile()", &[])
         .expect("should return a profile")
         .filter_map(Result::ok)
@@ -806,11 +809,9 @@ fn test_profile() {
     );
 }
 
-#[test]
-fn test_explain() {
-    let graph = graph();
-
-    let metrics = graph
+#[apply(common::serializers)]
+fn test_explain(protocol: IoProtocol) {
+    let metrics = graph_serializer(protocol)
         .execute("g.V().limit(1).explain()", &[])
         .expect("should return a profile")
         .filter_map(Result::ok)
@@ -840,16 +841,15 @@ fn test_explain() {
     );
 }
 
-#[test]
+#[apply(common::serializers)]
+fn test_group_count_vertex(protocol: IoProtocol) {
+    let client = graph_serializer(protocol.clone());
+    let mark = create_vertex(&client, "mark");
+    let frank = create_vertex(&client, "frank");
 
-fn test_group_count_vertex() {
-    let graph = graph();
-    let mark = create_vertex(&graph, "mark");
-    let frank = create_vertex(&graph, "frank");
+    create_edge(&client, &mark, &frank, "knows");
 
-    create_edge(&graph, &mark, &frank, "knows");
-
-    let map = graph
+    let map = client
         .execute(
             "g.V(identity).out().groupCount()",
             &[("identity", mark.id())],
@@ -866,21 +866,31 @@ fn test_group_count_vertex() {
 
     assert_eq!(1, first.len());
 
-    let count = first.get(&frank);
+    let count = if protocol == IoProtocol::GraphSONV2 {
+        //GraphSONV2 just sends a simplified map,
+        //so we need to look up by the edge's id as a simplified type
+        //instead of as a GID
+        first.get(match frank.id() {
+            GID::String(s) => s.to_string(),
+            GID::Int32(i) => i.to_string(),
+            GID::Int64(i) => i.to_string(),
+        })
+    } else {
+        first.get(&frank)
+    };
 
     assert_eq!(Some(&GValue::Int64(1)), count);
 }
 
-#[test]
+#[apply(common::serializers)]
+fn test_group_count_edge(protocol: IoProtocol) {
+    let client = graph_serializer(protocol.clone());
+    let mark = create_vertex(&client, "mark");
+    let frank = create_vertex(&client, "frank");
 
-fn test_group_count_edge() {
-    let graph = graph();
-    let mark = create_vertex(&graph, "mark");
-    let frank = create_vertex(&graph, "frank");
+    let edge = create_edge(&client, &mark, &frank, "knows");
 
-    let edge = create_edge(&graph, &mark, &frank, "knows");
-
-    let map = graph
+    let map = client
         .execute(
             "g.V(identity).outE().groupCount()",
             &[("identity", mark.id())],
@@ -897,17 +907,28 @@ fn test_group_count_edge() {
 
     assert_eq!(1, first.len());
 
-    let count = first.get(&edge);
+    let count = if protocol == IoProtocol::GraphSONV2 {
+        //GraphSONV2 just sends a simplified map,
+        //so we need to look up by the edge's id as a simplified type
+        //instead of as a GID
+        first.get(match edge.id() {
+            GID::String(s) => s.to_string(),
+            GID::Int32(i) => i.to_string(),
+            GID::Int64(i) => i.to_string(),
+        })
+    } else {
+        first.get(&edge)
+    };
 
     assert_eq!(Some(&GValue::Int64(1)), count);
 }
 
-#[test]
+#[apply(common::serializers)]
 #[cfg(feature = "derive")]
-fn test_vertex_mapping() {
-    let graph = graph();
+fn test_vertex_mapping(protocol: IoProtocol) {
     use gremlin_client::derive::FromGValue;
     use std::convert::TryFrom;
+    let client = graph_serializer(protocol.clone());
 
     let q = r#"
     g.addV('person')
@@ -930,7 +951,7 @@ fn test_vertex_mapping() {
         ("dateTime", &chrono::Utc.timestamp(1551825863, 0)),
         ("date", &(1551825863 as i64)),
     ];
-    let mark = graph
+    let mark = client
         .execute(q, params)
         .expect("should create a vertex")
         .filter_map(Result::ok)
@@ -948,7 +969,7 @@ fn test_vertex_mapping() {
 
     assert_eq!("person", mark[0].label());
 
-    let value_map = graph
+    let value_map = client
         .execute("g.V(identity).valueMap()", &[("identity", mark[0].id())])
         .expect("should fetch valueMap with properties")
         .filter_map(Result::ok)

@@ -59,14 +59,12 @@ impl Stream for GResultSet {
                     if this.response.status.code == 206 {
                         match futures::ready!(this.receiver.as_mut().poll_next(cx)) {
                             Some(Ok(response)) => {
-                                let results: VecDeque<GValue> = this
-                                    .client
-                                    .options
-                                    .serializer
-                                    .read(&response.result.data)?
-                                    .map(|v| v.into())
+                                let results: VecDeque<GValue> = response
+                                    .result
+                                    .data
+                                    .clone()
+                                    .map(Into::into)
                                     .unwrap_or_else(VecDeque::new);
-
                                 *this.results = results;
                                 *this.response = response;
                             }

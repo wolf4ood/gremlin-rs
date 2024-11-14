@@ -16,6 +16,10 @@ impl List {
         self.0.iter()
     }
 
+    pub fn into_iter(self) -> std::vec::IntoIter<GValue> {
+        self.0.into_iter()
+    }
+
     pub fn len(&self) -> usize {
         self.0.len()
     }
